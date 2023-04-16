@@ -1,0 +1,13 @@
+use_frameworks!
+
+platform :ios, '10.0'
+
+target 'ZDRouter_Example' do
+  pod 'ZDRouter', :path => '../'
+
+  target 'ZDRouter_Tests' do
+    inherit! :search_paths
+
+    pod 'FBSnapshotTestCase'
+  end
+end
