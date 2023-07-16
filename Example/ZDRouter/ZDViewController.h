@@ -11,3 +11,9 @@
 @interface ZDViewController : UIViewController
 
 @end
+
+@protocol ZDVCProtocol <NSObject>
+
+- (void)helloWorld;
+
+@end

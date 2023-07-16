@@ -33,7 +33,7 @@
 }
 
 - (void)setup {
-
+    [ZDRModuleCenter shareInstance];
 }
 
 #pragma mark - Public method

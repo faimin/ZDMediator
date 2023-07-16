@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param serviceName 遵守的协议
  @param priority 响应优先级
  @param eventId 事件id
- @param ... 多个type types不能为0，为0会自动结束
+ @param ... 多个eventId eventId不能为0，为0会自动结束
  */
 - (void)registerRespondService:(Protocol *)serviceName
                       priority:(ZDRPriority)priority
