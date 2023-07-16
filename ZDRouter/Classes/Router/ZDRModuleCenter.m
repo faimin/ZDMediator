@@ -8,6 +8,7 @@
 #import "ZDRModuleCenter.h"
 #import <dlfcn.h>
 #import <mach-o/getsect.h>
+#import <mach-o/loader.h>
 #import <objc/runtime.h>
 #import "ZDRBaseProtocol.h"
 #import "ZDRInvocation.h"
@@ -57,16 +58,6 @@
 
 #pragma mark - MachO
 
-#ifdef __LP64__
-typedef uint64_t ZDRMachORegisterValue;
-typedef struct section_64 ZDRMachORegisterSection;
-#define ZDRMachOGetSectByNameFromHeader getsectbynamefromheader_64
-#else
-typedef uint32_t ZDRMachORegisterValue;
-typedef struct section ZDRMachORegisterSection;
-#define ZDRMachOGetSectByNameFromHeader getsectbynamefromheader
-#endif
-
 static void __zdr_machORegisterEmptyFunc(void) {
     // 空实现，只为获取到当前image的Dl_info
 }
@@ -74,24 +65,31 @@ static void __zdr_machORegisterEmptyFunc(void) {
 + (void)_loadRegisterFromMacho {
     Dl_info info;
     dladdr((const void*)&__zdr_machORegisterEmptyFunc, &info);
-
-    const ZDRMachORegisterValue mach_header = (ZDRMachORegisterValue)info.dli_fbase;
-    const ZDRMachORegisterSection *section = ZDRMachOGetSectByNameFromHeader((void *)mach_header, "__DATA", ZDRouterSectionName);
-    if (!section) {
-        return;
-    }
+    
+#ifdef __LP64__
+    const struct mach_header_64 *mhp = (struct mach_header_64*)info.dli_fbase;
+    unsigned long size = 0;
+    uint64_t *sectionData = (uint64_t *)getsectiondata(mhp, SEG_DATA, ZDRouterSectionName, &size);
+#else 
+    const struct mach_header *mhp = (struct mach_header*)info.dli_fbase;
+    unsigned long size = 0;
+    uint32_t *sectionData = (uint32_t *)getsectiondata(mhp, SEG_DATA, ZDRouterSectionName, &size);
+#endif
     
     NSMutableDictionary<NSString *, Class> *kvContainer = [ZDRModuleCenter shareInstance].protocolWithClassMap;
     
-    int addrOffset = sizeof(struct ZDRMachORegisterKV);
-    for (ZDRMachORegisterValue addr = section->offset; addr < section->offset + section->size; addr += addrOffset) {
-        struct ZDRMachORegisterKV entry = *(struct ZDRMachORegisterKV *)(mach_header + addr);
-        if (!entry.key || !entry.value) {
-            continue;
+    struct ZDRMachORegisterKV *items = (struct ZDRMachORegisterKV *)sectionData;
+    uint64_t itemCount = size / sizeof(struct ZDRMachORegisterKV);
+    for (uint64_t i = 0; i < itemCount; ++i) {
+        @autoreleasepool {
+            struct ZDRMachORegisterKV item = items[i];
+            if (!item.key || !item.value) {
+                continue;
+            }
+            
+            NSString *key = [NSString stringWithUTF8String:item.key];
+            kvContainer[key] = objc_getClass(item.value);
         }
-        
-        NSString *key = [NSString stringWithUTF8String:entry.key];
-        kvContainer[key] = objc_getClass(entry.value);
     }
 }
 

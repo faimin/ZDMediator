@@ -32,10 +32,13 @@ struct ZDRMachORegisterKV {
 
 // 【使用】:
 //  ZDRouterMachORegister(protocolName, AViewController)
-#define ZDRouterSectionName "zdrouter_kv"
+#define ZDRouterSectionName "ZDRouter_KV"
 #define ZDRouterMachORegister(protocol, cls) \
-__attribute((used, section("__DATA, " ## ZDRouterSectionName))) \
-static const struct ZDRMachORegisterKV ___ZDRMachORegisterKV_##key##value = (struct ZDRMachORegisterKV){(char *)(&#protocol), (char *)(&#cls)};
+__attribute__((no_sanitize_address)) __attribute__((used, section("__DATA,ZDRouter_KV"))) \
+const struct ZDRMachORegisterKV ___ZDRMachORegisterKV_##protocol##cls = (struct ZDRMachORegisterKV){ \
+    .key = (char *)(#protocol), \
+    .value = (char *)(#cls) \
+};
 
 //-------------------------------------------------
 
