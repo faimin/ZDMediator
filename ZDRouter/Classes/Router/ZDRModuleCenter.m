@@ -64,17 +64,15 @@ static void __zdr_machORegisterEmptyFunc(void) {
 
 + (void)_loadRegisterFromMacho {
     Dl_info info;
-    dladdr((const void*)&__zdr_machORegisterEmptyFunc, &info);
+    dladdr((const void*)__zdr_machORegisterEmptyFunc, &info);
     
 #ifdef __LP64__
     const struct mach_header_64 *mhp = (struct mach_header_64*)info.dli_fbase;
-    unsigned long size = 0;
-    uint64_t *sectionData = (uint64_t *)getsectiondata(mhp, SEG_DATA, ZDRouterSectionName, &size);
-#else 
+#else
     const struct mach_header *mhp = (struct mach_header*)info.dli_fbase;
-    unsigned long size = 0;
-    uint32_t *sectionData = (uint32_t *)getsectiondata(mhp, SEG_DATA, ZDRouterSectionName, &size);
 #endif
+    unsigned long size = 0;
+    uint8_t *sectionData = getsectiondata(mhp, SEG_DATA, ZDRouterSectionName, &size);
     
     NSMutableDictionary<NSString *, Class> *kvContainer = [ZDRModuleCenter shareInstance].protocolWithClassMap;
     

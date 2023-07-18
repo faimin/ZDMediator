@@ -11,11 +11,6 @@
 
 ZDRouterMachORegister(ZDVCProtocol, ZDViewController)
 
-static const struct ZDRMachORegisterKV ___ZDRMachORegisterKV_ABC = (struct ZDRMachORegisterKV){
-    .key = (char *)("protocol"),
-    .value = (char *)("cls")
-};
-
 @interface ZDViewController () <ZDVCProtocol>
 
 @end
@@ -27,6 +22,11 @@ static const struct ZDRMachORegisterKV ___ZDRMachORegisterKV_ABC = (struct ZDRMa
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     [ZDRouter shareInstance];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    NSLog(@"%s", __PRETTY_FUNCTION__);
 }
 
 - (void)didReceiveMemoryWarning

@@ -26,18 +26,18 @@ typedef id(^ZDRCommonCallback)() NS_SWIFT_UNAVAILABLE("ZDRCommonCallback not ava
 
 
 struct ZDRMachORegisterKV {
-    char *key;
-    char *value;
+    const char *key;
+    const char *value;
 };
 
 // 【使用】:
 //  ZDRouterMachORegister(protocolName, AViewController)
-#define ZDRouterSectionName "ZDRouter_KV"
+#define ZDRouterSectionName "__ZDRouter_KV"
 #define ZDRouterMachORegister(protocol, cls) \
-__attribute__((no_sanitize_address)) __attribute__((used, section("__DATA,ZDRouter_KV"))) \
-const struct ZDRMachORegisterKV ___ZDRMachORegisterKV_##protocol##cls = (struct ZDRMachORegisterKV){ \
-    .key = (char *)(#protocol), \
-    .value = (char *)(#cls) \
+__attribute__((no_sanitize_address)) __attribute__((used, section("__DATA," ZDRouterSectionName))) \
+static struct ZDRMachORegisterKV ___ZDRMachORegisterKV_##protocol##cls = { \
+    .key = #protocol, \
+    .value = #cls \
 };
 
 //-------------------------------------------------
