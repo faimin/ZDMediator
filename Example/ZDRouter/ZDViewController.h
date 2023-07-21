@@ -12,8 +12,4 @@
 
 @end
 
-@protocol ZDVCProtocol <NSObject>
 
-- (void)helloWorld;
-
-@end

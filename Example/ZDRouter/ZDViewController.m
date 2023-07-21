@@ -8,10 +8,9 @@
 
 #import "ZDViewController.h"
 #import <ZDRouter/ZDRouter.h>
+#import "ZDProtocol.h"
 
-ZDRouterMachORegister(ZDVCProtocol, ZDViewController)
-
-@interface ZDViewController () <ZDVCProtocol>
+@interface ZDViewController ()
 
 @end
 
@@ -21,12 +20,15 @@ ZDRouterMachORegister(ZDVCProtocol, ZDViewController)
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-    [ZDRouter shareInstance];
+    
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     NSLog(@"%s", __PRETTY_FUNCTION__);
+    
+    __auto_type value = GetService(ZDProtocol);
+    [value hello];
 }
 
 - (void)didReceiveMemoryWarning

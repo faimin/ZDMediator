@@ -22,7 +22,7 @@ typedef NS_ENUM(NSInteger, ZDRPriority) {
 // 定义modules 传递消息的回调block类型 无参可以随意传递参数
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wstrict-prototypes"
-// 参数不能为bool 值， bool值会报错
+// 参数不能为bool类型，会报错
 typedef id(^ZDRCommonCallback)() NS_SWIFT_UNAVAILABLE("ZDRCommonCallback not available");
 #pragma clang diagnostic pop
 
@@ -32,14 +32,14 @@ struct ZDRMachORegisterKV {
     const char *value;
 };
 
-// 【使用】:
+// 【Usage】:
 //  ZDRouterMachORegister(protocolName, AViewController)
 #define ZDRouterSectionName "__ZDRouter_KV"
-#define ZDRouterMachORegister(protocol, cls) \
+#define ZDRouterRegister(protocol_name, cls) \
 __attribute__((no_sanitize_address)) __attribute__((used, section(SEG_DATA "," ZDRouterSectionName))) \
-static struct ZDRMachORegisterKV ___ZDRMachORegisterKV_##protocol##cls = { \
-    .key = #protocol, \
-    .value = #cls \
+static struct ZDRMachORegisterKV ___ZDRKV_##protocol_name_##cls = { \
+    .key = (((void)(NO && ((void)@protocol(protocol_name), NO)), #protocol_name)), \
+    .value = (((void)(NO && ((void)cls.class, NO)), #cls)) \
 };
 
 //-------------------------------------------------
