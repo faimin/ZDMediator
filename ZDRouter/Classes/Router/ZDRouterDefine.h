@@ -8,6 +8,8 @@
 #ifndef ZDRouterDefine_h
 #define ZDRouterDefine_h
 
+#import <mach-o/loader.h>
+
 /**
  响应优先级 默认defalut
  */
@@ -34,7 +36,7 @@ struct ZDRMachORegisterKV {
 //  ZDRouterMachORegister(protocolName, AViewController)
 #define ZDRouterSectionName "__ZDRouter_KV"
 #define ZDRouterMachORegister(protocol, cls) \
-__attribute__((no_sanitize_address)) __attribute__((used, section("__DATA," ZDRouterSectionName))) \
+__attribute__((no_sanitize_address)) __attribute__((used, section(SEG_DATA "," ZDRouterSectionName))) \
 static struct ZDRMachORegisterKV ___ZDRMachORegisterKV_##protocol##cls = { \
     .key = #protocol, \
     .value = #cls \

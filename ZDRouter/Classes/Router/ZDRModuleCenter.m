@@ -9,6 +9,7 @@
 #import <dlfcn.h>
 #import <mach-o/getsect.h>
 #import <mach-o/loader.h>
+#import <mach-o/dyld.h>
 #import <objc/runtime.h>
 #import "ZDRBaseProtocol.h"
 #import "ZDRInvocation.h"
@@ -63,6 +64,38 @@ static void __zdr_machORegisterEmptyFunc(void) {
 }
 
 + (void)_loadRegisterFromMacho {
+    NSMutableDictionary<NSString *, Class> *kvContainer = [ZDRModuleCenter shareInstance].protocolWithClassMap;
+    uint32_t imageCount = _dyld_image_count();
+    for (uint32_t i = 0; i < imageCount; ++i) {
+#ifdef __LP64__
+        const struct mach_header_64 *mhp = (void *)_dyld_get_image_header(i);
+#else
+        const struct mach_header *mhp = (void *)_dyld_get_image_header(i);
+#endif
+        
+        unsigned long size = 0;
+        uint8_t *sectionData = getsectiondata(mhp, SEG_DATA, ZDRouterSectionName, &size);
+        if (!sectionData) {
+            continue;
+        }
+        
+        struct ZDRMachORegisterKV *items = (struct ZDRMachORegisterKV *)sectionData;
+        uint64_t itemCount = size / sizeof(struct ZDRMachORegisterKV);
+        for (uint64_t i = 0; i < itemCount; ++i) {
+            @autoreleasepool {
+                struct ZDRMachORegisterKV item = items[i];
+                if (!item.key || !item.value) {
+                    continue;
+                }
+                
+                NSString *key = [NSString stringWithUTF8String:item.key];
+                kvContainer[key] = objc_getClass(item.value);
+            }
+        }
+    }
+    
+#if 0
+    
     Dl_info info;
     dladdr((const void*)__zdr_machORegisterEmptyFunc, &info);
     
@@ -89,6 +122,7 @@ static void __zdr_machORegisterEmptyFunc(void) {
             kvContainer[key] = objc_getClass(item.value);
         }
     }
+#endif
 }
 
 #pragma mark - Public Method
