@@ -37,9 +37,9 @@ struct ZDRMachORegisterKV {
 #define ZDRouterSectionName "__ZDRouter_KV"
 #define ZDRouterRegister(protocol_name, cls) \
 __attribute__((no_sanitize_address)) __attribute__((used, section(SEG_DATA "," ZDRouterSectionName))) \
-static struct ZDRMachORegisterKV ___ZDRKV_##protocol_name_##cls = { \
-    .key = (((void)(NO && ((void)@protocol(protocol_name), NO)), #protocol_name)), \
-    .value = (((void)(NO && ((void)cls.class, NO)), #cls)) \
+static struct ZDRMachORegisterKV ZDRKV_##protocol_name_##cls = { \
+    .key = #protocol_name, \
+    .value = #cls \
 };
 
 //-------------------------------------------------
