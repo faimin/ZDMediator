@@ -26,6 +26,12 @@
     __auto_type cat = [ZDCat new];
     
     [ZDRouter.shareInstance manualRegisterService:@protocol(CatProtocol) implementInstance:cat];
+    
+    
+    [ZDRouter.shareInstance registerResponder:@protocol(DogProtocol) priority:ZDRPriorityHigh selectors:@selector(foo:), @selector(bar:), nil];
+    
+    [ZDRouter.shareInstance registerResponder:@protocol(DogProtocol) priority:ZDRPriorityDefalut eventId:@"100", @"200"];
+    [ZDRouter.shareInstance registerResponder:@protocol(CatProtocol) priority:ZDRPriorityDefalut eventId:@"100", @"200"];
 }
 
 - (void)tearDown
@@ -59,7 +65,16 @@
         return a;
     }];
     XCTAssertTrue(dogResult2);
+}
+
+- (void)testDispatch {
+    [ZDRouter.shareInstance dispatchEventWithSelectorAndParams:@selector(foo:), 1];
     
+    [ZDRouter.shareInstance dispatchEventWithSelectorAndParams:@selector(bar:), @{
+        @"name": @"zero.d.saber"
+    }];
+    
+    [ZDRouter.shareInstance dispatchEventWithId:@"100" selectorAndParams:@selector(zdr_handleEvent:userInfo:callback:), 200, @{@100: @"100"}, nil];
 }
 
 @end

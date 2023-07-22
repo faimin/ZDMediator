@@ -62,20 +62,20 @@ NS_ASSUME_NONNULL_BEGIN
 ///   - eventId: multi number event
 - (void)registerResponder:(Protocol *)serviceProtocol
                  priority:(ZDRPriority)priority
-                  eventId:(NSInteger)eventId, ...;
+                  eventId:(NSString *)eventId, ...;
 
 /// register SEL event to service module
 /// - Parameters:
 ///   - serviceProtocol: protocol of service
 ///   - priority: priority
-///   - selector: multi SEL event
+///   - selector: multi SEL event, end with nil
 - (void)registerResponder:(Protocol *)serviceProtocol
                  priority:(ZDRPriority)priority
                 selectors:(SEL)selector, ...;
 
 /// dispatch event with numbre event
 /// @param eventId number event id
-/// @param selector SEL and multi any type paramters。
+/// @param selector SEL and multi any type paramters, end with nil
 ///
 /// float 与 int 不能混用，浮点数需要加小数点，type也一样。
 /// 如果sel的第一个参数为整数，则param传nil为跳过，其它参数正常传。

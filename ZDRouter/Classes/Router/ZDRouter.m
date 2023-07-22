@@ -213,17 +213,17 @@
 
 #pragma mark - Register Event
 
-- (void)registerResponder:(Protocol *)serviceProtocol priority:(ZDRPriority)priority eventId:(NSInteger)eventId, ... {
+- (void)registerResponder:(Protocol *)serviceProtocol priority:(ZDRPriority)priority eventId:(NSString *)eventId, ... {
     if (!serviceProtocol) {
         return;
     }
     
     va_list args;
     va_start(args, eventId);
-    NSInteger value = eventId;
+    NSString *value = eventId;
     while (value) {
-        [self _registerRespondService:serviceProtocol priority:priority eventKey:@(value).stringValue];
-        value = va_arg(args, NSInteger);
+        [self _registerRespondService:serviceProtocol priority:priority eventKey:value];
+        value = va_arg(args, NSString *);
     }
     va_end(args);
 }

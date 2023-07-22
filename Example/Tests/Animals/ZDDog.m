@@ -17,6 +17,14 @@ ZDRouterRegister(DogProtocol, ZDDog)
     return 2;
 }
 
+- (void)foo:(NSInteger)a {
+    NSLog(@"%zd", a);
+}
+
+- (void)bar:(NSDictionary *)dict {
+    NSLog(@"%@", dict);
+}
+
 - (BOOL)zdr_handleEvent:(NSInteger)event userInfo:(id)userInfo callback:(ZDRCommonCallback)callback {
     if (event == 200) {
         !callback ? NULL : callback(self.age, @"我是第二个参数");
