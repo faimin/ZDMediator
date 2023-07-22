@@ -1,5 +1,5 @@
 //
-//  ZDBaseModule.h
+//  ZDRBaseModule.h
 //  ZDRouter
 //
 //  Created by Zero.D.Saber on 2023/7/15.
@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ZDBaseModule : NSObject <ZDRBaseProtocol>
+@interface ZDRBaseModule : NSObject <ZDRBaseProtocol>
 
 @end
 
