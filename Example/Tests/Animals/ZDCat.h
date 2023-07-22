@@ -1,16 +1,17 @@
 //
-//  ZDModel.h
-//  ZDRouter_Example
+//  ZDCat.h
+//  ZDRouter_Tests
 //
-//  Created by Zero.D.Saber on 2023/7/21.
+//  Created by Zero.D.Saber on 2023/7/22.
 //  Copyright © 2023 8207436. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
+#import "CatProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ZDModel : NSObject
+@interface ZDCat : NSObject <CatProtocol>
 
 @end
 

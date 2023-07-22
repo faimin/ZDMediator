@@ -1,27 +1,16 @@
 PODS:
-  - FBSnapshotTestCase (2.1.4):
-    - FBSnapshotTestCase/SwiftSupport (= 2.1.4)
-  - FBSnapshotTestCase/Core (2.1.4)
-  - FBSnapshotTestCase/SwiftSupport (2.1.4):
-    - FBSnapshotTestCase/Core
-  - ZDRouter (0.1.0)
+  - ZDRouter (0.0.1)
 
 DEPENDENCIES:
-  - FBSnapshotTestCase
   - ZDRouter (from `../`)
-
-SPEC REPOS:
-  trunk:
-    - FBSnapshotTestCase
 
 EXTERNAL SOURCES:
   ZDRouter:
     :path: "../"
 
 SPEC CHECKSUMS:
-  FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
-  ZDRouter: d9e89acb103585974a941fe6a18e7b4e6eacb405
+  ZDRouter: 7ca0ce7b126d624a9ff56789f587678d8d95abe1
 
-PODFILE CHECKSUM: 10c9d6c76d52e7f6953158e43963f0f4a8f121d3
+PODFILE CHECKSUM: e9ee58fb5a690700fca92e83610238c8295dc599
 
 COCOAPODS: 1.12.1

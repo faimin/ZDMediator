@@ -7,8 +7,6 @@
 //
 
 #import "ZDViewController.h"
-#import <ZDRouter/ZDRouter.h>
-#import "ZDProtocol.h"
 
 @interface ZDViewController ()
 
@@ -20,25 +18,17 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-    
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     NSLog(@"%s", __PRETTY_FUNCTION__);
-    
-    __auto_type value = GetService(ZDProtocol);
-    [value hello];
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
-}
-
-- (void)helloWorld {
-    
 }
 
 @end

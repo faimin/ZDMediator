@@ -23,7 +23,8 @@
 		6003F5BC195388D20070C39A /* Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6003F5BB195388D20070C39A /* Tests.m */; };
 		71719F9F1E33DC2100824A3D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 71719F9D1E33DC2100824A3D /* LaunchScreen.storyboard */; };
 		873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 873B8AEA1B1F5CCA007FD442 /* Main.storyboard */; };
-		C2249FD92A6A88BE004295EB /* ZDModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C2249FD82A6A88BE004295EB /* ZDModel.m */; };
+		C224A7692A6BAC5D004295EB /* ZDDog.m in Sources */ = {isa = PBXBuildFile; fileRef = C224A7662A6BAC5D004295EB /* ZDDog.m */; };
+		C224A76C2A6BAC84004295EB /* ZDCat.m in Sources */ = {isa = PBXBuildFile; fileRef = C224A76B2A6BAC84004295EB /* ZDCat.m */; };
 		E71BCAA0CD1D2CF53610451B /* Pods_ZDRouter_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D93062865AF6D43151EBB7C3 /* Pods_ZDRouter_Tests.framework */; };
 /* End PBXBuildFile section */
 
@@ -66,9 +67,12 @@
 		873B8AEA1B1F5CCA007FD442 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Main.storyboard; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		AC187F2FB62C6CF1EF284273 /* Pods-ZDRouter_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZDRouter_Tests.debug.xcconfig"; path = "Target Support Files/Pods-ZDRouter_Tests/Pods-ZDRouter_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		B840DCFB954C6B7D6F2D43AC /* Pods-ZDRouter_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ZDRouter_Tests.release.xcconfig"; path = "Target Support Files/Pods-ZDRouter_Tests/Pods-ZDRouter_Tests.release.xcconfig"; sourceTree = "<group>"; };
-		C2249FD72A6A88BE004295EB /* ZDModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZDModel.h; sourceTree = "<group>"; };
-		C2249FD82A6A88BE004295EB /* ZDModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZDModel.m; sourceTree = "<group>"; };
-		C224A7532A6AF8F0004295EB /* ZDProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZDProtocol.h; sourceTree = "<group>"; };
+		C224A7652A6BAC5D004295EB /* CatProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CatProtocol.h; sourceTree = "<group>"; };
+		C224A7662A6BAC5D004295EB /* ZDDog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZDDog.m; sourceTree = "<group>"; };
+		C224A7672A6BAC5D004295EB /* DogProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DogProtocol.h; sourceTree = "<group>"; };
+		C224A7682A6BAC5D004295EB /* ZDDog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZDDog.h; sourceTree = "<group>"; };
+		C224A76A2A6BAC84004295EB /* ZDCat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZDCat.h; sourceTree = "<group>"; };
+		C224A76B2A6BAC84004295EB /* ZDCat.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZDCat.m; sourceTree = "<group>"; };
 		D93062865AF6D43151EBB7C3 /* Pods_ZDRouter_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ZDRouter_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E25D135A9E653646EC1F4E93 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -141,9 +145,6 @@
 				873B8AEA1B1F5CCA007FD442 /* Main.storyboard */,
 				6003F5A5195388D20070C39A /* ZDViewController.h */,
 				6003F5A6195388D20070C39A /* ZDViewController.m */,
-				C224A7532A6AF8F0004295EB /* ZDProtocol.h */,
-				C2249FD72A6A88BE004295EB /* ZDModel.h */,
-				C2249FD82A6A88BE004295EB /* ZDModel.m */,
 				71719F9D1E33DC2100824A3D /* LaunchScreen.storyboard */,
 				6003F5A8195388D20070C39A /* Images.xcassets */,
 				6003F594195388D20070C39A /* Supporting Files */,
@@ -166,6 +167,7 @@
 		6003F5B5195388D20070C39A /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				C224A7642A6BAC5D004295EB /* Animals */,
 				6003F5BB195388D20070C39A /* Tests.m */,
 				6003F5B6195388D20070C39A /* Supporting Files */,
 			);
@@ -203,6 +205,19 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		C224A7642A6BAC5D004295EB /* Animals */ = {
+			isa = PBXGroup;
+			children = (
+				C224A7652A6BAC5D004295EB /* CatProtocol.h */,
+				C224A7672A6BAC5D004295EB /* DogProtocol.h */,
+				C224A76A2A6BAC84004295EB /* ZDCat.h */,
+				C224A76B2A6BAC84004295EB /* ZDCat.m */,
+				C224A7682A6BAC5D004295EB /* ZDDog.h */,
+				C224A7662A6BAC5D004295EB /* ZDDog.m */,
+			);
+			path = Animals;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -233,7 +248,6 @@
 				6003F5AA195388D20070C39A /* Sources */,
 				6003F5AB195388D20070C39A /* Frameworks */,
 				6003F5AC195388D20070C39A /* Resources */,
-				41D6CF25F1177757E8C37340 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -343,24 +357,6 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZDRouter_Example/Pods-ZDRouter_Example-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		41D6CF25F1177757E8C37340 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ZDRouter_Tests/Pods-ZDRouter_Tests-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/FBSnapshotTestCase/FBSnapshotTestCase.framework",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSnapshotTestCase.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ZDRouter_Tests/Pods-ZDRouter_Tests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		8B0C3F2125CDE808892B0264 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -393,7 +389,6 @@
 				6003F59E195388D20070C39A /* ZDAppDelegate.m in Sources */,
 				6003F5A7195388D20070C39A /* ZDViewController.m in Sources */,
 				6003F59A195388D20070C39A /* main.m in Sources */,
-				C2249FD92A6A88BE004295EB /* ZDModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -401,6 +396,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C224A76C2A6BAC84004295EB /* ZDCat.m in Sources */,
+				C224A7692A6BAC5D004295EB /* ZDDog.m in Sources */,
 				6003F5BC195388D20070C39A /* Tests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -8,6 +8,6 @@ target 'ZDRouter_Example' do
   target 'ZDRouter_Tests' do
     inherit! :search_paths
 
-    pod 'FBSnapshotTestCase'
+    #pod 'FBSnapshotTestCase'
   end
 end

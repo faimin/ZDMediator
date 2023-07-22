@@ -9,6 +9,8 @@
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
+The run `Test.m`. 
+
 ## Requirements
 
 ## Installation
@@ -22,7 +24,7 @@ pod 'ZDRouter'
 
 ## Author
 
-8207436, fuxianchao@gmail.com
+Zero.D.Saber, fuxianchao@gmail.com
 
 ## License
 
