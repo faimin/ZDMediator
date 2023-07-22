@@ -29,10 +29,13 @@ struct ZDRMachORegisterKV {
     const int manualInit; // 0、1
 };
 
+#ifndef ZDRouterSectionName
 #define ZDRouterSectionName "__ZDRouter_KV"
+#endif
 
 // 【Usage】:
 //  ZDRouterMachORegister(protocolName, AViewController, 0)
+#ifndef ZDRouterRegisterManual
 #define ZDRouterRegisterManual(protocol_name, cls, manual_init) \
 __attribute__((no_sanitize_address)) __attribute__((used, section(SEG_DATA "," ZDRouterSectionName))) \
 static struct ZDRMachORegisterKV ZDRKV_##protocol_name_##cls = { \
@@ -40,8 +43,11 @@ static struct ZDRMachORegisterKV ZDRKV_##protocol_name_##cls = { \
     .value = #cls, \
     .manualInit = (int)(manual_init), \
 };
+#endif
 
+#ifndef ZDRouterRegister
 #define ZDRouterRegister(protocol_name, cls) \
 ZDRouterRegisterManual(protocol_name, cls, 0)
+#endif
 
 #endif /* ZDRouterDefine_h */
