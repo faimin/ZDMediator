@@ -15,8 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, unsafe_unretained) Class cls;
 @property (nonatomic, strong, nullable) id<ZDRBaseProtocol> strongObj;
 @property (nonatomic, weak, nullable) id<ZDRBaseProtocol> weakObj;
+@property (nonatomic, assign) BOOL autoInit;
 
-- (instancetype)initWithClass:(Class)cls;
+- (instancetype)initWithClass:(Class)cls autoInit:(BOOL)autoInit;
 
 @end
 

@@ -8,8 +8,8 @@
 
 Pod::Spec.new do |s|
   s.name             = 'ZDRouter'
-  s.version          = '0.1.0'
-  s.summary          = 'iOS模块路由器.'
+  s.version          = '0.0.1'
+  s.summary          = 'iOS模块路由'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -25,18 +25,28 @@ iOS模块之间的路由器，支持自动注册和手动注册
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Zero.D.Saber' => 'fuxianchao@gmail.com' }
-  s.source           = { :git => 'https://github.com/faimin/ZDRouter.git', :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
+  s.source           = {
+    :git => 'https://github.com/faimin/ZDRouter.git',
+    :tag => s.version.to_s
+  }
+  s.social_media_url = 'https://faimin.github.io/'
+
+  s.prefix_header_file = false
+  
+  s.module_name  = 'ZDRouter'
+  s.pod_target_xcconfig = {
+     'DEFINES_MODULE' => 'YES'
+  }
 
   s.ios.deployment_target = '10.0'
 
   s.source_files = 'ZDRouter/Classes/**/*'
+  s.project_header_files = 'ZDRouter/Classes/Private/*.h'
   
   # s.resource_bundles = {
   #   'ZDRouter' => ['ZDRouter/Assets/*.png']
   # }
 
-  # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
   # s.dependency 'AFNetworking', '~> 2.3'
 end

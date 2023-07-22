@@ -16,9 +16,10 @@
     NSLog(@"%s", __PRETTY_FUNCTION__);
 }
 
-- (instancetype)initWithClass:(Class)cls {
+- (instancetype)initWithClass:(Class)cls autoInit:(BOOL)autoInit {
     if (self = [super init]) {
         _cls = cls;
+        _autoInit = autoInit;
     }
     return self;
 }
@@ -31,7 +32,7 @@
     }
     
     if (strongObj == nil) {
-        [self _zdr_willDealloc:strongObj];
+        [self _zdr_willDealloc:_strongObj];
     }
     else if (_strongObj != strongObj) {
         [self _zdr_willDealloc:_strongObj];

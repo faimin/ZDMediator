@@ -90,13 +90,17 @@
                 
                 NSString *key = [NSString stringWithUTF8String:item.key];
                 Class value = objc_getClass(item.value);
-                storeMap[key] = [[ZDRServiceBox alloc] initWithClass:value];
+                int manualInit = item.manualInit;
+                
+                storeMap[key] = [[ZDRServiceBox alloc] initWithClass:value autoInit:manualInit == 0];
             }
         }
     }
 }
 
 #pragma mark - Public Method
+
+#pragma mark - Set
 
 - (void)registerService:(Protocol *)serviceProtocol implementClass:(Class)cls {
     if (!serviceProtocol) {
@@ -112,11 +116,20 @@
     box.cls = cls;
 }
 
-- (void)registerService:(Protocol *)serviceProtocol implementInstance:(id)obj {
-    [self registerService:serviceProtocol implementInstance:obj weakStore:YES];
+- (void)registerServiceName:(NSString *)serviceProtocolName implementClassName:(NSString *)clsName {
+    if (!serviceProtocolName) {
+        return;
+    }
+    
+    __auto_type box = [self _createServiceBoxIfNeedWithKey:serviceProtocolName];
+    box.cls = NSClassFromString(clsName);
 }
 
-- (void)registerService:(Protocol *)serviceProtocol implementInstance:(id)obj weakStore:(BOOL)weakStore {
+- (void)manualRegisterService:(Protocol *)serviceProtocol implementInstance:(id)obj {
+    [self manualRegisterService:serviceProtocol implementInstance:obj weakStore:NO];
+}
+
+- (void)manualRegisterService:(Protocol *)serviceProtocol implementInstance:(id)obj weakStore:(BOOL)weakStore {
     if (!serviceProtocol || !obj) {
         return;
     }
@@ -127,6 +140,8 @@
     }
     
     __auto_type box = [self _createServiceBoxIfNeedWithKey:key];
+    box.cls = [obj class];
+    box.autoInit = NO;
     if (weakStore) {
         box.weakObj = obj;
     }
@@ -135,36 +150,7 @@
     }
 }
 
-- (void)registerRespondService:(Protocol *)serviceName priority:(ZDRPriority)priority eventId:(NSInteger)eventId, ... {
-    if (!serviceName) {
-        return;
-    }
-    
-    va_list args;
-    va_start(args, eventId);
-    NSInteger value = eventId;
-    while (value) {
-        [self _registerRespondService:serviceName priority:priority eventKey:@(value).stringValue];
-        value = va_arg(args, NSInteger);
-    }
-    va_end(args);
-}
-
-- (void)registerRespondService:(Protocol *)serviceName priority:(ZDRPriority)priority selectors:(SEL)selector, ... {
-    if (!serviceName) {
-        return;
-    }
-    
-    va_list args;
-    va_start(args, selector);
-    SEL value = selector;
-    while (value) {
-        NSString *key = NSStringFromSelector(value);
-        [self _registerRespondService:serviceName priority:priority eventKey:key];
-        value = va_arg(args, SEL);
-    }
-    va_end(args);
-}
+#pragma mark - Get
 
 - (id)service:(Protocol *)serviceProtocol {
     NSString *key = NSStringFromProtocol(serviceProtocol);
@@ -178,19 +164,19 @@
     
     ZDRServiceBox *box = self.storeMap[serviceName];
     if (!box) {
-        NSAssert(NO, @"please register first");
+        NSLog(@"please register class first");
         return nil;
     }
     
     id serviceInstance = box.strongObj ?: box.weakObj;
-    if (!serviceInstance) {
+    if (!serviceInstance && box.autoInit) {
         Class cls = box.cls;
         if (!cls) {
-            NSAssert(NO, @"please register first");
+            NSLog(@"%d, %s => please register first", __LINE__, __FUNCTION__);
             return nil;
         }
         
-        if (class_conformsToProtocol(cls, @protocol(ZDRBaseProtocol))) {
+        if (class_conformsToProtocol(cls, @protocol(ZDRBaseProtocol)) && [cls resolveInstanceMethod:@selector(initWithContext:)]) {
             serviceInstance = [[cls alloc] initWithContext:self.context];
         }
         else {
@@ -201,17 +187,19 @@
     return serviceInstance;
 }
 
-- (BOOL)removeService:(Protocol *)serviceProtocol {
+- (BOOL)removeService:(Protocol *)serviceProtocol autoInitAgain:(BOOL)autoInitAgain {
     if (!serviceProtocol) {
         return NO;
     }
     
     NSString *key = NSStringFromProtocol(serviceProtocol);
     if (!key) {
+        NSAssert(NO, @"the protocol is nil");
         return NO;
     }
     
     ZDRServiceBox *serviceBox = self.storeMap[key];
+    serviceBox.autoInit = autoInitAgain;
     if (serviceBox.strongObj) {
         serviceBox.strongObj = nil;
         return YES;
@@ -221,6 +209,39 @@
         return YES;
     }
     return NO;
+}
+
+#pragma mark - Register Event
+
+- (void)registerResponder:(Protocol *)serviceProtocol priority:(ZDRPriority)priority eventId:(NSInteger)eventId, ... {
+    if (!serviceProtocol) {
+        return;
+    }
+    
+    va_list args;
+    va_start(args, eventId);
+    NSInteger value = eventId;
+    while (value) {
+        [self _registerRespondService:serviceProtocol priority:priority eventKey:@(value).stringValue];
+        value = va_arg(args, NSInteger);
+    }
+    va_end(args);
+}
+
+- (void)registerResponder:(Protocol *)serviceProtocol priority:(ZDRPriority)priority selectors:(SEL)selector, ... {
+    if (!serviceProtocol) {
+        return;
+    }
+    
+    va_list args;
+    va_start(args, selector);
+    SEL value = selector;
+    while (value) {
+        NSString *key = NSStringFromSelector(value);
+        [self _registerRespondService:serviceProtocol priority:priority eventKey:key];
+        value = va_arg(args, SEL);
+    }
+    va_end(args);
 }
 
 #pragma mark - Dispatch
