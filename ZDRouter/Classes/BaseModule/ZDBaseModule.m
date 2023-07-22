@@ -8,15 +8,15 @@
 #import "ZDBaseModule.h"
 
 @implementation ZDBaseModule
-@synthesize context = _context;
+@synthesize zdr_context = _zdr_context;
 
 - (void)dealloc {
     NSLog(@"%s", __PRETTY_FUNCTION__);
 }
 
-- (instancetype)initWithContext:(ZDRContext *)context {
+- (instancetype)initWithZDRContext:(ZDRContext *)context {
     if (self = [super init]) {
-        _context = context;
+        _zdr_context = context;
     }
     return self;
 }

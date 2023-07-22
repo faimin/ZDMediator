@@ -17,7 +17,7 @@ ZDRouterRegister(DogProtocol, ZDDog)
     return 2;
 }
 
-- (BOOL)handleEvent:(NSInteger)event userInfo:(id)userInfo callback:(ZDRCommonCallback)callback {
+- (BOOL)zdr_handleEvent:(NSInteger)event userInfo:(id)userInfo callback:(ZDRCommonCallback)callback {
     if (event == 200) {
         !callback ? NULL : callback(self.age, @"我是第二个参数");
         return YES;

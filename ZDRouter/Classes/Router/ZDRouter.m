@@ -176,8 +176,8 @@
             return nil;
         }
         
-        if (class_conformsToProtocol(cls, @protocol(ZDRBaseProtocol)) && [cls resolveInstanceMethod:@selector(initWithContext:)]) {
-            serviceInstance = [[cls alloc] initWithContext:self.context];
+        if (class_conformsToProtocol(cls, @protocol(ZDRBaseProtocol)) && [cls resolveInstanceMethod:@selector(initWithZDRContext:)]) {
+            serviceInstance = [[cls alloc] initWithZDRContext:self.context];
         }
         else {
             serviceInstance = [[cls alloc] init];

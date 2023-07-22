@@ -25,7 +25,7 @@
     return @"animal - cat";
 }
 
-- (BOOL)handleEvent:(NSInteger)event userInfo:(id)userInfo callback:(ZDRCommonCallback)callback {
+- (BOOL)zdr_handleEvent:(NSInteger)event userInfo:(id)userInfo callback:(ZDRCommonCallback)callback {
     if (event == 100) {
         if (callback) {
             callback(self.name);

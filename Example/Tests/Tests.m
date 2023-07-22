@@ -43,17 +43,17 @@
 {
     //XCTFail(@"No implementation for \"%s\"", __PRETTY_FUNCTION__);
     
-    BOOL catResult1 = [GetService(CatProtocol) handleEvent:100 userInfo:@{} callback:^id(NSString * x){
+    BOOL catResult1 = [GetService(CatProtocol) zdr_handleEvent:100 userInfo:@{} callback:^id(NSString * x){
         return @[x];
     }];
     XCTAssertTrue(catResult1);
     
-    BOOL dogResult1 = [GetService(DogProtocol) handleEvent:100 userInfo:@{} callback:^id(NSUInteger x){
+    BOOL dogResult1 = [GetService(DogProtocol) zdr_handleEvent:100 userInfo:@{} callback:^id(NSUInteger x){
         return @(x);
     }];
     XCTAssertFalse(dogResult1);
     
-    BOOL dogResult2 = [GetService(DogProtocol) handleEvent:200 userInfo:@{} callback:^id(NSUInteger x, NSString *y){
+    BOOL dogResult2 = [GetService(DogProtocol) zdr_handleEvent:200 userInfo:@{} callback:^id(NSUInteger x, NSString *y){
         NSString *a = [NSString stringWithFormat:@"%zd, %@", x, y];
         XCTAssertEqual(x, 2);
         return a;

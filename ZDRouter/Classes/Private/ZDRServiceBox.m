@@ -57,8 +57,8 @@
 #pragma mark - Private
 
 - (void)_zdr_willDealloc:(id<ZDRBaseProtocol>)obj {
-    if ([obj respondsToSelector:@selector(moduleWillDealloc)]) {
-        [obj moduleWillDealloc];
+    if ([obj respondsToSelector:@selector(zdr_willDealloc)]) {
+        [obj zdr_willDealloc];
     }
 }
 
@@ -88,6 +88,5 @@
     }
     return [super hash];
 }
-
 
 @end
