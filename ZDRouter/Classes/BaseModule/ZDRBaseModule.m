@@ -8,25 +8,22 @@
 #import "ZDRBaseModule.h"
 
 @implementation ZDRBaseModule
-@synthesize zdr_context = _zdr_context;
 
 - (void)dealloc {
     NSLog(@"%s", __PRETTY_FUNCTION__);
 }
 
-- (instancetype)initWithZDRContext:(ZDRContext *)context {
-    if (self = [super init]) {
-        _zdr_context = context;
-    }
-    return self;
+- (void)zdr_willDispose {
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+}
+
++ (instancetype)zdr_createInstance:(ZDRContext *)context {
+    __auto_type obj = [[self alloc] init];
+    return obj;
 }
 
 - (BOOL)handleEvent:(NSInteger)event userInfo:(id)userInfo callback:(ZDRCommonCallback)callback {
     return NO;
-}
-
-- (void)moduleWillDealloc {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
 }
 
 @end

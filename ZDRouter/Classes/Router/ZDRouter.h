@@ -109,7 +109,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #ifndef GetService
 #define GetService(proto) \
-((id <proto>)[[ZDRouter shareInstance] service:@protocol(proto)])
+((id<proto>)[[ZDRouter shareInstance] service:@protocol(proto)])
 #endif
 
 #ifndef GetServiceWithClass

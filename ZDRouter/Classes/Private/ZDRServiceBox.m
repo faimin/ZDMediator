@@ -31,12 +31,7 @@
         return;
     }
     
-    if (strongObj == nil) {
-        [self _zdr_willDealloc:_strongObj];
-    }
-    else if (_strongObj != strongObj) {
-        [self _zdr_willDealloc:_strongObj];
-    }
+    [self _zdr_willRemoveObj:_strongObj];
     _strongObj = strongObj;
 }
 
@@ -45,20 +40,15 @@
         return;
     }
     
-    if (weakObj == nil) {
-        [self _zdr_willDealloc:weakObj];
-    }
-    else if (_weakObj != weakObj) {
-        [self _zdr_willDealloc:_weakObj];
-    }
+    [self _zdr_willRemoveObj:_weakObj];
     _weakObj = weakObj;
 }
 
 #pragma mark - Private
 
-- (void)_zdr_willDealloc:(id<ZDRBaseProtocol>)obj {
-    if ([obj respondsToSelector:@selector(zdr_willDealloc)]) {
-        [obj zdr_willDealloc];
+- (void)_zdr_willRemoveObj:(id<ZDRBaseProtocol>)obj {
+    if (obj && [obj respondsToSelector:@selector(zdr_willDispose)]) {
+        [obj zdr_willDispose];
     }
 }
 

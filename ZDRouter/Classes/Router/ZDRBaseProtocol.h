@@ -17,14 +17,13 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol ZDRBaseProtocol <NSObject>
 
 @optional
-@property (nonatomic, strong, readonly) ZDRContext *zdr_context;
 
 /// 模块初始化方法
 /// - Parameter context: 上下文信息
-- (instancetype)initWithZDRContext:(ZDRContext *_Nullable)context;
++ (instancetype)zdr_createInstance:(ZDRContext *_Nullable)context;
 
-/// 模块即将释放
-- (void)zdr_willDealloc;
+/// 即将解除对模块的引用
+- (void)zdr_willDispose;
 
 /// 模块间通信
 /// @param event 事件类型

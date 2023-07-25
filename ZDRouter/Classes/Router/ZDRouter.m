@@ -170,17 +170,17 @@
     
     id serviceInstance = box.strongObj ?: box.weakObj;
     if (!serviceInstance && box.autoInit) {
-        Class cls = box.cls;
-        if (!cls) {
+        Class aCls = box.cls;
+        if (!aCls) {
             NSLog(@"%d, %s => please register first", __LINE__, __FUNCTION__);
             return nil;
         }
         
-        if (class_conformsToProtocol(cls, @protocol(ZDRBaseProtocol)) && [cls resolveInstanceMethod:@selector(initWithZDRContext:)]) {
-            serviceInstance = [[cls alloc] initWithZDRContext:self.context];
+        if (class_conformsToProtocol(aCls, @protocol(ZDRBaseProtocol)) && [aCls respondsToSelector:@selector(zdr_createInstance:)]) {
+            serviceInstance = [aCls zdr_createInstance:self.context];
         }
         else {
-            serviceInstance = [[cls alloc] init];
+            serviceInstance = [[aCls alloc] init];
         }
         box.strongObj = serviceInstance;
     }

@@ -13,6 +13,10 @@ ZDRouterRegister(DogProtocol, ZDDog)
 
 @implementation ZDDog
 
++ (instancetype)zdr_createInstance:(ZDRContext *)context {
+    return self.new;
+}
+
 - (NSUInteger)age {
     return 2;
 }
