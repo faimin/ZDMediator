@@ -8,10 +8,18 @@
 
 #import "ZDDog.h"
 #import <ZDRouter/ZDRouter.h>
+#import "ZDClassProtocol.h"
 
 ZDRouterRegister(DogProtocol, ZDDog)
 
 @implementation ZDDog
+
++ (void)initialize
+{
+    if (self == [ZDDog class]) {
+        [Router manualRegisterService:@protocol(ZDClassProtocol) implementInstance:self];
+    }
+}
 
 + (instancetype)zdr_createInstance:(ZDRContext *)context {
     return self.new;
@@ -35,6 +43,19 @@ ZDRouterRegister(DogProtocol, ZDDog)
         return YES;
     }
     return NO;
+}
+
+@end
+
+
+@interface ZDDog (ZDClassProtocol) <ZDClassProtocol>
+
+@end
+
+@implementation ZDDog (ZDClassProtocol)
+
++ (NSArray *)foo:(NSArray *)foo bar:(NSArray *)bar {
+    return [[NSArray arrayWithArray:foo] arrayByAddingObjectsFromArray:bar];
 }
 
 @end

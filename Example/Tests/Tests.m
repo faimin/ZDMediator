@@ -10,6 +10,7 @@
 @import ZDRouter;
 #import "DogProtocol.h"
 #import "CatProtocol.h"
+#import "ZDClassProtocol.h"
 #import "ZDCat.h"
 
 @interface Tests : XCTestCase
@@ -25,18 +26,17 @@
     
     __auto_type cat = [ZDCat new];
     
-    [ZDRouter.shareInstance manualRegisterService:@protocol(CatProtocol) implementInstance:cat];
+    [ZDRouter manualRegisterService:@protocol(CatProtocol) implementer:cat];
     
+    [ZDRouter registerResponder:@protocol(DogProtocol) priority:ZDRPriorityHigh selectors:@selector(foo:), @selector(bar:), nil];
     
-    [ZDRouter.shareInstance registerResponder:@protocol(DogProtocol) priority:ZDRPriorityHigh selectors:@selector(foo:), @selector(bar:), nil];
-    
-    [ZDRouter.shareInstance registerResponder:@protocol(DogProtocol) priority:ZDRPriorityDefalut eventId:@"100", @"200"];
-    [ZDRouter.shareInstance registerResponder:@protocol(CatProtocol) priority:ZDRPriorityDefalut eventId:@"100", @"200"];
+    [ZDRouter registerResponder:@protocol(DogProtocol) priority:ZDRPriorityDefalut eventId:@"100", @"200"];
+    [ZDRouter registerResponder:@protocol(CatProtocol) priority:ZDRPriorityDefalut eventId:@"100", @"200"];
 }
 
 - (void)tearDown
 {
-    [ZDRouter.shareInstance removeService:@protocol(CatProtocol) autoInitAgain:NO];
+    [ZDRouter removeService:@protocol(CatProtocol) autoInitAgain:NO];
     
     NSString *name = [GetService(CatProtocol) name];
     XCTAssertNil(name);
@@ -65,16 +65,22 @@
         return a;
     }];
     XCTAssertTrue(dogResult2);
+    
+    NSArray *dogResult3 = [GetService(ZDClassProtocol) foo:@[@1,@2] bar:@[@3,@4,@5]];
+    XCTAssertEqual(dogResult3.count, 5);
 }
 
 - (void)testDispatch {
-    [ZDRouter.shareInstance dispatchEventWithSelectorAndParams:@selector(foo:), 1];
+    ZDRIGNORE_SELWARNING(
+        [ZDRouter dispatchEventWithSelectorAndParameters:@selector(foo:), 1];
+        [ZDRouter dispatchEventWithSelectorAndParameters:@selector(foo:), 1];
+        
+        [ZDRouter dispatchEventWithSelectorAndParameters:@selector(bar:), @{
+            @"name": @"zero.d.saber"
+        }];
+    )
     
-    [ZDRouter.shareInstance dispatchEventWithSelectorAndParams:@selector(bar:), @{
-        @"name": @"zero.d.saber"
-    }];
-    
-    [ZDRouter.shareInstance dispatchEventWithId:@"100" selectorAndParams:@selector(zdr_handleEvent:userInfo:callback:), 200, @{@100: @"100"}, nil];
+    [ZDRouter dispatchEventWithId:@"100" selectorAndParameters:@selector(zdr_handleEvent:userInfo:callback:), 200, @{@100: @"100"}, nil];
 }
 
 @end

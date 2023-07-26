@@ -7,6 +7,7 @@
 
 #import "ZDRBaseModule.h"
 
+@class ZDRContext;
 @implementation ZDRBaseModule
 
 - (void)dealloc {

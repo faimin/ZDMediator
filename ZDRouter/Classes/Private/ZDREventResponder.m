@@ -24,7 +24,7 @@
 }
 
 - (NSUInteger)hash {
-    return self.name.hash;
+    return self.name.hash ^ self.priority;
 }
 
 @end

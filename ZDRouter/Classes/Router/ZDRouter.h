@@ -23,35 +23,35 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// register implementer Class to map
 /// @param serviceProtocol protocol
-/// @param cls implementer Class
-- (void)registerService:(Protocol *)serviceProtocol implementClass:(Class)cls;
-- (void)registerServiceName:(NSString *)serviceProtocolName implementClassName:(NSString *)clsName;
+/// @param cls implementer Class (instance or Class)
++ (void)registerService:(Protocol *)serviceProtocol implementClass:(Class)cls;
++ (void)registerServiceName:(NSString *)serviceProtocolName implementClassName:(NSString *)clsName;
 
 /// manual register implementer instance to map
 /// - Parameters:
 ///   - serviceProtocol: protocol
-///   - obj: protocol implementer
+///   - obj: protocol implementer (instance or Class)
 ///   - weakStore: strong ref or weak ref, default is NO (strong ref)
-- (void)manualRegisterService:(Protocol *)serviceProtocol
-            implementInstance:(id)obj
++ (void)manualRegisterService:(Protocol *)serviceProtocol
+                  implementer:(id)obj
                     weakStore:(BOOL)weakStore;
-- (void)manualRegisterService:(Protocol *)serviceProtocol
-            implementInstance:(id)obj;
++ (void)manualRegisterService:(Protocol *)serviceProtocol
+                  implementer:(id)obj;
 
 #pragma mark - Get
 
 /// get service instance with protocol
 /// - Parameter serviceProtocol: protocol of service
-- (id _Nullable)service:(Protocol *)serviceProtocol;
++ (id _Nullable)service:(Protocol *)serviceProtocol;
 
 /// get service instance with protocol name
 /// - Parameter serviceName: protocol of service
-- (id _Nullable)serviceWithName:(NSString *)serviceName;
++ (id _Nullable)serviceWithName:(NSString *)serviceName;
 
 /// delete service from store map
 /// @param serviceProtocol protocol of service
 /// @param autoInitAgain wheter init again
-- (BOOL)removeService:(Protocol *)serviceProtocol autoInitAgain:(BOOL)autoInitAgain;
++ (BOOL)removeService:(Protocol *)serviceProtocol autoInitAgain:(BOOL)autoInitAgain;
 
 #pragma mark - Event
 
@@ -60,7 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
 ///   - serviceProtocol: protocol of service
 ///   - priority: priority
 ///   - eventId: multi number event
-- (void)registerResponder:(Protocol *)serviceProtocol
++ (void)registerResponder:(Protocol *)serviceProtocol
                  priority:(ZDRPriority)priority
                   eventId:(NSString *)eventId, ...;
 
@@ -69,7 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
 ///   - serviceProtocol: protocol of service
 ///   - priority: priority
 ///   - selector: multi SEL event, end with nil
-- (void)registerResponder:(Protocol *)serviceProtocol
++ (void)registerResponder:(Protocol *)serviceProtocol
                  priority:(ZDRPriority)priority
                 selectors:(SEL)selector, ...;
 
@@ -81,7 +81,7 @@ NS_ASSUME_NONNULL_BEGIN
 ///
 /// @note float 与 int 不能混用，浮点数需要加小数点，type也一样。
 /// 如果sel的第一个参数为整数，那么param传nil为跳过，其它参数正常传。
-- (void)dispatchEventWithId:(NSString *)eventId selectorAndParams:(SEL)selector, ...;
++ (void)dispatchEventWithId:(NSString *)eventId selectorAndParameters:(SEL)selector, ...;
 
 /// dispatch event with SEL event
 /// @param selector SEL and multi any type paramters
@@ -90,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
 ///
 /// @note float 与 int 不能混用，浮点数需要加小数点，type也一样。
 /// 如果sel的第一个参数为整数，则param传nil为跳过，其它参数正常传。
-- (void)dispatchEventWithSelectorAndParams:(SEL)selector, ...;
++ (void)dispatchEventWithSelectorAndParameters:(SEL)selector, ...;
 
 @end
 
@@ -102,25 +102,28 @@ NS_ASSUME_NONNULL_BEGIN
 //#define ZDRProto(proto) \
 //(NO && ((void)({id<proto> tempObj; tempObj;}), NO), @protocol(proto))
 
-#ifndef Router
-#define Router \
-[ZDRouter shareInstance]
-#endif
-
 #ifndef GetService
 #define GetService(proto) \
-((id<proto>)[[ZDRouter shareInstance] service:@protocol(proto)])
+((id<proto>)[ZDRouter service:@protocol(proto)])
 #endif
 
 #ifndef GetServiceWithClass
 #define GetServiceWithClass(proto, clz) \
 ({ \
-    clz *obj = (clz *)[[ZDRouter shareInstance] service:@protocol(proto)]; \
+    clz *obj = (clz *)[ZDRouter service:@protocol(proto)]; \
     if (!obj || ![obj isKindOfClass:clz.class]) { \
         obj = nil; \
     } \
     obj; \
 })
+#endif
+
+#ifndef ZDRIGNORE_SELWARNING
+#define ZDRIGNORE_SELWARNING( ... ) \
+_Pragma("clang diagnostic push") \
+_Pragma("clang diagnostic ignored \"-Wundeclared-selector\"") \
+__VA_ARGS__ \
+_Pragma("clang diagnostic pop")
 #endif
 
 //------------------------------------------

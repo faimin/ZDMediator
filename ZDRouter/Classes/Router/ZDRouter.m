@@ -102,7 +102,7 @@
 
 #pragma mark - Set
 
-- (void)registerService:(Protocol *)serviceProtocol implementClass:(Class)cls {
++ (void)registerService:(Protocol *)serviceProtocol implementClass:(Class)cls {
     if (!serviceProtocol) {
         return;
     }
@@ -116,7 +116,7 @@
     box.cls = cls;
 }
 
-- (void)registerServiceName:(NSString *)serviceProtocolName implementClassName:(NSString *)clsName {
++ (void)registerServiceName:(NSString *)serviceProtocolName implementClassName:(NSString *)clsName {
     if (!serviceProtocolName) {
         return;
     }
@@ -125,11 +125,11 @@
     box.cls = NSClassFromString(clsName);
 }
 
-- (void)manualRegisterService:(Protocol *)serviceProtocol implementInstance:(id)obj {
-    [self manualRegisterService:serviceProtocol implementInstance:obj weakStore:NO];
++ (void)manualRegisterService:(Protocol *)serviceProtocol implementer:(id)obj {
+    [self manualRegisterService:serviceProtocol implementer:obj weakStore:NO];
 }
 
-- (void)manualRegisterService:(Protocol *)serviceProtocol implementInstance:(id)obj weakStore:(BOOL)weakStore {
++ (void)manualRegisterService:(Protocol *)serviceProtocol implementer:(id)obj weakStore:(BOOL)weakStore {
     if (!serviceProtocol || !obj) {
         return;
     }
@@ -152,17 +152,18 @@
 
 #pragma mark - Get
 
-- (id)service:(Protocol *)serviceProtocol {
++ (id)service:(Protocol *)serviceProtocol {
     NSString *key = NSStringFromProtocol(serviceProtocol);
     return [self serviceWithName:key];
 }
 
-- (id)serviceWithName:(NSString *)serviceName {
++ (id)serviceWithName:(NSString *)serviceName {
     if (!serviceName) {
         return nil;
     }
     
-    ZDRServiceBox *box = self.storeMap[serviceName];
+    __auto_type router = [self shareInstance];
+    ZDRServiceBox *box = router.storeMap[serviceName];
     if (!box) {
         NSLog(@"please register class first");
         return nil;
@@ -177,7 +178,7 @@
         }
         
         if (class_conformsToProtocol(aCls, @protocol(ZDRBaseProtocol)) && [aCls respondsToSelector:@selector(zdr_createInstance:)]) {
-            serviceInstance = [aCls zdr_createInstance:self.context];
+            serviceInstance = [aCls zdr_createInstance:router.context];
         }
         else {
             serviceInstance = [[aCls alloc] init];
@@ -187,7 +188,7 @@
     return serviceInstance;
 }
 
-- (BOOL)removeService:(Protocol *)serviceProtocol autoInitAgain:(BOOL)autoInitAgain {
++ (BOOL)removeService:(Protocol *)serviceProtocol autoInitAgain:(BOOL)autoInitAgain {
     if (!serviceProtocol) {
         return NO;
     }
@@ -198,7 +199,8 @@
         return NO;
     }
     
-    ZDRServiceBox *serviceBox = self.storeMap[key];
+    __auto_type router = [self shareInstance];
+    ZDRServiceBox *serviceBox = router.storeMap[key];
     serviceBox.autoInit = autoInitAgain;
     if (serviceBox.strongObj) {
         serviceBox.strongObj = nil;
@@ -213,7 +215,7 @@
 
 #pragma mark - Register Event
 
-- (void)registerResponder:(Protocol *)serviceProtocol priority:(ZDRPriority)priority eventId:(NSString *)eventId, ... {
++ (void)registerResponder:(Protocol *)serviceProtocol priority:(ZDRPriority)priority eventId:(NSString *)eventId, ... {
     if (!serviceProtocol) {
         return;
     }
@@ -228,7 +230,7 @@
     va_end(args);
 }
 
-- (void)registerResponder:(Protocol *)serviceProtocol priority:(ZDRPriority)priority selectors:(SEL)selector, ... {
++ (void)registerResponder:(Protocol *)serviceProtocol priority:(ZDRPriority)priority selectors:(SEL)selector, ... {
     if (!serviceProtocol) {
         return;
     }
@@ -246,12 +248,13 @@
 
 #pragma mark - Dispatch
 
-- (void)dispatchEventWithId:(NSString *)eventId selectorAndParams:(SEL)selector, ... {
++ (void)dispatchEventWithId:(NSString *)eventId selectorAndParameters:(SEL)selector, ... {
     if (!selector) {
         return;
     }
     
-    NSMutableOrderedSet <ZDREventResponder *> *set = self.serviceResponderMap[eventId];
+    __auto_type router = [self shareInstance];
+    NSMutableOrderedSet <ZDREventResponder *> *set = router.serviceResponderMap[eventId];
     for (ZDREventResponder *obj in set) {
         id module = [self serviceWithName:obj.name];
         if (!module) {
@@ -265,13 +268,14 @@
     }
 }
 
-- (void)dispatchEventWithSelectorAndParams:(SEL)selector, ... {
++ (void)dispatchEventWithSelectorAndParameters:(SEL)selector, ... {
     if (!selector) {
         return;
     }
     
+    __auto_type router = [self shareInstance];
     NSString *eventId = NSStringFromSelector(selector);
-    NSMutableOrderedSet <ZDREventResponder *> *set = self.serviceResponderMap[eventId];
+    NSMutableOrderedSet <ZDREventResponder *> *set = router.serviceResponderMap[eventId];
     for (ZDREventResponder *obj in set) {
         id module = [self serviceWithName:obj.name];
         if (!module) {
@@ -287,12 +291,13 @@
 
 #pragma mark - Private Method
 
-- (ZDRServiceBox *)_createServiceBoxIfNeedWithKey:(NSString *)key {
++ (ZDRServiceBox *)_createServiceBoxIfNeedWithKey:(NSString *)key {
     if (!key) {
         return nil;
     }
     
-    NSMutableDictionary<NSString *, ZDRServiceBox *> *storeDict = self.storeMap;
+    __auto_type router = [self shareInstance];
+    NSMutableDictionary<NSString *, ZDRServiceBox *> *storeDict = router.storeMap;
     ZDRServiceBox *box = storeDict[key];
     if (!box) {
         box = [[ZDRServiceBox alloc] init];
@@ -301,15 +306,16 @@
     return box;
 }
 
-- (void)_registerRespondService:(Protocol *)serviceName priority:(ZDRPriority)priority eventKey:(NSString *)eventKey {
++ (void)_registerRespondService:(Protocol *)serviceName priority:(ZDRPriority)priority eventKey:(NSString *)eventKey {
     if (!serviceName || !eventKey) {
         return;
     }
     
-    NSMutableOrderedSet<ZDREventResponder *> *orderSet = self.serviceResponderMap[eventKey];
+    __auto_type router = [self shareInstance];
+    NSMutableOrderedSet<ZDREventResponder *> *orderSet = router.serviceResponderMap[eventKey];
     if (!orderSet) {
         orderSet = [[NSMutableOrderedSet alloc] init];
-        self.serviceResponderMap[eventKey] = orderSet;
+        router.serviceResponderMap[eventKey] = orderSet;
     }
     
     ZDREventResponder *respondModel = ({
