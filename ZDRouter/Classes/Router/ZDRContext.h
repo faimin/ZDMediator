@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ZDRContext : NSObject
 
-@property (nonatomic, copy, nullable) NSString *biz;
+@property (nonatomic, strong) NSDictionary *launchOptions;
 @property (nonatomic, strong, nullable) id extraObj;
 
 @end
