@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)registerService:(Protocol *)serviceProtocol implementClass:(Class)cls;
 + (void)registerServiceName:(NSString *)serviceProtocolName implementClassName:(NSString *)clsName;
 
-/// manual register implementer instance to map
+/// manual register implementer to map
 /// - Parameters:
 ///   - serviceProtocol: protocol
 ///   - obj: protocol implementer (instance or Class)

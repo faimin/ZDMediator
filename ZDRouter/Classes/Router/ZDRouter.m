@@ -19,9 +19,8 @@
 
 @interface ZDRouter ()
 
-@property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDREventResponder *> *> *serviceResponderMap; ///< 响应事件的Map
-
 @property (nonatomic, strong) NSMutableDictionary<NSString *, ZDRServiceBox *> *storeMap;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDREventResponder *> *> *serviceResponderMap; ///< 响应事件的Map
 
 @end
 
@@ -254,7 +253,7 @@
     }
     
     __auto_type router = [self shareInstance];
-    NSMutableOrderedSet <ZDREventResponder *> *set = router.serviceResponderMap[eventId];
+    NSMutableOrderedSet<ZDREventResponder *> *set = router.serviceResponderMap[eventId];
     for (ZDREventResponder *obj in set) {
         id module = [self serviceWithName:obj.name];
         if (!module) {
@@ -275,7 +274,7 @@
     
     __auto_type router = [self shareInstance];
     NSString *eventId = NSStringFromSelector(selector);
-    NSMutableOrderedSet <ZDREventResponder *> *set = router.serviceResponderMap[eventId];
+    NSMutableOrderedSet<ZDREventResponder *> *set = router.serviceResponderMap[eventId];
     for (ZDREventResponder *obj in set) {
         id module = [self serviceWithName:obj.name];
         if (!module) {
