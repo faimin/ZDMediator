@@ -72,15 +72,15 @@
 
 - (void)testDispatch {
     ZDRIGNORE_SELWARNING(
-        [ZDRouter dispatchEventWithSelectorAndParameters:@selector(foo:), 1];
-        [ZDRouter dispatchEventWithSelectorAndParameters:@selector(foo:), 1];
+        [ZDRouter dispatchWithEventSelAndArgs:@selector(foo:), 1];
+        [ZDRouter dispatchWithEventSelAndArgs:@selector(foo:), 1];
         
-        [ZDRouter dispatchEventWithSelectorAndParameters:@selector(bar:), @{
+        [ZDRouter dispatchWithEventSelAndArgs:@selector(bar:), @{
             @"name": @"zero.d.saber"
         }];
     )
     
-    [ZDRouter dispatchEventWithId:@"100" selectorAndParameters:@selector(zdr_handleEvent:userInfo:callback:), 200, @{@100: @"100"}, nil];
+    [ZDRouter dispatchWithEventId:@"100" selAndArgs:@selector(zdr_handleEvent:userInfo:callback:), 200, @{@100: @"100"}, nil];
 }
 
 @end

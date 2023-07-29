@@ -81,7 +81,7 @@ NS_ASSUME_NONNULL_BEGIN
 ///
 /// @note float 与 int 不能混用，浮点数需要加小数点，type也一样。
 /// 如果sel的第一个参数为整数，那么param传nil为跳过，其它参数正常传。
-+ (void)dispatchEventWithId:(NSString *)eventId selectorAndParameters:(SEL)selector, ...;
++ (void)dispatchWithEventId:(NSString *)eventId selAndArgs:(SEL)selector, ...;
 
 /// dispatch event with SEL event
 /// @param selector SEL and multi any type paramters
@@ -90,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
 ///
 /// @note float 与 int 不能混用，浮点数需要加小数点，type也一样。
 /// 如果sel的第一个参数为整数，则param传nil为跳过，其它参数正常传。
-+ (void)dispatchEventWithSelectorAndParameters:(SEL)selector, ...;
++ (void)dispatchWithEventSelAndArgs:(SEL)selector, ...;
 
 @end
 

@@ -14,10 +14,9 @@ ZDRouterRegister(DogProtocol, ZDDog)
 
 @implementation ZDDog
 
-+ (void)initialize
-{
++ (void)initialize {
     if (self == [ZDDog class]) {
-        [Router manualRegisterService:@protocol(ZDClassProtocol) implementInstance:self];
+        [ZDRouter manualRegisterService:@protocol(ZDClassProtocol) implementer:self];
     }
 }
 

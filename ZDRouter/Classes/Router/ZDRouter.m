@@ -247,7 +247,7 @@
 
 #pragma mark - Dispatch
 
-+ (void)dispatchEventWithId:(NSString *)eventId selectorAndParameters:(SEL)selector, ... {
++ (void)dispatchWithEventId:(NSString *)eventId selAndArgs:(nonnull SEL)selector, ... {
     if (!selector) {
         return;
     }
@@ -267,7 +267,7 @@
     }
 }
 
-+ (void)dispatchEventWithSelectorAndParameters:(SEL)selector, ... {
++ (void)dispatchWithEventSelAndArgs:(SEL)selector, ... {
     if (!selector) {
         return;
     }
