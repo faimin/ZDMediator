@@ -92,7 +92,7 @@
                 int autoInit = item.autoInit;
                 
                 storeMap[key] = ({
-                    __auto_type box = [[ZDRServiceBox alloc] initWithClass:value];
+                    ZDRServiceBox *box = [[ZDRServiceBox alloc] initWithClass:value];
                     box.autoInit = autoInit == 1;
                     box.isProtocolAllClsMethod = item.allClsMethod == 1;
                     if (item.allClsMethod == 1) {
@@ -119,7 +119,7 @@
         return;
     }
     
-    __auto_type box = [self _createServiceBoxIfNeedWithKey:key];
+    ZDRServiceBox *box = [self _createServiceBoxIfNeedWithKey:key];
     box.cls = cls;
 }
 
@@ -128,7 +128,7 @@
         return;
     }
     
-    __auto_type box = [self _createServiceBoxIfNeedWithKey:serviceProtocolName];
+    ZDRServiceBox *box = [self _createServiceBoxIfNeedWithKey:serviceProtocolName];
     box.cls = NSClassFromString(clsName);
 }
 
@@ -146,7 +146,7 @@
         return;
     }
     
-    __auto_type box = [self _createServiceBoxIfNeedWithKey:key];
+    ZDRServiceBox *box = [self _createServiceBoxIfNeedWithKey:key];
     box.autoInit = NO;
     if (weakStore) {
         box.weakObj = obj;
@@ -168,7 +168,7 @@
         return nil;
     }
     
-    __auto_type router = [self shareInstance];
+    ZDRouter *router = [self shareInstance];
     ZDRServiceBox *box = router.storeMap[serviceName];
     if (!box) {
         NSLog(@"please register class first");
@@ -208,7 +208,7 @@
         return NO;
     }
     
-    __auto_type router = [self shareInstance];
+    ZDRouter *router = [self shareInstance];
     ZDRServiceBox *serviceBox = router.storeMap[key];
     serviceBox.autoInit = autoInitAgain;
     if (serviceBox.strongObj) {
@@ -262,7 +262,7 @@
         return;
     }
     
-    __auto_type router = [self shareInstance];
+    ZDRouter *router = [self shareInstance];
     NSMutableOrderedSet<ZDREventResponder *> *set = router.serviceResponderMap[eventId];
     for (ZDREventResponder *obj in set) {
         id module = [self serviceWithName:obj.name];
@@ -282,7 +282,7 @@
         return;
     }
     
-    __auto_type router = [self shareInstance];
+    ZDRouter *router = [self shareInstance];
     NSString *eventId = NSStringFromSelector(selector);
     NSMutableOrderedSet<ZDREventResponder *> *set = router.serviceResponderMap[eventId];
     for (ZDREventResponder *obj in set) {
@@ -305,7 +305,7 @@
         return nil;
     }
     
-    __auto_type router = [self shareInstance];
+    ZDRouter *router = [self shareInstance];
     NSMutableDictionary<NSString *, ZDRServiceBox *> *storeDict = router.storeMap;
     ZDRServiceBox *box = storeDict[key];
     if (!box) {
@@ -320,7 +320,7 @@
         return;
     }
     
-    __auto_type router = [self shareInstance];
+    ZDRouter *router = [self shareInstance];
     NSMutableOrderedSet<ZDREventResponder *> *orderSet = router.serviceResponderMap[eventKey];
     if (!orderSet) {
         orderSet = [[NSMutableOrderedSet alloc] init];
@@ -328,7 +328,7 @@
     }
     
     ZDREventResponder *respondModel = ({
-        __auto_type model = [[ZDREventResponder alloc] init];
+        ZDREventResponder *model = [[ZDREventResponder alloc] init];
         model.name = NSStringFromProtocol(serviceName);
         model.priority = priority;
         model;
