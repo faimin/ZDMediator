@@ -16,17 +16,16 @@
     NSLog(@"%s", __PRETTY_FUNCTION__);
 }
 
-- (instancetype)initWithClass:(Class)cls autoInit:(BOOL)autoInit {
+- (instancetype)initWithClass:(Class)cls {
     if (self = [super init]) {
         _cls = cls;
-        _autoInit = autoInit;
     }
     return self;
 }
 
 #pragma mark - Setter
 
-- (void)setStrongObj:(id<ZDRBaseProtocol>)strongObj {
+- (void)setStrongObj:(id<ZDRCommonProtocol>)strongObj {
     if (_strongObj == strongObj) {
         return;
     }
@@ -35,7 +34,7 @@
     _strongObj = strongObj;
 }
 
-- (void)setWeakObj:(id<ZDRBaseProtocol>)weakObj {
+- (void)setWeakObj:(id<ZDRCommonProtocol>)weakObj {
     if (_weakObj == weakObj) {
         return;
     }
@@ -46,7 +45,7 @@
 
 #pragma mark - Private
 
-- (void)_zdr_willRemoveObj:(id<ZDRBaseProtocol>)obj {
+- (void)_zdr_willRemoveObj:(id<ZDRCommonProtocol>)obj {
     if (obj && [obj respondsToSelector:@selector(zdr_willDispose)]) {
         [obj zdr_willDispose];
     }

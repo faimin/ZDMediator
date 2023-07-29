@@ -6,18 +6,19 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ZDRBaseProtocol.h"
+#import "ZDRCommonProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ZDRServiceBox : NSObject
 
 @property (nonatomic, unsafe_unretained) Class cls;
-@property (nonatomic, strong, nullable) id<ZDRBaseProtocol> strongObj;
-@property (nonatomic, weak, nullable) id<ZDRBaseProtocol> weakObj;
+@property (nonatomic, strong, nullable) id strongObj;
+@property (nonatomic, weak, nullable) id weakObj;
 @property (nonatomic, assign) BOOL autoInit;
+@property (nonatomic, assign) BOOL isProtocolAllClsMethod;
 
-- (instancetype)initWithClass:(Class)cls autoInit:(BOOL)autoInit;
+- (instancetype)initWithClass:(Class _Nullable)cls;
 
 @end
 

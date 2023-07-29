@@ -1,12 +1,12 @@
 //
-//  ZDRBaseProtocol.h
+//  ZDRCommonProtocol.h
 //  ZDRouter
 //
 //  Created by Zero.D.Saber on 2023/7/15.
 //
 
-#ifndef ZDRModuleBaseProtocol_h
-#define ZDRModuleBaseProtocol_h
+#ifndef ZDRCommonProtocol_h
+#define ZDRCommonProtocol_h
 
 #import <Foundation/Foundation.h>
 #import "ZDRouterDefine.h"
@@ -14,7 +14,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class ZDRContext;
-@protocol ZDRBaseProtocol <NSObject>
+@protocol ZDRCommonProtocol <NSObject>
 
 @optional
 
@@ -29,10 +29,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param event 事件类型
 /// @param userInfo 传递的参数
 /// @param callback 事件回调
-- (BOOL)zdr_handleEvent:(NSInteger)event userInfo:(id _Nullable)userInfo callback:(ZDRCommonCallback _Nullable)callback NS_SWIFT_UNAVAILABLE("ZDRCommonCallback not available");
+- (BOOL)zdr_handleEvent:(NSInteger)event
+               userInfo:(id _Nullable)userInfo
+               callback:(ZDRCommonCallback _Nullable)callback NS_SWIFT_UNAVAILABLE("ZDRCommonCallback not available");
 
 @end
 
 NS_ASSUME_NONNULL_END
 
-#endif /* ZDRModuleBaseProtocol_h */
+#endif /* ZDRCommonProtocol_h */

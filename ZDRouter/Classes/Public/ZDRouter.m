@@ -11,7 +11,7 @@
 #import <mach-o/loader.h>
 #import <mach-o/dyld.h>
 #import <objc/runtime.h>
-#import "ZDRBaseProtocol.h"
+#import "ZDRCommonProtocol.h"
 #import "ZDRInvocation.h"
 #import "ZDRContext.h"
 #import "ZDRServiceBox.h"
@@ -89,9 +89,17 @@
                 
                 NSString *key = [NSString stringWithUTF8String:item.key];
                 Class value = objc_getClass(item.value);
-                int manualInit = item.manualInit;
+                int autoInit = item.autoInit;
                 
-                storeMap[key] = [[ZDRServiceBox alloc] initWithClass:value autoInit:manualInit == 0];
+                storeMap[key] = ({
+                    __auto_type box = [[ZDRServiceBox alloc] initWithClass:value];
+                    box.autoInit = autoInit == 1;
+                    box.isProtocolAllClsMethod = item.allClsMethod == 1;
+                    if (item.allClsMethod == 1) {
+                        box.strongObj = (id)value; // cast forbid warning
+                    }
+                    box;
+                });
             }
         }
     }
@@ -139,7 +147,6 @@
     }
     
     __auto_type box = [self _createServiceBoxIfNeedWithKey:key];
-    box.cls = [obj class];
     box.autoInit = NO;
     if (weakStore) {
         box.weakObj = obj;
@@ -176,7 +183,10 @@
             return nil;
         }
         
-        if (class_conformsToProtocol(aCls, @protocol(ZDRBaseProtocol)) && [aCls respondsToSelector:@selector(zdr_createInstance:)]) {
+        if (box.isProtocolAllClsMethod) {
+            serviceInstance = aCls;
+        }
+        else if ([aCls respondsToSelector:@selector(zdr_createInstance:)]) {
             serviceInstance = [aCls zdr_createInstance:router.context];
         }
         else {

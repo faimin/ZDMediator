@@ -10,9 +10,9 @@
 #define CatProtocol_h
 
 #import <Foundation/Foundation.h>
-#import <ZDRouter/ZDRBaseProtocol.h>
+#import <ZDRouter/ZDRCommonProtocol.h>
 
-@protocol CatProtocol <ZDRBaseProtocol>
+@protocol CatProtocol <ZDRCommonProtocol>
 
 - (NSString *)name;
 

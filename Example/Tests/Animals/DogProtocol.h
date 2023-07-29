@@ -10,9 +10,9 @@
 #define DogProtocol_h
 
 #import <Foundation/Foundation.h>
-#import <ZDRouter/ZDRBaseProtocol.h>
+#import <ZDRouter/ZDRCommonProtocol.h>
 
-@protocol DogProtocol <ZDRBaseProtocol>
+@protocol DogProtocol <ZDRCommonProtocol>
 
 - (NSUInteger)age;
 

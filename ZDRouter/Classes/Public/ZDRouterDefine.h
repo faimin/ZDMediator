@@ -26,7 +26,8 @@ typedef id(^ZDRCommonCallback)() NS_SWIFT_UNAVAILABLE("ZDRCommonCallback not ava
 struct ZDRMachORegisterKV {
     const char *key;
     const char *value;
-    const int manualInit; // 0、1
+    const int autoInit;     ///< 0,1
+    const int allClsMethod; ///< 0,1
 };
 
 #ifndef ZDRouterSectionName
@@ -34,20 +35,21 @@ struct ZDRMachORegisterKV {
 #endif
 
 // 【Usage】:
-//  ZDRouterRegisterManual(protocolName, AViewController, 0)
+//  ZDRouterRegisterManual(protocolName, AViewController, 1, 0)
 #ifndef ZDRouterRegisterManual
-#define ZDRouterRegisterManual(protocol_name, cls, manual_init) \
+#define ZDRouterRegisterManual(protocol_name, cls, auto_init, protocol_all_cls_method) \
 __attribute__((no_sanitize_address)) __attribute__((used, section(SEG_DATA "," ZDRouterSectionName))) \
 static struct ZDRMachORegisterKV ZDRKV_##protocol_name_##cls = { \
-    .key = #protocol_name, \
+    .key = (NO && ((void)@protocol(protocol_name), NO), #protocol_name), \
     .value = #cls, \
-    .manualInit = (int)(manual_init), \
+    .autoInit = (int)(auto_init), \
+    .allClsMethod = (int)protocol_all_cls_method, \
 };
 #endif
 
 #ifndef ZDRouterRegister
 #define ZDRouterRegister(protocol_name, cls) \
-ZDRouterRegisterManual(protocol_name, cls, 0)
+ZDRouterRegisterManual(protocol_name, cls, 1, 0)
 #endif
 
 #endif /* ZDRouterDefine_h */
