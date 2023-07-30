@@ -71,16 +71,16 @@
 }
 
 - (void)testDispatch {
-//    ZDRIGNORE_SELWARNING(
-//        [ZDSingleRouter dispatchWithEventSelAndArgs:@selector(foo:), 1];
-//        [ZDSingleRouter dispatchWithEventSelAndArgs:@selector(foo:), 1];
-//        
-//        [ZDSingleRouter dispatchWithEventSelAndArgs:@selector(bar:), @{
-//            @"name": @"zero.d.saber"
-//        }];
-//    )
-//    
-//    [ZDSingleRouter dispatchWithEventId:@"100" selAndArgs:@selector(zdr_handleEvent:userInfo:callback:), 200, @{@100: @"100"}, nil];
+    ZDRIGNORE_SELWARNING(
+        [ZDSingleRouter dispatchWithEventSelAndArgs:@selector(foo:), 1];
+        [ZDSingleRouter dispatchWithEventSelAndArgs:@selector(foo:), 1];
+        
+        [ZDSingleRouter dispatchWithEventSelAndArgs:@selector(bar:), @{
+            @"name": @"zero.d.saber"
+        }];
+    )
+    
+    [ZDSingleRouter dispatchWithEventId:@"100" selAndArgs:@selector(zdr_handleEvent:userInfo:callback:), 200, @{@100: @"100"}, nil];
     
     [ZDBroadcastRouter dispatchWithProtocol:@protocol(ZDRCommonProtocol) selAndArgs:@selector(zdr_handleEvent:userInfo:callback:), 101, @{}, nil];
 }

@@ -7,9 +7,8 @@
 //
 
 #import "ZDDog.h"
-#import <ZDRouter/ZDSingleRouter.h>
+#import <ZDRouter/ZDRouter.h>
 #import "ZDClassProtocol.h"
-#import <ZDRouter/ZDRCommonProtocol.h>
 
 ZDRouterRegister(DogProtocol, ZDDog)
 ZDRouterOneToMoreRegister(ZDRCommonProtocol, ZDDog, 1)
