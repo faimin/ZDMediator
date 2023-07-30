@@ -22,8 +22,13 @@
 
 + (id)zd_target:(id)target invokeSelector:(SEL)selector args:(va_list)args {
     if (![target respondsToSelector:selector]) {
-        NSAssert2(NO, @"%@ doesNotRecognizeSelector: %@", target, NSStringFromSelector(selector));
-        return nil;
+        if ([[target class] respondsToSelector:selector]) {
+            target = [target class];
+        }
+        else {
+            NSAssert2(NO, @"%@ doesNotRecognizeSelector: %@", target, NSStringFromSelector(selector));
+            return nil;
+        }
     }
     
     NSMethodSignature *signature = [target methodSignatureForSelector:selector];
