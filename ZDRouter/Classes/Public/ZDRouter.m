@@ -30,11 +30,6 @@
     if (self != ZDRouter.class) {
         return;
     }
-    
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        [self _loadRegisterFromMacho];
-    });
 }
 
 #pragma mark - Singleton
@@ -61,6 +56,13 @@
 }
 
 #pragma mark - MachO
+
++ (void)_loadRegisterIfNeed {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [self _loadRegisterFromMacho];
+    });
+}
 
 + (void)_loadRegisterFromMacho {
     NSMutableDictionary<NSString *, ZDRServiceBox *> *storeMap = [ZDRouter shareInstance].storeMap;
@@ -167,6 +169,8 @@
     if (!serviceName) {
         return nil;
     }
+    
+    [self _loadRegisterIfNeed];
     
     ZDRouter *router = [self shareInstance];
     ZDRServiceBox *box = router.storeMap[serviceName];
