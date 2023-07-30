@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL autoInit;
 @property (nonatomic, assign) BOOL isProtocolAllClsMethod;
 
+@property (nonatomic, assign) NSInteger priority;
+
 - (instancetype)initWithClass:(Class _Nullable)cls;
 
 @end
