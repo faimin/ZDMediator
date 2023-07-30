@@ -1,11 +1,11 @@
 //
-//  ZDRouter.m
+//  ZDSingleRouter.m
 //  ZDRouter
 //
 //  Created by Zero.D.Saber on 2023/7/16.
 //
 
-#import "ZDRouter.h"
+#import "ZDSingleRouter.h"
 #import <dlfcn.h>
 #import <mach-o/getsect.h>
 #import <mach-o/loader.h>
@@ -17,17 +17,17 @@
 #import "ZDRServiceBox.h"
 #import "ZDREventResponder.h"
 
-@interface ZDRouter ()
+@interface ZDSingleRouter ()
 
 @property (nonatomic, strong) NSMutableDictionary<NSString *, ZDRServiceBox *> *storeMap;
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDREventResponder *> *> *serviceResponderMap; ///< 响应事件的Map
 
 @end
 
-@implementation ZDRouter
+@implementation ZDSingleRouter
 
 + (void)initialize {
-    if (self != ZDRouter.class) {
+    if (self != ZDSingleRouter.class) {
         return;
     }
 }
@@ -35,7 +35,7 @@
 #pragma mark - Singleton
 
 + (instancetype)shareInstance {
-    static ZDRouter *instance = nil;
+    static ZDSingleRouter *instance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         instance = [[super allocWithZone:NULL] init];
@@ -65,7 +65,7 @@
 }
 
 + (void)_loadRegisterFromMacho {
-    NSMutableDictionary<NSString *, ZDRServiceBox *> *storeMap = [ZDRouter shareInstance].storeMap;
+    NSMutableDictionary<NSString *, ZDRServiceBox *> *storeMap = [ZDSingleRouter shareInstance].storeMap;
     uint32_t imageCount = _dyld_image_count();
     for (uint32_t i = 0; i < imageCount; ++i) {
 #ifdef __LP64__
@@ -130,8 +130,7 @@
         return;
     }
     
-    ZDRServiceBox *box = [self _createServiceBoxIfNeedWithKey:serviceProtocolName];
-    box.cls = NSClassFromString(clsName);
+    [self registerService:NSProtocolFromString(serviceProtocolName) implementClass:NSClassFromString(clsName)];
 }
 
 + (void)manualRegisterService:(Protocol *)serviceProtocol implementer:(id)obj {
@@ -172,7 +171,7 @@
     
     [self _loadRegisterIfNeed];
     
-    ZDRouter *router = [self shareInstance];
+    ZDSingleRouter *router = [self shareInstance];
     ZDRServiceBox *box = router.storeMap[serviceName];
     if (!box) {
         NSLog(@"please register class first");
@@ -212,7 +211,7 @@
         return NO;
     }
     
-    ZDRouter *router = [self shareInstance];
+    ZDSingleRouter *router = [self shareInstance];
     ZDRServiceBox *serviceBox = router.storeMap[key];
     serviceBox.autoInit = autoInitAgain;
     if (serviceBox.strongObj) {
@@ -266,7 +265,7 @@
         return;
     }
     
-    ZDRouter *router = [self shareInstance];
+    ZDSingleRouter *router = [self shareInstance];
     NSMutableOrderedSet<ZDREventResponder *> *set = router.serviceResponderMap[eventId];
     for (ZDREventResponder *obj in set) {
         id module = [self serviceWithName:obj.name];
@@ -286,7 +285,7 @@
         return;
     }
     
-    ZDRouter *router = [self shareInstance];
+    ZDSingleRouter *router = [self shareInstance];
     NSString *eventId = NSStringFromSelector(selector);
     NSMutableOrderedSet<ZDREventResponder *> *set = router.serviceResponderMap[eventId];
     for (ZDREventResponder *obj in set) {
@@ -309,7 +308,7 @@
         return nil;
     }
     
-    ZDRouter *router = [self shareInstance];
+    ZDSingleRouter *router = [self shareInstance];
     NSMutableDictionary<NSString *, ZDRServiceBox *> *storeDict = router.storeMap;
     ZDRServiceBox *box = storeDict[key];
     if (!box) {
@@ -324,7 +323,7 @@
         return;
     }
     
-    ZDRouter *router = [self shareInstance];
+    ZDSingleRouter *router = [self shareInstance];
     NSMutableOrderedSet<ZDREventResponder *> *orderSet = router.serviceResponderMap[eventKey];
     if (!orderSet) {
         orderSet = [[NSMutableOrderedSet alloc] init];
@@ -342,15 +341,15 @@
         [orderSet removeObject:respondModel];
     }
     
-    __block BOOL hasInsert = NO;
+    __block NSInteger position = NSNotFound;
     [orderSet enumerateObjectsUsingBlock:^(ZDREventResponder * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         if (obj.priority <= priority) {
             [orderSet insertObject:respondModel atIndex:idx];
-            hasInsert = YES;
+            position = idx;
             *stop = YES;
         }
     }];
-    if (!hasInsert) {
+    if (position == NSNotFound) {
         [orderSet addObject:respondModel];
     }
 }

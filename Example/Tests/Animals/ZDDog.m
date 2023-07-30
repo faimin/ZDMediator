@@ -7,16 +7,18 @@
 //
 
 #import "ZDDog.h"
-#import <ZDRouter/ZDRouter.h>
+#import <ZDRouter/ZDSingleRouter.h>
 #import "ZDClassProtocol.h"
+#import <ZDRouter/ZDRCommonProtocol.h>
 
 ZDRouterRegister(DogProtocol, ZDDog)
+ZDRouterOneToMoreRegister(ZDRCommonProtocol, ZDDog, 1)
 
 @implementation ZDDog
 
 + (void)initialize {
     if (self == [ZDDog class]) {
-        [ZDRouter manualRegisterService:@protocol(ZDClassProtocol) implementer:self];
+        [ZDSingleRouter manualRegisterService:@protocol(ZDClassProtocol) implementer:self];
     }
 }
 
@@ -55,6 +57,13 @@ ZDRouterRegister(DogProtocol, ZDDog)
 
 + (NSArray *)foo:(NSArray *)foo bar:(NSArray *)bar {
     return [[NSArray arrayWithArray:foo] arrayByAddingObjectsFromArray:bar];
+}
+
+- (BOOL)zdr_handleEvent:(NSInteger)event userInfo:(id)userInfo callback:(ZDRCommonCallback)callback {
+    if (event == 101) {
+        return YES;
+    }
+    return NO;
 }
 
 @end

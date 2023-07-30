@@ -70,10 +70,13 @@
 
 - (NSUInteger)hash {
     if (_strongObj) {
-        return [_strongObj hash];
+        return [_strongObj hash] ^ [self.cls hash] ^ self.priority;
     }
     else if (_weakObj) {
-        return [_weakObj hash];
+        return [_weakObj hash] ^ [self.cls hash] ^ self.priority;
+    }
+    else if (_cls) {
+        return [self.cls hash] ^ self.priority;
     }
     return [super hash];
 }

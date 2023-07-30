@@ -1,5 +1,5 @@
 PODS:
-  - ZDRouter (0.0.2)
+  - ZDRouter (0.0.3.1)
 
 DEPENDENCIES:
   - ZDRouter (from `../`)
@@ -9,7 +9,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  ZDRouter: dd5e3da053be3c718bd648b41ada79e0739f5629
+  ZDRouter: ec63da3c5de24b5f7659d7151e7f74f60a795edb
 
 PODFILE CHECKSUM: e9ee58fb5a690700fca92e83610238c8295dc599
 

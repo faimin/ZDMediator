@@ -1,5 +1,5 @@
 //
-//  ZDRouter.h
+//  ZDSingleRouter.h
 //  ZDRouter
 //
 //  Created by Zero.D.Saber on 2023/7/16.
@@ -12,7 +12,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class ZDRContext;
-@interface ZDRouter : NSObject
+@interface ZDSingleRouter : NSObject
 
 @property (nonatomic, strong, nullable) ZDRContext *context;
 
@@ -99,18 +99,15 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Macro
 #pragma mark -
 
-//#define ZDRProto(proto) \
-//(NO && ((void)({id<proto> tempObj; tempObj;}), NO), @protocol(proto))
-
 #ifndef GetService
 #define GetService(proto) \
-((id<proto>)[ZDRouter service:@protocol(proto)])
+((id<proto>)[ZDSingleRouter service:@protocol(proto)])
 #endif
 
 #ifndef GetServiceWithClass
 #define GetServiceWithClass(proto, clz) \
 ({ \
-    clz *obj = (clz *)[ZDRouter service:@protocol(proto)]; \
+    clz *obj = (clz *)[ZDSingleRouter service:@protocol(proto)]; \
     if (!obj || ![obj isKindOfClass:clz.class]) { \
         obj = nil; \
     } \

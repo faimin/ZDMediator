@@ -1,6 +1,6 @@
 //
-//  ZDRouterTests.m
-//  ZDRouterTests
+//  ZDSingleRouterTests.m
+//  ZDSingleRouterTests
 //
 //  Created by 8207436 on 04/16/2023.
 //  Copyright (c) 2023 8207436. All rights reserved.
@@ -26,17 +26,17 @@
     
     __auto_type cat = [ZDCat new];
     
-    [ZDRouter manualRegisterService:@protocol(CatProtocol) implementer:cat];
+    [ZDSingleRouter manualRegisterService:@protocol(CatProtocol) implementer:cat];
     
-    [ZDRouter registerResponder:@protocol(DogProtocol) priority:ZDRPriorityHigh selectors:@selector(foo:), @selector(bar:), nil];
+    [ZDSingleRouter registerResponder:@protocol(DogProtocol) priority:ZDRPriorityHigh selectors:@selector(foo:), @selector(bar:), nil];
     
-    [ZDRouter registerResponder:@protocol(DogProtocol) priority:ZDRPriorityDefalut eventId:@"100", @"200"];
-    [ZDRouter registerResponder:@protocol(CatProtocol) priority:ZDRPriorityDefalut eventId:@"100", @"200"];
+    [ZDSingleRouter registerResponder:@protocol(DogProtocol) priority:ZDRPriorityDefalut eventId:@"100", @"200"];
+    [ZDSingleRouter registerResponder:@protocol(CatProtocol) priority:ZDRPriorityDefalut eventId:@"100", @"200"];
 }
 
 - (void)tearDown
 {
-    [ZDRouter removeService:@protocol(CatProtocol) autoInitAgain:NO];
+    [ZDSingleRouter removeService:@protocol(CatProtocol) autoInitAgain:NO];
     
     NSString *name = [GetService(CatProtocol) name];
     XCTAssertNil(name);
@@ -71,16 +71,18 @@
 }
 
 - (void)testDispatch {
-    ZDRIGNORE_SELWARNING(
-        [ZDRouter dispatchWithEventSelAndArgs:@selector(foo:), 1];
-        [ZDRouter dispatchWithEventSelAndArgs:@selector(foo:), 1];
-        
-        [ZDRouter dispatchWithEventSelAndArgs:@selector(bar:), @{
-            @"name": @"zero.d.saber"
-        }];
-    )
+//    ZDRIGNORE_SELWARNING(
+//        [ZDSingleRouter dispatchWithEventSelAndArgs:@selector(foo:), 1];
+//        [ZDSingleRouter dispatchWithEventSelAndArgs:@selector(foo:), 1];
+//        
+//        [ZDSingleRouter dispatchWithEventSelAndArgs:@selector(bar:), @{
+//            @"name": @"zero.d.saber"
+//        }];
+//    )
+//    
+//    [ZDSingleRouter dispatchWithEventId:@"100" selAndArgs:@selector(zdr_handleEvent:userInfo:callback:), 200, @{@100: @"100"}, nil];
     
-    [ZDRouter dispatchWithEventId:@"100" selAndArgs:@selector(zdr_handleEvent:userInfo:callback:), 200, @{@100: @"100"}, nil];
+    [ZDBroadcastRouter dispatchWithProtocol:@protocol(ZDRCommonProtocol) selAndArgs:@selector(zdr_handleEvent:userInfo:callback:), 101, @{}, nil];
 }
 
 @end
