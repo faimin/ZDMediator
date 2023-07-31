@@ -7,11 +7,10 @@
 //
 
 #import "ZDCat.h"
-#import <ZDRouter/ZDSingleRouter.h>
-#import <ZDRouter/ZDBroadcastRouter.h>
+#import <ZDRouter/ZDRouter.h>
 
-//ZDRouterRegister(CatProtocol, ZDCat)
-ZDRouterOneToMoreRegister(ZDRCommonProtocol, ZDCat, 1)
+//ZDRouter1V1Register(CatProtocol, ZDCat)
+ZDRouter1VMRegister(ZDRCommonProtocol, ZDCat, 1)
 
 @implementation ZDCat
 

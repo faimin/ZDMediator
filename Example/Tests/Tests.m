@@ -26,17 +26,17 @@
     
     __auto_type cat = [ZDCat new];
     
-    [ZDSingleRouter manualRegisterService:@protocol(CatProtocol) implementer:cat];
+    [ZD1V1Router manualRegisterService:@protocol(CatProtocol) implementer:cat];
     
-    [ZDSingleRouter registerResponder:@protocol(DogProtocol) priority:ZDRPriorityHigh selectors:@selector(foo:), @selector(bar:), nil];
+    [ZD1V1Router registerResponder:@protocol(DogProtocol) priority:ZDRPriorityHigh selectors:@selector(foo:), @selector(bar:), nil];
     
-    [ZDSingleRouter registerResponder:@protocol(DogProtocol) priority:ZDRPriorityDefalut eventId:@"100", @"200"];
-    [ZDSingleRouter registerResponder:@protocol(CatProtocol) priority:ZDRPriorityDefalut eventId:@"100", @"200"];
+    [ZD1V1Router registerResponder:@protocol(DogProtocol) priority:ZDRPriorityDefalut eventId:@"100", @"200"];
+    [ZD1V1Router registerResponder:@protocol(CatProtocol) priority:ZDRPriorityDefalut eventId:@"100", @"200"];
 }
 
 - (void)tearDown
 {
-    [ZDSingleRouter removeService:@protocol(CatProtocol) autoInitAgain:NO];
+    [ZD1V1Router removeService:@protocol(CatProtocol) autoInitAgain:NO];
     
     NSString *name = [GetService(CatProtocol) name];
     XCTAssertNil(name);
@@ -72,17 +72,17 @@
 
 - (void)testDispatch {
     ZDRIGNORE_SELWARNING(
-        [ZDSingleRouter dispatchWithEventSelAndArgs:@selector(foo:), 1];
-        [ZDSingleRouter dispatchWithEventSelAndArgs:@selector(foo:), 1];
+        [ZD1V1Router dispatchWithEventSelAndArgs:@selector(foo:), 1];
+        [ZD1V1Router dispatchWithEventSelAndArgs:@selector(foo:), 1];
         
-        [ZDSingleRouter dispatchWithEventSelAndArgs:@selector(bar:), @{
+        [ZD1V1Router dispatchWithEventSelAndArgs:@selector(bar:), @{
             @"name": @"zero.d.saber"
         }];
     )
     
-    [ZDSingleRouter dispatchWithEventId:@"100" selAndArgs:@selector(zdr_handleEvent:userInfo:callback:), 200, @{@100: @"100"}, nil];
+    [ZD1V1Router dispatchWithEventId:@"100" selAndArgs:@selector(zdr_handleEvent:userInfo:callback:), 200, @{@100: @"100"}, nil];
     
-    [ZDBroadcastRouter dispatchWithProtocol:@protocol(ZDRCommonProtocol) selAndArgs:@selector(zdr_handleEvent:userInfo:callback:), 101, @{}, nil];
+    [ZD1VMRouter dispatchWithProtocol:@protocol(ZDRCommonProtocol) selAndArgs:@selector(zdr_handleEvent:userInfo:callback:), 101, @{}, nil];
 }
 
 @end

@@ -1,11 +1,11 @@
 //
-//  ZDBroadcastRouter.m
+//  ZD1VMRouter.m
 //  ZDRouter
 //
 //  Created by Zero.D.Saber on 2023/7/30.
 //
 
-#import "ZDBroadcastRouter.h"
+#import "ZD1VMRouter.h"
 #import <mach-o/getsect.h>
 #import <mach-o/loader.h>
 #import <mach-o/dyld.h>
@@ -16,14 +16,14 @@
 #import "ZDRServiceBox.h"
 #import "ZDREventResponder.h"
 
-@interface ZDBroadcastRouter ()
+@interface ZD1VMRouter ()
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDRServiceBox *> *> *storeMap;
 @end
 
-@implementation ZDBroadcastRouter
+@implementation ZD1VMRouter
 
 + (void)initialize {
-    if (self != ZDBroadcastRouter.class) {
+    if (self != ZD1VMRouter.class) {
         return;
     }
     
@@ -32,7 +32,7 @@
 #pragma mark - Singleton
 
 + (instancetype)shareInstance {
-    static ZDBroadcastRouter *instance = nil;
+    static ZD1VMRouter *instance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         instance = [[super allocWithZone:NULL] init];
@@ -61,7 +61,7 @@
 }
 
 + (void)_loadRegisterFromMacho {
-    NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDRServiceBox *> *> *storeMap = [ZDBroadcastRouter shareInstance].storeMap;
+    NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDRServiceBox *> *> *storeMap = [ZD1VMRouter shareInstance].storeMap;
     uint32_t imageCount = _dyld_image_count();
     for (uint32_t i = 0; i < imageCount; ++i) {
 #ifdef __LP64__
@@ -71,16 +71,16 @@
 #endif
         
         unsigned long size = 0;
-        uint8_t *sectionData = getsectiondata(mhp, SEG_DATA, ZDRouterOneToMoreSectionName, &size);
+        uint8_t *sectionData = getsectiondata(mhp, SEG_DATA, ZDRouter1VMSectionName, &size);
         if (!sectionData) {
             continue;
         }
         
-        struct ZDRMachOOneToMoreRegisterKV *items = (struct ZDRMachOOneToMoreRegisterKV *)sectionData;
-        uint64_t itemCount = size / sizeof(struct ZDRMachOOneToMoreRegisterKV);
+        struct ZDRMachO1VMRegisterKV *items = (struct ZDRMachO1VMRegisterKV *)sectionData;
+        uint64_t itemCount = size / sizeof(struct ZDRMachO1VMRegisterKV);
         for (uint64_t i = 0; i < itemCount; ++i) {
             @autoreleasepool {
-                struct ZDRMachOOneToMoreRegisterKV item = items[i];
+                struct ZDRMachO1VMRegisterKV item = items[i];
                 if (!item.key || !item.value) {
                     continue;
                 }
@@ -180,7 +180,7 @@
     [self _loadRegisterIfNeed];
     
     NSString *protoName = NSStringFromProtocol(protocol);
-    ZDBroadcastRouter *router = [self shareInstance];
+    ZD1VMRouter *router = [self shareInstance];
     NSMutableOrderedSet<ZDRServiceBox *> *orderSet = router.storeMap[protoName];
     if (!orderSet) {
         return;

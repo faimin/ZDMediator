@@ -1,5 +1,5 @@
 //
-//  ZDBroadcastRouter.h
+//  ZD1VMRouter.h
 //  ZDRouter
 //
 //  Created by Zero.D.Saber on 2023/7/30.
@@ -11,7 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class ZDRContext;
-@interface ZDBroadcastRouter : NSObject
+@interface ZD1VMRouter : NSObject
 
 @property (nonatomic, strong, nullable) ZDRContext *context;
 

@@ -1,11 +1,11 @@
 //
-//  ZDSingleRouter.m
+//  ZD1V1Router.m
 //  ZDRouter
 //
 //  Created by Zero.D.Saber on 2023/7/16.
 //
 
-#import "ZDSingleRouter.h"
+#import "ZD1V1Router.h"
 #import <dlfcn.h>
 #import <mach-o/getsect.h>
 #import <mach-o/loader.h>
@@ -17,17 +17,17 @@
 #import "ZDRServiceBox.h"
 #import "ZDREventResponder.h"
 
-@interface ZDSingleRouter ()
+@interface ZD1V1Router ()
 
 @property (nonatomic, strong) NSMutableDictionary<NSString *, ZDRServiceBox *> *storeMap;
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDREventResponder *> *> *serviceResponderMap; ///< 响应事件的Map
 
 @end
 
-@implementation ZDSingleRouter
+@implementation ZD1V1Router
 
 + (void)initialize {
-    if (self != ZDSingleRouter.class) {
+    if (self != ZD1V1Router.class) {
         return;
     }
 }
@@ -35,7 +35,7 @@
 #pragma mark - Singleton
 
 + (instancetype)shareInstance {
-    static ZDSingleRouter *instance = nil;
+    static ZD1V1Router *instance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         instance = [[super allocWithZone:NULL] init];
@@ -65,7 +65,7 @@
 }
 
 + (void)_loadRegisterFromMacho {
-    NSMutableDictionary<NSString *, ZDRServiceBox *> *storeMap = [ZDSingleRouter shareInstance].storeMap;
+    NSMutableDictionary<NSString *, ZDRServiceBox *> *storeMap = [ZD1V1Router shareInstance].storeMap;
     uint32_t imageCount = _dyld_image_count();
     for (uint32_t i = 0; i < imageCount; ++i) {
 #ifdef __LP64__
@@ -75,16 +75,16 @@
 #endif
         
         unsigned long size = 0;
-        uint8_t *sectionData = getsectiondata(mhp, SEG_DATA, ZDRouterSectionName, &size);
+        uint8_t *sectionData = getsectiondata(mhp, SEG_DATA, ZDRouter1V1SectionName, &size);
         if (!sectionData) {
             continue;
         }
         
-        struct ZDRMachORegisterKV *items = (struct ZDRMachORegisterKV *)sectionData;
-        uint64_t itemCount = size / sizeof(struct ZDRMachORegisterKV);
+        struct ZDRMachO1V1RegisterKV *items = (struct ZDRMachO1V1RegisterKV *)sectionData;
+        uint64_t itemCount = size / sizeof(struct ZDRMachO1V1RegisterKV);
         for (uint64_t i = 0; i < itemCount; ++i) {
             @autoreleasepool {
-                struct ZDRMachORegisterKV item = items[i];
+                struct ZDRMachO1V1RegisterKV item = items[i];
                 if (!item.key || !item.value) {
                     continue;
                 }
@@ -171,7 +171,7 @@
     
     [self _loadRegisterIfNeed];
     
-    ZDSingleRouter *router = [self shareInstance];
+    ZD1V1Router *router = [self shareInstance];
     ZDRServiceBox *box = router.storeMap[serviceName];
     if (!box) {
         NSLog(@"please register class first");
@@ -211,7 +211,7 @@
         return NO;
     }
     
-    ZDSingleRouter *router = [self shareInstance];
+    ZD1V1Router *router = [self shareInstance];
     ZDRServiceBox *serviceBox = router.storeMap[key];
     serviceBox.autoInit = autoInitAgain;
     if (serviceBox.strongObj) {
@@ -265,7 +265,7 @@
         return;
     }
     
-    ZDSingleRouter *router = [self shareInstance];
+    ZD1V1Router *router = [self shareInstance];
     NSMutableOrderedSet<ZDREventResponder *> *set = router.serviceResponderMap[eventId];
     for (ZDREventResponder *obj in set) {
         id module = [self serviceWithName:obj.name];
@@ -285,7 +285,7 @@
         return;
     }
     
-    ZDSingleRouter *router = [self shareInstance];
+    ZD1V1Router *router = [self shareInstance];
     NSString *eventId = NSStringFromSelector(selector);
     NSMutableOrderedSet<ZDREventResponder *> *set = router.serviceResponderMap[eventId];
     for (ZDREventResponder *obj in set) {
@@ -308,7 +308,7 @@
         return nil;
     }
     
-    ZDSingleRouter *router = [self shareInstance];
+    ZD1V1Router *router = [self shareInstance];
     NSMutableDictionary<NSString *, ZDRServiceBox *> *storeDict = router.storeMap;
     ZDRServiceBox *box = storeDict[key];
     if (!box) {
@@ -323,7 +323,7 @@
         return;
     }
     
-    ZDSingleRouter *router = [self shareInstance];
+    ZD1V1Router *router = [self shareInstance];
     NSMutableOrderedSet<ZDREventResponder *> *orderSet = router.serviceResponderMap[eventKey];
     if (!orderSet) {
         orderSet = [[NSMutableOrderedSet alloc] init];

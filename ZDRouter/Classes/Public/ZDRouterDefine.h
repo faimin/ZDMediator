@@ -22,24 +22,25 @@ typedef NS_ENUM(NSInteger, ZDRPriority) {
 typedef id(^ZDRCommonCallback)() NS_SWIFT_UNAVAILABLE("ZDRCommonCallback not available");
 #pragma clang diagnostic pop
 
+//-------------------------1 V 1------------------------------
 
-struct ZDRMachORegisterKV {
+struct ZDRMachO1V1RegisterKV {
     const char *key;
     const char *value;
     const int autoInit;     ///< 0,1
     const int allClsMethod; ///< 0,1
 };
 
-#ifndef ZDRouterSectionName
-#define ZDRouterSectionName "__ZDRKV"
+#ifndef ZDRouter1V1SectionName
+#define ZDRouter1V1SectionName "__ZDRKV_1V1"
 #endif
 
 // 【Usage】:
 //  ZDRouterRegisterManual(protocolName, AViewController, 1, 0)
-#ifndef ZDRouterRegisterManual
-#define ZDRouterRegisterManual(protocol_name, cls, auto_init, protocol_all_cls_method) \
-__attribute__((no_sanitize_address)) __attribute__((used, section(SEG_DATA "," ZDRouterSectionName))) \
-static struct ZDRMachORegisterKV ZDRKV_##protocol_name_##cls = { \
+#ifndef ZDRouter1V1RegisterManual
+#define ZDRouter1V1RegisterManual(protocol_name, cls, auto_init, protocol_all_cls_method) \
+__attribute__((no_sanitize_address)) __attribute__((used, section(SEG_DATA "," ZDRouter1V1SectionName))) \
+static struct ZDRMachO1V1RegisterKV ZDRKV_##protocol_name_##cls = { \
     .key = (NO && ((void)@protocol(protocol_name), NO), #protocol_name), \
     .value = (NO && ((void)[cls class], NO), #cls), \
     .autoInit = (int)(auto_init), \
@@ -47,14 +48,14 @@ static struct ZDRMachORegisterKV ZDRKV_##protocol_name_##cls = { \
 };
 #endif
 
-#ifndef ZDRouterRegister
-#define ZDRouterRegister(protocol_name, cls) \
-ZDRouterRegisterManual(protocol_name, cls, 1, 0)
+#ifndef ZDRouter1V1Register
+#define ZDRouter1V1Register(protocol_name, cls) \
+ZDRouter1V1RegisterManual(protocol_name, cls, 1, 0)
 #endif
 
-//-------------------------------------------------------
+//-------------------------1 V many------------------------------
 
-struct ZDRMachOOneToMoreRegisterKV {
+struct ZDRMachO1VMRegisterKV {
     const char *key;
     const char *value;
     const int autoInit;     ///< 0,1
@@ -62,16 +63,16 @@ struct ZDRMachOOneToMoreRegisterKV {
     const int priority;
 };
 
-#ifndef ZDRouterOneToMoreSectionName
-#define ZDRouterOneToMoreSectionName "__ZDRBroadKV"
+#ifndef ZDRouter1VMSectionName
+#define ZDRouter1VMSectionName "__ZDRKV_1VM"
 #endif
 
 // 【Usage】:
-//  ZDRouterOneToMoreRegisterManual(protocolName, Class, 100, 1, 0)
-#ifndef ZDRouterOneToMoreRegisterManual
-#define ZDRouterOneToMoreRegisterManual(protocol_name, cls, _priority, auto_init, protocol_all_cls_method) \
-__attribute__((no_sanitize_address)) __attribute__((used, section(SEG_DATA "," ZDRouterOneToMoreSectionName))) \
-static struct ZDRMachOOneToMoreRegisterKV ZDRKV_OTM_##protocol_name_##cls = { \
+//  ZDRouter1VMRegisterManual(protocolName, Class, 100, 1, 0)
+#ifndef ZDRouter1VMRegisterManual
+#define ZDRouter1VMRegisterManual(protocol_name, cls, _priority, auto_init, protocol_all_cls_method) \
+__attribute__((no_sanitize_address)) __attribute__((used, section(SEG_DATA "," ZDRouter1VMSectionName))) \
+static struct ZDRMachO1VMRegisterKV ZDRKV_OTM_##protocol_name_##cls = { \
     .key = (NO && ((void)@protocol(protocol_name), NO), #protocol_name), \
     .value = (NO && ((void)[cls class], NO), #cls), \
     .autoInit = (int)(auto_init), \
@@ -80,9 +81,9 @@ static struct ZDRMachOOneToMoreRegisterKV ZDRKV_OTM_##protocol_name_##cls = { \
 };
 #endif
 
-#ifndef ZDRouterOneToMoreRegister
-#define ZDRouterOneToMoreRegister(protocol_name, cls, _priority) \
-ZDRouterOneToMoreRegisterManual(protocol_name, cls, _priority, 1, 0)
+#ifndef ZDRouter1VMRegister
+#define ZDRouter1VMRegister(protocol_name, cls, _priority) \
+ZDRouter1VMRegisterManual(protocol_name, cls, _priority, 1, 0)
 #endif
 
 #endif /* ZDRouterDefine_h */
