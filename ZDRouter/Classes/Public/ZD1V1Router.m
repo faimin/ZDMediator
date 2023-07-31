@@ -26,12 +26,6 @@
 
 @implementation ZD1V1Router
 
-+ (void)initialize {
-    if (self != ZD1V1Router.class) {
-        return;
-    }
-}
-
 #pragma mark - Singleton
 
 + (instancetype)shareInstance {

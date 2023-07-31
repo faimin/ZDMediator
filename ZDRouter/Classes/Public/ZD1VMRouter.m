@@ -22,13 +22,6 @@
 
 @implementation ZD1VMRouter
 
-+ (void)initialize {
-    if (self != ZD1VMRouter.class) {
-        return;
-    }
-    
-}
-
 #pragma mark - Singleton
 
 + (instancetype)shareInstance {
@@ -214,7 +207,7 @@
         return nil;
     }
     
-    NSMutableDictionary *storeDict = [self shareInstance].storeMap;
+    NSMutableDictionary *storeDict = [ZD1VMRouter shareInstance].storeMap;
     NSMutableOrderedSet *orderSet = storeDict[key];
     if (!orderSet) {
         orderSet = [[NSMutableOrderedSet alloc] init];
