@@ -1,39 +1,41 @@
 //
 //  ZDCat.m
-//  ZDRouter_Tests
+//  ZDMediator_Tests
 //
 //  Created by Zero.D.Saber on 2023/7/22.
 //  Copyright © 2023 8207436. All rights reserved.
 //
 
 #import "ZDCat.h"
-#import <ZDRouter/ZDRouter.h>
+#import <ZDMediator/ZDMediator.h>
 
-//ZDRouter1V1Register(CatProtocol, ZDCat)
-ZDRouter1VMRegister(ZDRCommonProtocol, ZDCat, 1)
+// ZDMediator1V1Register(CatProtocol, ZDCat)
+ZDMediator1VMRegister(ZDMCommonProtocol, ZDCat, 1)
 
-@implementation ZDCat
+    @implementation ZDCat
 
 - (void)dealloc {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
+  NSLog(@"%s", __PRETTY_FUNCTION__);
 }
 
 - (void)moduleWillDealloc {
-    NSLog(@"小猫要释放了， %@", self);
+  NSLog(@"小猫要释放了， %@", self);
 }
 
 - (NSString *)name {
-    return @"animal - cat";
+  return @"animal - cat";
 }
 
-- (BOOL)zdr_handleEvent:(NSInteger)event userInfo:(id)userInfo callback:(ZDRCommonCallback)callback {
-    if (event == 100) {
-        if (callback) {
-            callback(self.name);
-        }
-        return YES;
+- (BOOL)zdm_handleEvent:(NSInteger)event
+               userInfo:(id)userInfo
+               callback:(ZDMCommonCallback)callback {
+  if (event == 100) {
+    if (callback) {
+      callback(self.name);
     }
-    return NO;
+    return YES;
+  }
+  return NO;
 }
 
 @end

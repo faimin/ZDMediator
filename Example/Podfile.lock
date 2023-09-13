@@ -1,16 +1,16 @@
 PODS:
-  - ZDRouter (0.0.3.1)
+  - ZDMediator (0.0.4.2)
 
 DEPENDENCIES:
-  - ZDRouter (from `../`)
+  - ZDMediator (from `../`)
 
 EXTERNAL SOURCES:
-  ZDRouter:
+  ZDMediator:
     :path: "../"
 
 SPEC CHECKSUMS:
-  ZDRouter: ec63da3c5de24b5f7659d7151e7f74f60a795edb
+  ZDMediator: 7218cb3e586b8a12fa92ee463302795cbbac4e3e
 
-PODFILE CHECKSUM: e9ee58fb5a690700fca92e83610238c8295dc599
+PODFILE CHECKSUM: c1d83561b2c0825ce845956b60ef00441ec3fc5c
 
 COCOAPODS: 1.12.1
