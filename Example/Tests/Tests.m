@@ -26,22 +26,22 @@
 
   __auto_type cat = [ZDCat new];
 
-  [ZD1V1Router manualRegisterService:@protocol(CatProtocol) implementer:cat];
+  [ZDM1V1Router manualRegisterService:@protocol(CatProtocol) implementer:cat];
 
-  [ZD1V1Router registerResponder:@protocol(DogProtocol)
+  [ZDM1V1Router registerResponder:@protocol(DogProtocol)
                         priority:ZDMPriorityHigh
                        selectors:@selector(foo:), @selector(bar:), nil];
 
-  [ZD1V1Router registerResponder:@protocol(DogProtocol)
+  [ZDM1V1Router registerResponder:@protocol(DogProtocol)
                         priority:ZDMPriorityDefalut
                          eventId:@"100", @"200"];
-  [ZD1V1Router registerResponder:@protocol(CatProtocol)
+  [ZDM1V1Router registerResponder:@protocol(CatProtocol)
                         priority:ZDMPriorityDefalut
                          eventId:@"100", @"200"];
 }
 
 - (void)tearDown {
-  [ZD1V1Router removeService:@protocol(CatProtocol) autoInitAgain:NO];
+  [ZDM1V1Router removeService:@protocol(CatProtocol) autoInitAgain:NO];
 
   NSString *name = [GetService(CatProtocol) name];
   XCTAssertNil(name);
@@ -85,18 +85,18 @@
 
 - (void)testDispatch {
   ZDMIGNORE_SELWARNING(
-      [ZD1V1Router dispatchWithEventSelAndArgs:@selector(foo:), 1];
-      [ZD1V1Router dispatchWithEventSelAndArgs:@selector(foo:), 1];
+      [ZDM1V1Router dispatchWithEventSelAndArgs:@selector(foo:), 1];
+      [ZDM1V1Router dispatchWithEventSelAndArgs:@selector(foo:), 1];
 
-      [ZD1V1Router dispatchWithEventSelAndArgs:@selector(bar:),
+      [ZDM1V1Router dispatchWithEventSelAndArgs:@selector(bar:),
                                                @{@"name" : @"zero.d.saber"}];)
 
-  [ZD1V1Router dispatchWithEventId:@"100"
+  [ZDM1V1Router dispatchWithEventId:@"100"
                         selAndArgs:@selector(zdm_handleEvent:
                                                     userInfo:callback:),
                                    200, @{@100 : @"100"}, nil];
 
-  [ZD1VMRouter dispatchWithProtocol:@protocol(ZDMCommonProtocol)
+  [ZDM1VMRouter dispatchWithProtocol:@protocol(ZDMCommonProtocol)
                          selAndArgs:@selector(zdm_handleEvent:
                                                      userInfo:callback:),
                                     101, @{}, nil];

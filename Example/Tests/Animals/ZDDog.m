@@ -17,7 +17,7 @@ ZDMediator1V1Register(DogProtocol, ZDDog)
 
 + (void)initialize {
   if (self == [ZDDog class]) {
-    [ZD1V1Router manualRegisterService:@protocol(ZDClassProtocol)
+    [ZDM1V1Router manualRegisterService:@protocol(ZDClassProtocol)
                            implementer:self];
   }
 }

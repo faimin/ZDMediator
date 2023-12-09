@@ -11,9 +11,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ZDMInvocation<__covariant R : id> : NSObject
 
-+ (R)zd_target:(id)target invokeSelectorWithArgs:(SEL)selector, ...;
++ (R)target:(id)target invokeSelectorWithArgs:(SEL)selector, ...;
 
-+ (R)zd_target:(id)target invokeSelector:(SEL)selector args:(va_list)args;
++ (R)target:(id)target invokeSelector:(SEL)selector args:(va_list)args;
 
 @end
 

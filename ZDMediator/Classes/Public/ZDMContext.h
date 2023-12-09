@@ -5,7 +5,7 @@
 //  Created by Zero.D.Saber on 2023/7/15.
 //
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

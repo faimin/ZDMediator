@@ -1,5 +1,5 @@
 //
-//  ZD1V1Router.h
+//  ZDM1V1Router.h
 //  ZDMediator
 //
 //  Created by Zero.D.Saber on 2023/7/16.
@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class ZDMContext;
 
 /// One-to-one communication
-@interface ZD1V1Router : NSObject
+@interface ZDM1V1Router : NSObject
 
 @property (nonatomic, strong, nullable) ZDMContext *context;
 
@@ -102,13 +102,13 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark -
 
 #ifndef GetService
-#define GetService(proto) ((id<proto>)[ZD1V1Router service:@protocol(proto)])
+#define GetService(proto) ((id<proto>)[ZDM1V1Router service:@protocol(proto)])
 #endif
 
 #ifndef GetServiceWithClass
 #define GetServiceWithClass(proto, clz)                                        \
   ({                                                                           \
-    clz *obj = (clz *)[ZD1V1Router service:@protocol(proto)];                  \
+    clz *obj = (clz *)[ZDM1V1Router service:@protocol(proto)];                 \
     if (!obj || ![obj isKindOfClass:clz.class]) {                              \
       obj = nil;                                                               \
     }                                                                          \

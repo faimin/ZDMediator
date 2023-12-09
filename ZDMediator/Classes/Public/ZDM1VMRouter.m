@@ -1,11 +1,11 @@
 //
-//  ZD1VMRouter.m
+//  ZDM1VMRouter.m
 //  ZDMediator
 //
 //  Created by Zero.D.Saber on 2023/7/30.
 //
 
-#import "ZD1VMRouter.h"
+#import "ZDM1VMRouter.h"
 #import "ZDMCommonProtocol.h"
 #import "ZDMContext.h"
 #import "ZDMEventResponder.h"
@@ -16,18 +16,18 @@
 #import <mach-o/loader.h>
 #import <objc/runtime.h>
 
-@interface ZD1VMRouter ()
-@property(nonatomic, strong)
-NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDMServiceBox *> *>
-*storeMap;
+@interface ZDM1VMRouter ()
+
+@property(nonatomic, strong) NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDMServiceBox *> *> *storeMap;
+
 @end
 
-@implementation ZD1VMRouter
+@implementation ZDM1VMRouter
 
 #pragma mark - Singleton
 
 + (instancetype)shareInstance {
-    static ZD1VMRouter *instance = nil;
+    static ZDM1VMRouter *instance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         instance = [[super allocWithZone:NULL] init];
@@ -57,7 +57,7 @@ NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDMServiceBox *> *>
 
 + (void)_loadRegisterFromMacho {
     NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDMServiceBox *> *>
-    *storeMap = [ZD1VMRouter shareInstance].storeMap;
+    *storeMap = [ZDM1VMRouter shareInstance].storeMap;
     uint32_t imageCount = _dyld_image_count();
     for (uint32_t i = 0; i < imageCount; ++i) {
 #ifdef __LP64__
@@ -199,7 +199,7 @@ NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDMServiceBox *> *>
     [self _loadRegisterIfNeed];
     
     NSString *protoName = NSStringFromProtocol(protocol);
-    ZD1VMRouter *router = [self shareInstance];
+    ZDM1VMRouter *router = [self shareInstance];
     NSMutableOrderedSet<ZDMServiceBox *> *orderSet = router.storeMap[protoName];
     if (!orderSet) {
         return;
@@ -220,7 +220,7 @@ NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDMServiceBox *> *>
         
         va_list args;
         va_start(args, selector);
-        [ZDMInvocation zd_target:module invokeSelector:selector args:args];
+        [ZDMInvocation target:module invokeSelector:selector args:args];
         va_end(args);
     }
 }
@@ -232,7 +232,7 @@ NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDMServiceBox *> *>
         return nil;
     }
     
-    NSMutableDictionary *storeDict = [ZD1VMRouter shareInstance].storeMap;
+    NSMutableDictionary *storeDict = [ZDM1VMRouter shareInstance].storeMap;
     NSMutableOrderedSet *orderSet = storeDict[key];
     if (!orderSet) {
         orderSet = [[NSMutableOrderedSet alloc] init];

@@ -11,16 +11,16 @@
 
 @implementation ZDMInvocation
 
-+ (id)zd_target:(id)target invokeSelectorWithArgs:(SEL)selector, ... {
++ (id)target:(id)target invokeSelectorWithArgs:(SEL)selector, ... {
     va_list args;
     va_start(args, selector);
-    id result = [self zd_target:target invokeSelector:selector args:args];
+    id result = [self target:target invokeSelector:selector args:args];
     va_end(args);
     
     return result;
 }
 
-+ (id)zd_target:(id)target invokeSelector:(SEL)selector args:(va_list)args {
++ (id)target:(id)target invokeSelector:(SEL)selector args:(va_list)args {
     if (![target respondsToSelector:selector]) {
         if ([[target class] respondsToSelector:selector]) {
             target = [target class];
