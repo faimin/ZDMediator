@@ -24,13 +24,20 @@ typedef NS_ENUM(NSInteger, ZDMPriority) {
 typedef id (^ZDMCommonCallback)();
 #pragma clang diagnostic pop
 
+#ifndef ZDMIGNORE_SELWARNING
+#define ZDMIGNORE_SELWARNING(...)                                              \
+  _Pragma("clang diagnostic push")                                             \
+      _Pragma("clang diagnostic ignored \"-Wundeclared-selector\"")            \
+          __VA_ARGS__ _Pragma("clang diagnostic pop")
+#endif
+
 //-------------------------1 V 1------------------------------
 
 struct ZDMMachO1V1RegisterKV {
-  const char *key;
-  const char *value;
-  const int autoInit;     ///< 0,1
-  const int allClsMethod; ///< 0,1
+    const char *key;
+    const char *value;
+    const int autoInit;     ///< 0,1
+    const int allClsMethod; ///< 0,1
 };
 
 #ifndef ZDMediator1V1SectionName
@@ -63,11 +70,11 @@ struct ZDMMachO1V1RegisterKV {
 //-------------------------1 V many------------------------------
 
 struct ZDMMachO1VMRegisterKV {
-  const char *key;
-  const char *value;
-  const int autoInit;     ///< 0,1
-  const int allClsMethod; ///< 0,1
-  const int priority;
+    const char *key;
+    const char *value;
+    const int autoInit;     ///< 0,1
+    const int allClsMethod; ///< 0,1
+    const int priority;
 };
 
 #ifndef ZDMediator1VMSectionName

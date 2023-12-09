@@ -11,8 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ZDMContext : NSObject
 
-@property(nonatomic, strong) NSDictionary *launchOptions;
-@property(nonatomic, strong, nullable) id extraObj;
+@property (nonatomic, strong) NSDictionary *launchOptions;
+@property (nonatomic, strong, nullable) id extraObj;
 
 @end
 

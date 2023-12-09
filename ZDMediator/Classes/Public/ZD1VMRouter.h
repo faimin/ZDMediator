@@ -11,9 +11,11 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class ZDMContext;
+
+/// One-to-many communication
 @interface ZD1VMRouter : NSObject
 
-@property(nonatomic, strong, nullable) ZDMContext *context;
+@property (nonatomic, strong, nullable) ZDMContext *context;
 
 + (instancetype)shareInstance;
 

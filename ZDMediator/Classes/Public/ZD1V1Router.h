@@ -12,9 +12,11 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class ZDMContext;
+
+/// One-to-one communication
 @interface ZD1V1Router : NSObject
 
-@property(nonatomic, strong, nullable) ZDMContext *context;
+@property (nonatomic, strong, nullable) ZDMContext *context;
 
 /// singleton
 + (instancetype)shareInstance;
@@ -25,8 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param serviceProtocol protocol
 /// @param cls implementer Class (instance or Class)
 + (void)registerService:(Protocol *)serviceProtocol implementClass:(Class)cls;
-+ (void)registerServiceName:(NSString *)serviceProtocolName
-         implementClassName:(NSString *)clsName;
++ (void)registerServiceName:(NSString *)serviceProtocolName implementClassName:(NSString *)clsName;
 
 /// manual register implementer to map
 /// - Parameters:
@@ -50,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// delete service from store map
 /// @param serviceProtocol protocol of service
-/// @param autoInitAgain wheter init again
+/// @param autoInitAgain whether init again
 + (BOOL)removeService:(Protocol *)serviceProtocol
         autoInitAgain:(BOOL)autoInitAgain;
 
@@ -113,13 +114,6 @@ NS_ASSUME_NONNULL_BEGIN
     }                                                                          \
     obj;                                                                       \
   })
-#endif
-
-#ifndef ZDMIGNORE_SELWARNING
-#define ZDMIGNORE_SELWARNING(...)                                              \
-  _Pragma("clang diagnostic push")                                             \
-      _Pragma("clang diagnostic ignored \"-Wundeclared-selector\"")            \
-          __VA_ARGS__ _Pragma("clang diagnostic pop")
 #endif
 
 //------------------------------------------

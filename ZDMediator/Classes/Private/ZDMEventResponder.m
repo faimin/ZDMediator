@@ -10,21 +10,21 @@
 @implementation ZDMEventResponder
 
 - (void)dealloc {
-  NSLog(@"%s", __PRETTY_FUNCTION__);
+    NSLog(@"%s", __PRETTY_FUNCTION__);
 }
 
 #pragma mark -
 
 - (BOOL)isEqual:(ZDMEventResponder *)object {
-  if (![self isKindOfClass:object.class]) {
-    return NO;
-  }
-  BOOL res = [self.name isEqualToString:object.name];
-  return res;
+    if (![self isKindOfClass:object.class]) {
+        return NO;
+    }
+    BOOL res = [self.name isEqualToString:object.name];
+    return res;
 }
 
 - (NSUInteger)hash {
-  return self.name.hash ^ self.priority;
+    return self.name.hash ^ self.priority;
 }
 
 @end
