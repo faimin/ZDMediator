@@ -8,8 +8,8 @@
 
 Pod::Spec.new do |s|
   s.name             = 'ZDMediator'
-  s.version          = '0.0.4.2'
-  s.summary          = 'iOS中间人'
+  s.version          = '0.1.0'
+  s.summary          = 'decoupled communication'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -42,11 +42,4 @@ Pod::Spec.new do |s|
 
   s.source_files = 'ZDMediator/Classes/**/*'
   s.project_header_files = 'ZDMediator/Classes/Private/*.h'
-  
-  # s.resource_bundles = {
-  #   'ZDMediator' => ['ZDMediator/Assets/*.png']
-  # }
-
-  # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
 end
