@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.version          = '0.1.0'
   s.summary          = '模块通信中间件'
   s.description      = <<-DESC
-    模块间通信的中间件，支持自动注册和手动注册
+    用于模块间通信的中间件，支持自动注册和手动注册
                        DESC
   s.homepage         = 'https://github.com/faimin/ZDMediator'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }

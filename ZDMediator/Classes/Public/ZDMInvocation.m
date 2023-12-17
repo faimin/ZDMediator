@@ -36,7 +36,7 @@
     invocation.target = target;
     invocation.selector = selector;
     
-    [self _buildInvocation:invocation singature:signature args:args];
+    [self _buildInvocation:invocation signature:signature args:args];
     
     [invocation invoke];
     
@@ -47,7 +47,7 @@
 #pragma mark - Private
 
 + (void)_buildInvocation:(NSInvocation *)invocation
-              singature:(NSMethodSignature *)signature
+              signature:(NSMethodSignature *)signature
                    args:(va_list)args {
     NSUInteger argsCount = signature.numberOfArguments;
     for (NSUInteger index = 2; index < argsCount; ++index) {
@@ -189,7 +189,7 @@
                 };
                 for (int i = 0; i < size; i++)
                     va_arg(args, struct dummy);
-                NSLog(@"ZDMInvocation _buildInvocation:singature:args: unsupported type:%s (%lu " @"bytes)", [signature getArgumentTypeAtIndex:index], (unsigned long)size);
+                NSLog(@"ZDMInvocation _buildInvocation:signature:args: unsupported type:%s (%lu " @"bytes)", [signature getArgumentTypeAtIndex:index], (unsigned long)size);
             }
 #undef case_size
         }
