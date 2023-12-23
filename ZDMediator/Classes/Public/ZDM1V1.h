@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) ZDMContext *context;
 
 /// singleton
-+ (instancetype)shareInstance;
++ (ZDM1V1 *)shareInstance;
 
 #pragma mark - Set
 

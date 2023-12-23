@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, nullable) ZDMContext *context;
 
-+ (instancetype)shareInstance;
++ (ZDM1VM *)shareInstance;
 
 + (void)registerService:(Protocol *)serviceProtocol
          implementClass:(Class)cls

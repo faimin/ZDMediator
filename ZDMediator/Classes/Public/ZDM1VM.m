@@ -18,7 +18,9 @@
 
 @interface ZDM1VM ()
 
-@property(nonatomic, strong) NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDMServiceBox *> *> *storeMap;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDMServiceBox *> *> *storeMap;
+
+@property (nonatomic, strong) NSRecursiveLock *lock;
 
 @end
 
@@ -26,7 +28,7 @@
 
 #pragma mark - Singleton
 
-+ (instancetype)shareInstance {
++ (ZDM1VM *)shareInstance {
     static ZDM1VM *instance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -43,6 +45,8 @@
 #pragma mark - Inner Method
 
 - (void)_setup {
+    _lock = [[NSRecursiveLock alloc] init];
+    _lock.name = @"ZDM1VM_lock";
     _storeMap = @{}.mutableCopy;
 }
 
@@ -102,16 +106,11 @@
         }
         
         // sort
-        [storeMap enumerateKeysAndObjectsUsingBlock:^(
-                                                      NSString *_Nonnull key,
-                                                      NSMutableOrderedSet<ZDMServiceBox *> *_Nonnull obj,
-                                                      BOOL *_Nonnull stop) {
-                                                          [obj sortUsingComparator:^NSComparisonResult(
-                                                                                                       ZDMServiceBox *_Nonnull obj1, ZDMServiceBox *_Nonnull obj2) {
-                                                                                                           return obj1.priority >= obj2.priority ? NSOrderedAscending
-                                                                                                           : NSOrderedDescending;
-                                                                                                       }];
-                                                      }];
+        [storeMap enumerateKeysAndObjectsUsingBlock:^(NSString *_Nonnull key, NSMutableOrderedSet<ZDMServiceBox *> *_Nonnull obj, BOOL *_Nonnull stop) {
+            [obj sortUsingComparator:^NSComparisonResult(ZDMServiceBox *_Nonnull obj1, ZDMServiceBox *_Nonnull obj2) {
+                return obj1.priority >= obj2.priority ? NSOrderedAscending : NSOrderedDescending;
+            }];
+        }];
     }
 }
 
@@ -134,8 +133,7 @@
     ZDMServiceBox *box = [[ZDMServiceBox alloc] initWithClass:cls];
     box.priority = priority;
     
-    NSMutableOrderedSet<ZDMServiceBox *> *orderSet =
-    [self _createServiceOrderSetIfNeedWithKey:key];
+    NSMutableOrderedSet<ZDMServiceBox *> *orderSet = [self _createServiceOrderSetIfNeedWithKey:key];
     [self _insertObj:box toOrderSet:orderSet];
 }
 
@@ -181,8 +179,7 @@
         box.strongObj = obj;
     }
     
-    NSMutableOrderedSet *orderSet =
-    [self _createServiceOrderSetIfNeedWithKey:key];
+    NSMutableOrderedSet *orderSet = [self _createServiceOrderSetIfNeedWithKey:key];
     [self _insertObj:box toOrderSet:orderSet];
 }
 
@@ -232,12 +229,15 @@
         return nil;
     }
     
-    NSMutableDictionary *storeDict = [ZDM1VM shareInstance].storeMap;
-    NSMutableOrderedSet *orderSet = storeDict[key];
+    NSMutableDictionary *storeMap = [self shareInstance].storeMap;
+    __auto_type lock = [self shareInstance].lock;
+    [lock lock];
+    NSMutableOrderedSet *orderSet = storeMap[key];
     if (!orderSet) {
         orderSet = [[NSMutableOrderedSet alloc] init];
-        storeDict[key] = orderSet;
+        storeMap[key] = orderSet;
     }
+    [lock unlock];
     return orderSet;
 }
 
@@ -245,6 +245,8 @@
         toOrderSet:(NSMutableOrderedSet *)orderSet {
     NSInteger priority = box.priority;
     
+    __auto_type lock = [self shareInstance].lock;
+    [lock lock];
     __block NSInteger position = NSNotFound;
     [orderSet enumerateObjectsUsingBlock:^(ZDMServiceBox *_Nonnull obj, NSUInteger idx, BOOL *_Nonnull stop) {
         if (obj.priority <= priority) {
@@ -256,6 +258,7 @@
     if (position == NSNotFound) {
         [orderSet addObject:box];
     }
+    [lock unlock];
 }
 
 @end

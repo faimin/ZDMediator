@@ -21,6 +21,7 @@
 
 @property (nonatomic, strong) NSMutableDictionary<NSString *, ZDMServiceBox *> *storeMap;
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDMEventResponder *> *> *serviceResponderMap; ///< 响应事件的Map
+@property (nonatomic, strong) NSRecursiveLock *lock;
 
 @end
 
@@ -28,7 +29,7 @@
 
 #pragma mark - Singleton
 
-+ (instancetype)shareInstance {
++ (ZDM1V1 *)shareInstance {
     static ZDM1V1 *instance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -45,6 +46,8 @@
 #pragma mark - Inner Method
 
 - (void)_setup {
+    _lock = [[NSRecursiveLock alloc] init];
+    _lock.name = @"ZDM1V1_lock";
     _storeMap = @{}.mutableCopy;
     _serviceResponderMap = @{}.mutableCopy;
 }
@@ -59,8 +62,7 @@
 }
 
 + (void)_loadRegisterFromMacho {
-    NSMutableDictionary<NSString *, ZDMServiceBox *> *storeMap =
-    [ZDM1V1 shareInstance].storeMap;
+    NSMutableDictionary<NSString *, ZDMServiceBox *> *storeMap = [ZDM1V1 shareInstance].storeMap;
     uint32_t imageCount = _dyld_image_count();
     for (uint32_t i = 0; i < imageCount; ++i) {
 #ifdef __LP64__
@@ -172,7 +174,9 @@
     [self _loadRegisterIfNeed];
     
     ZDM1V1 *router = [self shareInstance];
+    [router.lock lock];
     ZDMServiceBox *box = router.storeMap[serviceName];
+    [router.lock unlock];
     if (!box) {
         NSLog(@"please register class first");
         return nil;
@@ -211,7 +215,9 @@
     }
     
     ZDM1V1 *router = [self shareInstance];
+    [router.lock lock];
     ZDMServiceBox *serviceBox = router.storeMap[key];
+    [router.lock unlock];
     serviceBox.autoInit = autoInitAgain;
     if (serviceBox.strongObj) {
         serviceBox.strongObj = nil;
@@ -232,6 +238,8 @@
         return;
     }
     
+    __auto_type lock = [self shareInstance].lock;
+    [lock lock];
     va_list args;
     va_start(args, eventId);
     NSString *value = eventId;
@@ -242,6 +250,7 @@
         value = va_arg(args, NSString *);
     }
     va_end(args);
+    [lock unlock];
 }
 
 + (void)registerResponder:(Protocol *)serviceProtocol
@@ -251,6 +260,8 @@
         return;
     }
     
+    __auto_type lock = [self shareInstance].lock;
+    [lock lock];
     va_list args;
     va_start(args, selector);
     SEL value = selector;
@@ -262,6 +273,7 @@
         value = va_arg(args, SEL);
     }
     va_end(args);
+    [lock unlock];
 }
 
 #pragma mark - Dispatch
@@ -273,8 +285,7 @@
     }
     
     ZDM1V1 *router = [self shareInstance];
-    NSMutableOrderedSet<ZDMEventResponder *> *set =
-    router.serviceResponderMap[eventId];
+    NSMutableOrderedSet<ZDMEventResponder *> *set = router.serviceResponderMap[eventId];
     for (ZDMEventResponder *obj in set) {
         id module = [self serviceWithName:obj.name];
         if (!module) {
@@ -318,12 +329,14 @@
     }
     
     ZDM1V1 *router = [self shareInstance];
-    NSMutableDictionary<NSString *, ZDMServiceBox *> *storeDict = router.storeMap;
-    ZDMServiceBox *box = storeDict[key];
+    NSMutableDictionary<NSString *, ZDMServiceBox *> *storeMap = router.storeMap;
+    [router.lock lock];
+    ZDMServiceBox *box = storeMap[key];
     if (!box) {
         box = [[ZDMServiceBox alloc] init];
-        storeDict[key] = box;
+        storeMap[key] = box;
     }
+    [router.lock unlock];
     return box;
 }
 
@@ -335,8 +348,7 @@
     }
     
     ZDM1V1 *router = [self shareInstance];
-    NSMutableOrderedSet<ZDMEventResponder *> *orderSet =
-    router.serviceResponderMap[eventKey];
+    NSMutableOrderedSet<ZDMEventResponder *> *orderSet = router.serviceResponderMap[eventKey];
     if (!orderSet) {
         orderSet = [[NSMutableOrderedSet alloc] init];
         router.serviceResponderMap[eventKey] = orderSet;
