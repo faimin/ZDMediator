@@ -26,22 +26,22 @@
 
   __auto_type cat = [ZDCat new];
 
-  [ZDM1V1Router manualRegisterService:@protocol(CatProtocol) implementer:cat];
+  [ZDM1V1 manualRegisterService:@protocol(CatProtocol) implementer:cat];
 
-  [ZDM1V1Router registerResponder:@protocol(DogProtocol)
-                        priority:ZDMPriorityHigh
-                       selectors:@selector(foo:), @selector(bar:), nil];
+  [ZDM1V1 registerResponder:@protocol(DogProtocol)
+                   priority:ZDMPriorityHigh
+                  selectors:@selector(foo:), @selector(bar:), nil];
 
-  [ZDM1V1Router registerResponder:@protocol(DogProtocol)
-                        priority:ZDMPriorityDefalut
-                         eventId:@"100", @"200"];
-  [ZDM1V1Router registerResponder:@protocol(CatProtocol)
-                        priority:ZDMPriorityDefalut
-                         eventId:@"100", @"200"];
+  [ZDM1V1 registerResponder:@protocol(DogProtocol)
+                   priority:ZDMPriorityDefalut
+                    eventId:@"100", @"200"];
+  [ZDM1V1 registerResponder:@protocol(CatProtocol)
+                   priority:ZDMPriorityDefalut
+                    eventId:@"100", @"200"];
 }
 
 - (void)tearDown {
-  [ZDM1V1Router removeService:@protocol(CatProtocol) autoInitAgain:NO];
+  [ZDM1V1 removeService:@protocol(CatProtocol) autoInitAgain:NO];
 
   NSString *name = [GetService(CatProtocol) name];
   XCTAssertNil(name);
@@ -68,38 +68,33 @@
                                                     }];
   XCTAssertFalse(dogResult1);
 
-  BOOL dogResult2 = [GetService(DogProtocol)
-      zdm_handleEvent:200
-             userInfo:@{}
-             callback:^id(NSUInteger x, NSString *y) {
-               NSString *a = [NSString stringWithFormat:@"%zd, %@", x, y];
-               XCTAssertEqual(x, 2);
-               return a;
-             }];
+  BOOL dogResult2 =
+      [GetService(DogProtocol) zdm_handleEvent:200
+                                      userInfo:@{}
+                                      callback:^id(NSUInteger x, NSString *y) {
+                                        NSString *a = [NSString stringWithFormat:@"%zd, %@", x, y];
+                                        XCTAssertEqual(x, 2);
+                                        return a;
+                                      }];
   XCTAssertTrue(dogResult2);
 
-  NSArray *dogResult3 = [GetService(ZDClassProtocol) foo:@[ @1, @2 ]
-                                                     bar:@[ @3, @4, @5 ]];
+  NSArray *dogResult3 = [GetService(ZDClassProtocol) foo:@[ @1, @2 ] bar:@[ @3, @4, @5 ]];
   XCTAssertEqual(dogResult3.count, 5);
 }
 
 - (void)testDispatch {
   ZDMIGNORE_SELWARNING(
-      [ZDM1V1Router dispatchWithEventSelAndArgs:@selector(foo:), 1];
-      [ZDM1V1Router dispatchWithEventSelAndArgs:@selector(foo:), 1];
+      [ZDM1V1 dispatchWithEventSelAndArgs:@selector(foo:), 1];
+      [ZDM1V1 dispatchWithEventSelAndArgs:@selector(foo:), 1];
 
-      [ZDM1V1Router dispatchWithEventSelAndArgs:@selector(bar:),
-                                               @{@"name" : @"zero.d.saber"}];)
+      [ZDM1V1 dispatchWithEventSelAndArgs:@selector(bar:), @{@"name" : @"zero.d.saber"}];)
 
-  [ZDM1V1Router dispatchWithEventId:@"100"
-                        selAndArgs:@selector(zdm_handleEvent:
-                                                    userInfo:callback:),
-                                   200, @{@100 : @"100"}, nil];
+  [ZDM1V1 dispatchWithEventId:@"100"
+                   selAndArgs:@selector(zdm_handleEvent:userInfo:callback:), 200, @{@100 : @"100"},
+                              nil];
 
-  [ZDM1VMRouter dispatchWithProtocol:@protocol(ZDMCommonProtocol)
-                         selAndArgs:@selector(zdm_handleEvent:
-                                                     userInfo:callback:),
-                                    101, @{}, nil];
+  [ZDM1VM dispatchWithProtocol:@protocol(ZDMCommonProtocol)
+                    selAndArgs:@selector(zdm_handleEvent:userInfo:callback:), 101, @{}, nil];
 }
 
 @end

@@ -1,5 +1,5 @@
 //
-//  ZDM1VMRouter.h
+//  ZDM1VM.h
 //  ZDMediator
 //
 //  Created by Zero.D.Saber on 2023/7/30.
@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class ZDMContext;
 
 /// One-to-many communication
-@interface ZDM1VMRouter : NSObject
+@interface ZDM1VM : NSObject
 
 @property (nonatomic, strong, nullable) ZDMContext *context;
 

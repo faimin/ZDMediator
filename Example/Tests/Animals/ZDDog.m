@@ -11,14 +11,13 @@
 #import <ZDMediator/ZDMediator.h>
 
 ZDMediator1V1Register(DogProtocol, ZDDog)
-    ZDMediator1VMRegister(ZDMCommonProtocol, ZDDog, 1)
+ZDMediator1VMRegister(ZDMCommonProtocol, ZDDog, 1)
 
-        @implementation ZDDog
+@implementation ZDDog
 
 + (void)initialize {
   if (self == [ZDDog class]) {
-    [ZDM1V1Router manualRegisterService:@protocol(ZDClassProtocol)
-                           implementer:self];
+    [ZDM1V1 manualRegisterService:@protocol(ZDClassProtocol) implementer:self];
   }
 }
 

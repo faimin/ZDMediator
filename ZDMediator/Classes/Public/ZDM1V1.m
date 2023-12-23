@@ -1,11 +1,11 @@
 //
-//  ZDM1V1Router.m
+//  ZDM1V1.m
 //  ZDMediator
 //
 //  Created by Zero.D.Saber on 2023/7/16.
 //
 
-#import "ZDM1V1Router.h"
+#import "ZDM1V1.h"
 #import "ZDMCommonProtocol.h"
 #import "ZDMContext.h"
 #import "ZDMEventResponder.h"
@@ -17,19 +17,19 @@
 #import <mach-o/loader.h>
 #import <objc/runtime.h>
 
-@interface ZDM1V1Router ()
+@interface ZDM1V1 ()
 
 @property (nonatomic, strong) NSMutableDictionary<NSString *, ZDMServiceBox *> *storeMap;
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDMEventResponder *> *> *serviceResponderMap; ///< 响应事件的Map
 
 @end
 
-@implementation ZDM1V1Router
+@implementation ZDM1V1
 
 #pragma mark - Singleton
 
 + (instancetype)shareInstance {
-    static ZDM1V1Router *instance = nil;
+    static ZDM1V1 *instance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         instance = [[super allocWithZone:NULL] init];
@@ -60,7 +60,7 @@
 
 + (void)_loadRegisterFromMacho {
     NSMutableDictionary<NSString *, ZDMServiceBox *> *storeMap =
-    [ZDM1V1Router shareInstance].storeMap;
+    [ZDM1V1 shareInstance].storeMap;
     uint32_t imageCount = _dyld_image_count();
     for (uint32_t i = 0; i < imageCount; ++i) {
 #ifdef __LP64__
@@ -171,7 +171,7 @@
     
     [self _loadRegisterIfNeed];
     
-    ZDM1V1Router *router = [self shareInstance];
+    ZDM1V1 *router = [self shareInstance];
     ZDMServiceBox *box = router.storeMap[serviceName];
     if (!box) {
         NSLog(@"please register class first");
@@ -210,7 +210,7 @@
         return NO;
     }
     
-    ZDM1V1Router *router = [self shareInstance];
+    ZDM1V1 *router = [self shareInstance];
     ZDMServiceBox *serviceBox = router.storeMap[key];
     serviceBox.autoInit = autoInitAgain;
     if (serviceBox.strongObj) {
@@ -272,7 +272,7 @@
         return;
     }
     
-    ZDM1V1Router *router = [self shareInstance];
+    ZDM1V1 *router = [self shareInstance];
     NSMutableOrderedSet<ZDMEventResponder *> *set =
     router.serviceResponderMap[eventId];
     for (ZDMEventResponder *obj in set) {
@@ -293,7 +293,7 @@
         return;
     }
     
-    ZDM1V1Router *router = [self shareInstance];
+    ZDM1V1 *router = [self shareInstance];
     NSString *eventId = NSStringFromSelector(selector);
     NSMutableOrderedSet<ZDMEventResponder *> *set =
     router.serviceResponderMap[eventId];
@@ -317,7 +317,7 @@
         return nil;
     }
     
-    ZDM1V1Router *router = [self shareInstance];
+    ZDM1V1 *router = [self shareInstance];
     NSMutableDictionary<NSString *, ZDMServiceBox *> *storeDict = router.storeMap;
     ZDMServiceBox *box = storeDict[key];
     if (!box) {
@@ -334,7 +334,7 @@
         return;
     }
     
-    ZDM1V1Router *router = [self shareInstance];
+    ZDM1V1 *router = [self shareInstance];
     NSMutableOrderedSet<ZDMEventResponder *> *orderSet =
     router.serviceResponderMap[eventKey];
     if (!orderSet) {

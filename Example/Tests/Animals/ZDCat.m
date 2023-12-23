@@ -12,7 +12,7 @@
 // ZDMediator1V1Register(CatProtocol, ZDCat)
 ZDMediator1VMRegister(ZDMCommonProtocol, ZDCat, 1)
 
-    @implementation ZDCat
+@implementation ZDCat
 
 - (void)dealloc {
   NSLog(@"%s", __PRETTY_FUNCTION__);
