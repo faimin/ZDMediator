@@ -16,6 +16,8 @@
 
 - (NSString *)name;
 
++ (NSString *)sex;
+
 @end
 
 #endif /* CatProtocol_h */

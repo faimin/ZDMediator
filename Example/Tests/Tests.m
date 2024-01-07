@@ -25,7 +25,6 @@
   // test method in the class.
 
   __auto_type cat = [ZDCat new];
-
   [ZDM1V1 manualRegisterService:@protocol(CatProtocol) implementer:cat];
 
   [ZDM1V1 registerResponder:@protocol(DogProtocol)
@@ -60,6 +59,11 @@
                                                       return @[ x ];
                                                     }];
   XCTAssertTrue(catResult1);
+    
+  NSString *sex = [GetService(CatProtocol) sex];
+  XCTAssertNotNil(sex);
+
+  //----------------------------------
 
   BOOL dogResult1 = [GetService(DogProtocol) zdm_handleEvent:100
                                                     userInfo:@{}

@@ -32,7 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// manual register implementer to map
 /// - Parameters:
 ///   - serviceProtocol: protocol
-///   - obj: protocol implementer (instance or Class)
+///   - obj: protocol implementer (instance or Class),
+///   if obj is a class, the `isProtocolAllClsMethod` will be set `true`
 ///   - weakStore: strong ref or weak ref, default is NO (strong ref)
 + (void)manualRegisterService:(Protocol *)serviceProtocol
                   implementer:(id)obj

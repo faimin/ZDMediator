@@ -1,5 +1,5 @@
 PODS:
-  - ZDMediator (0.1.2)
+  - ZDMediator (0.2.0)
 
 DEPENDENCIES:
   - ZDMediator (from `../`)
@@ -9,7 +9,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  ZDMediator: 1157e86881131c1dd0fdbc9d9037fafc0f09785b
+  ZDMediator: a60256a6c79340b39993c4d85dc82b34cf0388e9
 
 PODFILE CHECKSUM: c1d83561b2c0825ce845956b60ef00441ec3fc5c
 

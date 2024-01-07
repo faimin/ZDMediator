@@ -22,6 +22,37 @@ it, simply add the following line to your Podfile:
 pod 'ZDMediator'
 ```
 
+## Feature
+
+- Macho自动注册 或 手动注册
+- 生命周期可以自主控制
+- 实例方法协议、类方法协议
+- 事件分发
+
+## Usage
+
+- 注册
+
+```objectivec
+/// 自动注册
+// 一对一
+ZDMediator1V1Register(CatProtocol, ZDCat)
+
+// 一对多
+ZDMediator1VMRegister(ZDMCommonProtocol, ZDCat, 1)
+
+ ------
+
+/// 手动注册
+[ZDM1V1 manualRegisterService:@protocol(ZDClassProtocol) implementer:self weakStore:YES];
+```
+
+- 读取
+
+```objectivec
+NSString *sex = [GetService(CatProtocol) sex];
+```
+
 ## Author
 
 Zero.D.Saber, fuxianchao@gmail.com

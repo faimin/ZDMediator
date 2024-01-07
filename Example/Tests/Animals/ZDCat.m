@@ -38,4 +38,8 @@ ZDMediator1VMRegister(ZDMCommonProtocol, ZDCat, 1)
   return NO;
 }
 
++ (NSString *)sex {
+    return @"M";
+}
+
 @end

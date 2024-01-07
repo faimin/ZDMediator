@@ -6,16 +6,17 @@
 //
 
 #import "ZDM1V1.h"
-#import "ZDMCommonProtocol.h"
-#import "ZDMContext.h"
-#import "ZDMEventResponder.h"
-#import "ZDMInvocation.h"
-#import "ZDMServiceBox.h"
 #import <dlfcn.h>
 #import <mach-o/dyld.h>
 #import <mach-o/getsect.h>
 #import <mach-o/loader.h>
 #import <objc/runtime.h>
+#import "ZDMCommonProtocol.h"
+#import "ZDMContext.h"
+#import "ZDMEventResponder.h"
+#import "ZDMInvocation.h"
+#import "ZDMServiceBox.h"
+#import "ZDMProxy.h"
 
 @interface ZDM1V1 ()
 
@@ -152,6 +153,8 @@
     
     ZDMServiceBox *box = [self _createServiceBoxIfNeedWithKey:key];
     box.autoInit = NO;
+    // 如果手动注册的是类，则认为协议都是类方法
+    box.isProtocolAllClsMethod = object_isClass(obj);
     if (weakStore) {
         box.weakObj = obj;
     } else {
@@ -167,6 +170,10 @@
 }
 
 + (id)serviceWithName:(NSString *)serviceName {
+    return [self serviceWithName:serviceName needProxyWrap:YES];
+}
+
++ (id)serviceWithName:(NSString *)serviceName needProxyWrap:(BOOL)needWrap {
     if (!serviceName) {
         return nil;
     }
@@ -178,7 +185,7 @@
     ZDMServiceBox *box = router.storeMap[serviceName];
     [router.lock unlock];
     if (!box) {
-        NSLog(@"please register class first");
+        NSLog(@"❎ >>>>> please register class first");
         return nil;
     }
     
@@ -186,7 +193,7 @@
     if (!serviceInstance && box.autoInit) {
         Class aCls = box.cls;
         if (!aCls) {
-            NSLog(@"%d, %s => please register first", __LINE__, __FUNCTION__);
+            NSLog(@"❎ >>>>> %d, %s => please register first", __LINE__, __FUNCTION__);
             return nil;
         }
         
@@ -198,6 +205,12 @@
             serviceInstance = [[aCls alloc] init];
         }
         box.strongObj = serviceInstance;
+    }
+    
+    // prevent crashes
+    if (needWrap) {
+        ZDMProxy *proxyValue = [ZDMProxy proxyWithTarget:serviceInstance];
+        return proxyValue;
     }
     return serviceInstance;
 }
@@ -287,7 +300,7 @@
     ZDM1V1 *router = [self shareInstance];
     NSMutableOrderedSet<ZDMEventResponder *> *set = router.serviceResponderMap[eventId];
     for (ZDMEventResponder *obj in set) {
-        id module = [self serviceWithName:obj.name];
+        id module = [self serviceWithName:obj.name needProxyWrap:NO];
         if (!module) {
             continue;
         };
@@ -306,10 +319,9 @@
     
     ZDM1V1 *router = [self shareInstance];
     NSString *eventId = NSStringFromSelector(selector);
-    NSMutableOrderedSet<ZDMEventResponder *> *set =
-    router.serviceResponderMap[eventId];
+    NSMutableOrderedSet<ZDMEventResponder *> *set = router.serviceResponderMap[eventId];
     for (ZDMEventResponder *obj in set) {
-        id module = [self serviceWithName:obj.name];
+        id module = [self serviceWithName:obj.name needProxyWrap:NO];
         if (!module) {
             continue;
         };
@@ -322,6 +334,23 @@
 }
 
 #pragma mark - Private Method
+
++ (ZDMProxy *)_shareProxy {
+    static ZDMProxy *proxy = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        proxy = [ZDMProxy proxyWithTarget:nil];
+    });
+    return proxy;
+}
+
++ (id)_getRealTargetIfneedWithObject:(id)object {
+    id target = object;
+    if ([target isKindOfClass:object_getClass([self _shareProxy])]) {
+        target = ((ZDMProxy *)object).target;
+    }
+    return target;
+}
 
 + (ZDMServiceBox *)_createServiceBoxIfNeedWithKey:(NSString *)key {
     if (!key) {
