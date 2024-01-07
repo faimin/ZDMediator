@@ -60,9 +60,10 @@
 }
 
 + (void)_loadRegisterFromMacho {
-    NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDMServiceBox *> *>
-    *storeMap = [ZDM1VM shareInstance].storeMap;
+    NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDMServiceBox *> *> *storeMap = [ZDM1VM shareInstance].storeMap;
+    __auto_type lock = [self shareInstance].lock;
     uint32_t imageCount = _dyld_image_count();
+    [lock lock];
     for (uint32_t i = 0; i < imageCount; ++i) {
 #ifdef __LP64__
         const struct mach_header_64 *mhp = (void *)_dyld_get_image_header(i);
@@ -77,8 +78,7 @@
             continue;
         }
         
-        struct ZDMMachO1VMRegisterKV *items =
-        (struct ZDMMachO1VMRegisterKV *)sectionData;
+        struct ZDMMachO1VMRegisterKV *items = (struct ZDMMachO1VMRegisterKV *)sectionData;
         uint64_t itemCount = size / sizeof(struct ZDMMachO1VMRegisterKV);
         for (uint64_t i = 0; i < itemCount; ++i) {
             @autoreleasepool {
@@ -112,6 +112,7 @@
             }];
         }];
     }
+    [lock unlock];
 }
 
 #pragma mark - Public Method
@@ -197,12 +198,14 @@
     
     NSString *protoName = NSStringFromProtocol(protocol);
     ZDM1VM *router = [self shareInstance];
+    [router.lock lock];
     NSMutableOrderedSet<ZDMServiceBox *> *orderSet = router.storeMap[protoName];
+    [router.lock unlock];
     if (!orderSet) {
         return;
     }
     
-    for (ZDMServiceBox *obj in orderSet) {
+    for (ZDMServiceBox *obj in orderSet.copy) {
         id module = obj.strongObj ?: obj.weakObj;
         if (!module) {
             id o = nil;
@@ -244,10 +247,9 @@
 + (void)_insertObj:(ZDMServiceBox *)box
         toOrderSet:(NSMutableOrderedSet *)orderSet {
     NSInteger priority = box.priority;
-    
+    __block NSInteger position = NSNotFound;
     __auto_type lock = [self shareInstance].lock;
     [lock lock];
-    __block NSInteger position = NSNotFound;
     [orderSet enumerateObjectsUsingBlock:^(ZDMServiceBox *_Nonnull obj, NSUInteger idx, BOOL *_Nonnull stop) {
         if (obj.priority <= priority) {
             [orderSet insertObject:box atIndex:idx];

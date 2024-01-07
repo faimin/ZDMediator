@@ -64,6 +64,7 @@
 
 + (void)_loadRegisterFromMacho {
     NSMutableDictionary<NSString *, ZDMServiceBox *> *storeMap = [ZDM1V1 shareInstance].storeMap;
+    __auto_type lock = [self shareInstance].lock;
     uint32_t imageCount = _dyld_image_count();
     for (uint32_t i = 0; i < imageCount; ++i) {
 #ifdef __LP64__
@@ -79,8 +80,7 @@
             continue;
         }
         
-        struct ZDMMachO1V1RegisterKV *items =
-        (struct ZDMMachO1V1RegisterKV *)sectionData;
+        struct ZDMMachO1V1RegisterKV *items = (struct ZDMMachO1V1RegisterKV *)sectionData;
         uint64_t itemCount = size / sizeof(struct ZDMMachO1V1RegisterKV);
         for (uint64_t i = 0; i < itemCount; ++i) {
             @autoreleasepool {
@@ -93,15 +93,17 @@
                 Class value = objc_getClass(item.value);
                 int autoInit = item.autoInit;
                 
+                [lock lock];
                 storeMap[key] = ({
                     ZDMServiceBox *box = [[ZDMServiceBox alloc] initWithClass:value];
                     box.autoInit = autoInit == 1;
                     box.isProtocolAllClsMethod = item.allClsMethod == 1;
-                    if (item.allClsMethod == 1) {
+                    if (box.isProtocolAllClsMethod) {
                         box.strongObj = (id)value; // cast forbid warning
                     }
                     box;
                 });
+                [lock unlock];
             }
         }
     }
@@ -298,12 +300,15 @@
     }
     
     ZDM1V1 *router = [self shareInstance];
+    [router.lock lock];
     NSMutableOrderedSet<ZDMEventResponder *> *set = router.serviceResponderMap[eventId];
-    for (ZDMEventResponder *obj in set) {
+    [router.lock unlock];
+    for (ZDMEventResponder *obj in set.copy) {
+        // ZDMInvocation中做了安全校验，不需要用proxy包装
         id module = [self serviceWithName:obj.name needProxyWrap:NO];
         if (!module) {
             continue;
-        };
+        }
         
         va_list args;
         va_start(args, selector);
@@ -319,12 +324,15 @@
     
     ZDM1V1 *router = [self shareInstance];
     NSString *eventId = NSStringFromSelector(selector);
+    [router.lock lock];
     NSMutableOrderedSet<ZDMEventResponder *> *set = router.serviceResponderMap[eventId];
-    for (ZDMEventResponder *obj in set) {
+    [router.lock unlock];
+    for (ZDMEventResponder *obj in set.copy) {
+        // ZDMInvocation中做了安全校验，不需要用proxy包装
         id module = [self serviceWithName:obj.name needProxyWrap:NO];
         if (!module) {
             continue;
-        };
+        }
         
         va_list args;
         va_start(args, selector);
@@ -334,23 +342,6 @@
 }
 
 #pragma mark - Private Method
-
-+ (ZDMProxy *)_shareProxy {
-    static ZDMProxy *proxy = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        proxy = [ZDMProxy proxyWithTarget:nil];
-    });
-    return proxy;
-}
-
-+ (id)_getRealTargetIfneedWithObject:(id)object {
-    id target = object;
-    if ([target isKindOfClass:object_getClass([self _shareProxy])]) {
-        target = ((ZDMProxy *)object).target;
-    }
-    return target;
-}
 
 + (ZDMServiceBox *)_createServiceBoxIfNeedWithKey:(NSString *)key {
     if (!key) {
