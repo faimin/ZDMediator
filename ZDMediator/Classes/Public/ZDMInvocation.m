@@ -31,8 +31,7 @@
     }
     
     NSMethodSignature *signature = [target methodSignatureForSelector:selector];
-    NSInvocation *invocation =
-    [NSInvocation invocationWithMethodSignature:signature];
+    NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
     invocation.target = target;
     invocation.selector = selector;
     

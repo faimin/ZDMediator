@@ -51,8 +51,6 @@
 }
 
 - (void)testExample {
-  // XCTFail(@"No implementation for \"%s\"", __PRETTY_FUNCTION__);
-
   BOOL catResult1 = [GetService(CatProtocol) zdm_handleEvent:100
                                                     userInfo:@{}
                                                     callback:^id(NSString *x) {
@@ -91,11 +89,10 @@
       [ZDM1V1 dispatchWithEventSelAndArgs:@selector(foo:), 1];
       [ZDM1V1 dispatchWithEventSelAndArgs:@selector(foo:), 1];
 
-      [ZDM1V1 dispatchWithEventSelAndArgs:@selector(bar:), @{@"name" : @"zero.d.saber"}];)
+      [ZDM1V1 dispatchWithEventSelAndArgs:@selector(bar:), @{@"name" : @"zero.d.saber"}];
+  )
 
-  [ZDM1V1 dispatchWithEventId:@"100"
-                   selAndArgs:@selector(zdm_handleEvent:userInfo:callback:), 200, @{@100 : @"100"},
-                              nil];
+  [ZDM1V1 dispatchWithEventId:@"100" selAndArgs:@selector(zdr_handleEvent:userInfo:callback:), 200, @{@100 : @"100"}, nil];
 
   [ZDM1VM dispatchWithProtocol:@protocol(ZDMCommonProtocol)
                     selAndArgs:@selector(zdm_handleEvent:userInfo:callback:), 101, @{}, nil];
