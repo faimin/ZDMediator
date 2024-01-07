@@ -25,7 +25,7 @@
         if ([[target class] respondsToSelector:selector]) {
             target = [target class];
         } else {
-            NSAssert2(NO, @"%@ doesNotRecognizeSelector: %@", target, NSStringFromSelector(selector));
+            NSLog(@"❎ >>>>> %@ doesNotRecognizeSelector: %@", target, NSStringFromSelector(selector));
             return nil;
         }
     }

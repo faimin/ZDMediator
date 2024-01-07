@@ -25,7 +25,7 @@
 #pragma mark - Forward Message
 
 - (id)forwardingTargetForSelector:(SEL)selector {
-    if (!_target) {
+    if (!_target || !selector) {
         return nil;
     }
     
@@ -35,13 +35,20 @@
     } else if ([[_target class] respondsToSelector:selector]) {
         return [_target class];
     }
-    NSLog(@"❎ >>>>> target: %@ don't recognized selector：%s", _target, selector);
+    NSLog(@"❎ >>>>> target: %@ don't recognized selector：%@", _target, NSStringFromSelector(selector));
     return nil;
 }
 
 /// 转发到这一步一般都是由于`forwardingTargetForSelector:`返回nil
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)sel {
-    return [NSObject instanceMethodSignatureForSelector:@selector(init)];
+    NSMethodSignature *signature = nil;
+    if (_target && sel) {
+        signature = [_target methodSignatureForSelector:sel];
+        if (!signature) {
+            signature = [NSObject instanceMethodSignatureForSelector:@selector(init)];
+        }
+    }
+    return signature;
 }
 
 /// 转发消息,一般只有在出现`doesNotRecognizeSelector:`情况时才会执行到这个方法,此时直接返回nil

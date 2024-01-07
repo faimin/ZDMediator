@@ -208,7 +208,7 @@
     }
     
     // prevent crashes
-    if (needWrap) {
+    if (serviceInstance && needWrap) {
         ZDMProxy *proxyValue = [ZDMProxy proxyWithTarget:serviceInstance];
         return proxyValue;
     }
