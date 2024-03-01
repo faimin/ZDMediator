@@ -5,9 +5,9 @@
 //  Created by Zero.D.Saber on 2023/7/16.
 //
 
+#import <Foundation/Foundation.h>
 #import "ZDMContext.h"
 #import "ZDMediatorDefine.h"
-#import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -113,7 +113,7 @@ NS_ASSUME_NONNULL_BEGIN
 #ifndef GetServiceWithClass
 #define GetServiceWithClass(proto, clz)                                        \
   ({                                                                           \
-    clz *obj = (clz *)[ZDM1V1 service:@protocol(proto)];                 \
+    clz *obj = (clz *)[ZDM1V1 service:@protocol(proto)];                       \
     if (!obj || ![obj isKindOfClass:clz.class]) {                              \
       obj = nil;                                                               \
     }                                                                          \
