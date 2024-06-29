@@ -188,10 +188,10 @@
 
 #pragma mark - Dispatch
 
-+ (void)dispatchWithProtocol:(Protocol *)protocol
-                  selAndArgs:(nonnull SEL)selector, ... {
++ (NSArray<id> *)dispatchWithProtocol:(Protocol *)protocol
+                           selAndArgs:(nonnull SEL)selector, ... {
     if (!protocol || !selector) {
-        return;
+        return @[];
     }
     
     [self _loadRegisterIfNeed];
@@ -202,9 +202,10 @@
     NSMutableOrderedSet<ZDMServiceBox *> *orderSet = router.storeMap[protoName];
     [router.lock unlock];
     if (!orderSet) {
-        return;
+        return @[];
     }
     
+    NSMutableArray *results = @[].mutableCopy;
     for (ZDMServiceBox *obj in orderSet.copy) {
         id module = obj.strongObj ?: obj.weakObj;
         if (!module) {
@@ -220,9 +221,13 @@
         
         va_list args;
         va_start(args, selector);
-        [ZDMInvocation target:module invokeSelector:selector args:args];
+        id res = [ZDMInvocation target:module invokeSelector:selector args:args];
+        if (res) {
+            [results addObject:res];
+        }
         va_end(args);
     }
+    return results.copy;
 }
 
 #pragma mark - Private Method

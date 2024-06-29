@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
                      priority:(NSInteger)priority
                     weakStore:(BOOL)weakStore;
 
-+ (void)dispatchWithProtocol:(Protocol *)protocol selAndArgs:(SEL)selector, ...;
++ (NSArray<id> *)dispatchWithProtocol:(Protocol *)protocol selAndArgs:(SEL)selector, ...;
 
 @end
 
