@@ -74,6 +74,7 @@
 		C224A76A2A6BAC84004295EB /* ZDCat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZDCat.h; sourceTree = "<group>"; };
 		C224A76B2A6BAC84004295EB /* ZDCat.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZDCat.m; sourceTree = "<group>"; };
 		C23F65C72A70CE16003CA9F3 /* ZDClassProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZDClassProtocol.h; sourceTree = "<group>"; };
+		C2A9DE192C3087C300B90BCC /* AnimalProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AnimalProtocol.h; sourceTree = "<group>"; };
 		D93062865AF6D43151EBB7C3 /* Pods_ZDMediator_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ZDMediator_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E25D135A9E653646EC1F4E93 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -211,6 +212,7 @@
 			children = (
 				C224A7652A6BAC5D004295EB /* CatProtocol.h */,
 				C224A7672A6BAC5D004295EB /* DogProtocol.h */,
+				C2A9DE192C3087C300B90BCC /* AnimalProtocol.h */,
 				C23F65C72A70CE16003CA9F3 /* ZDClassProtocol.h */,
 				C224A76A2A6BAC84004295EB /* ZDCat.h */,
 				C224A76B2A6BAC84004295EB /* ZDCat.m */,
