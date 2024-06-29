@@ -54,7 +54,7 @@ struct ZDMMachO1V1RegisterKV {
       section(                                                                 \
           SEG_DATA                                                             \
           "," ZDMediator1V1SectionName))) static struct ZDMMachO1V1RegisterKV  \
-      ZDMKV_##protocol_name_##cls = {                                          \
+      ZDMKV_##protocol_name##_##cls = {                                        \
           .key = (NO && ((void)@protocol(protocol_name), NO), #protocol_name), \
           .value = (NO && ((void)[cls class], NO), #cls),                      \
           .autoInit = (int)(auto_init),                                        \
@@ -91,7 +91,7 @@ struct ZDMMachO1VMRegisterKV {
       section(                                                                 \
           SEG_DATA                                                             \
           "," ZDMediator1VMSectionName))) static struct ZDMMachO1VMRegisterKV  \
-      ZDMKV_OTM_##protocol_name_##cls = {                                      \
+      ZDMKV_OTM_##protocol_name##_##cls = {                                    \
           .key = (NO && ((void)@protocol(protocol_name), NO), #protocol_name), \
           .value = (NO && ((void)[cls class], NO), #cls),                      \
           .autoInit = (int)(auto_init),                                        \
