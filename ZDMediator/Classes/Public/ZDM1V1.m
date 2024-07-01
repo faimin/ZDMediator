@@ -91,18 +91,19 @@
                 
                 NSString *key = [NSString stringWithUTF8String:item.key];
                 Class value = objc_getClass(item.value);
-                int autoInit = item.autoInit;
                 
-                [lock lock];
-                storeMap[key] = ({
+                __auto_type serviceBox = ({
                     ZDMServiceBox *box = [[ZDMServiceBox alloc] initWithClass:value];
-                    box.autoInit = autoInit == 1;
+                    box.autoInit = item.autoInit == 1;
                     box.isProtocolAllClsMethod = item.allClsMethod == 1;
                     if (box.isProtocolAllClsMethod) {
                         box.strongObj = (id)value; // cast forbid warning
                     }
                     box;
                 });
+                
+                [lock lock];
+                storeMap[key] = serviceBox;
                 [lock unlock];
             }
         }
