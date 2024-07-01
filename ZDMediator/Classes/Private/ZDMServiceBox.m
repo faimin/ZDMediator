@@ -17,8 +17,15 @@
 }
 
 - (instancetype)initWithClass:(Class)cls {
-    if (self = [super init]) {
+    if (self = [self init]) {
         _cls = cls;
+    }
+    return self;
+}
+
+- (instancetype)init {
+    if (self = [super init]) {
+        _priority = -1;
     }
     return self;
 }
