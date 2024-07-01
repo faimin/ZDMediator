@@ -58,7 +58,10 @@
 + (void)_loadRegisterIfNeed {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
+        CFAbsoluteTime start = CFAbsoluteTimeGetCurrent();
         [self _loadRegisterFromMacho];
+        CFAbsoluteTime end = CFAbsoluteTimeGetCurrent();
+        printf("读取1V1 macho耗时： %f\n", end - start);
     });
 }
 
