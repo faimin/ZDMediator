@@ -8,8 +8,9 @@
 #ifndef ZDMediator_h
 #define ZDMediator_h
 
-#if __has_include("ZDM1V1.h")
+#if __has_include("ZDMOneForAll.h")
 
+#import "ZDMOneForAll.h"
 #import "ZDM1V1.h"
 #import "ZDM1VM.h"
 #import "ZDMCommonProtocol.h"
@@ -18,8 +19,9 @@
 #import "ZDMProxy.h"
 #import "ZDMediatorDefine.h"
 
-#elif __has_include(<ZDMediator/ZDM1V1.h>)
+#elif __has_include(<ZDMediator/ZDMOneForAll.h>)
 
+#import <ZDMediator/ZDMOneForAll.h>
 #import <ZDMediator/ZDM1V1.h>
 #import <ZDMediator/ZDM1VM.h>
 #import <ZDMediator/ZDMCommonProtocol.h>

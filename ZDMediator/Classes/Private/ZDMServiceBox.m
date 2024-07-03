@@ -25,7 +25,7 @@
 
 - (instancetype)init {
     if (self = [super init]) {
-        _priority = -1;
+        _priority = 0;
     }
     return self;
 }

@@ -35,8 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
                      priority:(NSInteger)priority
                   implementer:(id)obj
                     weakStore:(BOOL)weakStore;
-+ (void)manualRegisterService:(Protocol *)serviceProtocol 
-                     priority:(NSInteger)priority
++ (void)manualRegisterService:(Protocol *)serviceProtocol
                   implementer:(id)obj;
 
 #pragma mark - Get
@@ -111,5 +110,31 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSArray<id> *)dispatchWithEventSelAndArgs:(SEL)selector, ...;
 
 @end
+
+//------------------------------------------
+
+#pragma mark - Macro
+#pragma mark -
+
+#ifndef GetService
+#define GetService(proto) GetServiceWithPriority(proto, 0)
+#endif
+
+#ifndef GetServiceWithPriority
+#define GetServiceWithPriority(proto, _priority) ((id<proto>)[ZDMOneForAll service:@protocol(proto) priority:_priority])
+#endif
+
+#ifndef GetServiceWithClass
+#define GetServiceWithClass(proto, _priority, clz)                                  \
+  ({                                                                                \
+    clz *obj = (clz *)[ZDMOneForAll service:@protocol(proto) priority:_priority];   \
+    if (!obj || ![obj isKindOfClass:clz.class]) {                                   \
+      obj = nil;                                                                    \
+    }                                                                               \
+    obj;                                                                            \
+  })
+#endif
+
+//------------------------------------------
 
 NS_ASSUME_NONNULL_END

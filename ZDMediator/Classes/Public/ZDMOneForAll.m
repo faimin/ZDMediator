@@ -19,7 +19,7 @@
 #import "ZDMProxy.h"
 
 static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
-    return [NSString stringWithFormat:@"%@-%@", serviceName, priority];
+    return [NSString stringWithFormat:@"%@+%@", serviceName, priority];
 }
 
 @interface ZDMOneForAll ()
@@ -73,7 +73,7 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         CFAbsoluteTime start = CFAbsoluteTimeGetCurrent();
         [self _loadRegisterFromMacho];
         CFAbsoluteTime end = CFAbsoluteTimeGetCurrent();
-        printf("读取one for all macho耗时：%f毫秒\n", end - start);
+        printf("读取one for all macho耗时：%f 毫秒\n", (end - start)*1000);
     });
 }
 
@@ -122,8 +122,6 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
                 NSNumber *priorityNum = @(item.priority);
                 
                 [lock lock];
-                storeMap[zdmStoreKey(serviceName, priorityNum)] = serviceBox;
-                
                 NSMutableOrderedSet *orderSet = priorityMap[serviceName];
                 if (!orderSet) {
                     orderSet = [[NSMutableOrderedSet alloc] initWithCapacity:1];
@@ -131,10 +129,12 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
                 }
 #if DEBUG
                 if ([orderSet containsObject:priorityNum]) {
-                    NSAssert(NO, @"注册了相同priority的类");
+                    NSAssert(NO, @"注册了相同priority的类，请修改");
                 }
 #endif
                 [orderSet addObject:priorityNum];
+                
+                storeMap[zdmStoreKey(serviceName, priorityNum)] = serviceBox;
                 [lock unlock];
             }
         }
@@ -173,9 +173,8 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 }
 
 + (void)manualRegisterService:(Protocol *)serviceProtocol 
-                     priority:(NSInteger)priority
                   implementer:(id)obj {
-    [self manualRegisterService:serviceProtocol priority:priority implementer:obj weakStore:NO];
+    [self manualRegisterService:serviceProtocol priority:0 implementer:obj weakStore:NO];
 }
 
 + (void)manualRegisterService:(Protocol *)serviceProtocol
@@ -227,6 +226,11 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     NSString *key = zdmStoreKey(serviceName, @(priority));
     [mediator.lock lock];
     ZDMServiceBox *box = mediator.storeMap[key];
+    if (!box && priority == 0) {
+        NSNumber *prioNum = mediator.priorityMap[serviceName].firstObject;
+        NSString *newKey = zdmStoreKey(serviceName, prioNum);
+        box = mediator.storeMap[newKey];
+    }
     [mediator.lock unlock];
     if (!box) {
         NSLog(@"❎ >>>>> please register class first");
@@ -492,15 +496,21 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     NSNumber *priorityNum = @(box.priority);
     
     [mediator.lock lock];
-    mediator.storeMap[zdmStoreKey(serviceName, priorityNum)] = box;
     NSMutableOrderedSet<NSNumber *> *orderSet = mediator.priorityMap[serviceName];
     if (!orderSet) {
         orderSet = [[NSMutableOrderedSet alloc] init];
     }
+#if DEBUG
+    if ([orderSet containsObject:priorityNum]) {
+        NSAssert(NO, @"注册了相同优先级的服务，请修改");
+    }
+#endif
     [orderSet addObject:priorityNum];
     [orderSet sortUsingComparator:^NSComparisonResult(id _Nonnull obj1, id _Nonnull obj2) {
         return [obj1 compare:obj2];
     }];
+    
+    mediator.storeMap[zdmStoreKey(serviceName, priorityNum)] = box;
     [mediator.lock unlock];
 }
 

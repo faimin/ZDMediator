@@ -11,15 +11,16 @@
 #import <ZDMediator/ZDMediator.h>
 #import "AnimalProtocol.h"
 
-ZDMediator1V1Register(DogProtocol, ZDDog)
-ZDMediator1VMRegister(ZDMCommonProtocol, ZDDog, 1)
-ZDMediator1VMRegister(AnimalProtocol, ZDDog, 0)
+//ZDMediator1V1Register(DogProtocol, ZDDog)
+//ZDMediator1VMRegister(ZDMCommonProtocol, ZDDog, 1)
+//ZDMediator1VMRegister(AnimalProtocol, ZDDog, 0)
+ZDMediatorOFARegister(AnimalProtocol, ZDDog, 1)
 
 @implementation ZDDog
 
 + (void)initialize {
     if (self == [ZDDog class]) {
-        [ZDM1V1 manualRegisterService:@protocol(ZDClassProtocol) implementer:self];
+        [ZDMOneForAll manualRegisterService:@protocol(ZDClassProtocol) implementer:self];
     }
 }
 

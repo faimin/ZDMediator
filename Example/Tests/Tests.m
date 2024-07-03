@@ -51,6 +51,7 @@
     [super tearDown];
 }
 
+#if 0
 - (void)testExample {
     BOOL catResult1 = [GetService(CatProtocol) zdm_handleEvent:100
                                                       userInfo:@{}
@@ -108,6 +109,36 @@
     NSArray *results2 = [ZDM1VM dispatchWithProtocol:@protocol(AnimalProtocol) selAndArgs:@selector(eatFood), nil];
     NSLog(@"---> %@", results2);
     NSLog(@"++++++++++++");
+}
+#endif
+
+- (void)testOneForAll {
+    BOOL catResult1 = [GetService(AnimalProtocol) zdm_handleEvent:100 userInfo:@{} callback:^id(NSString *x) {
+        return @[ x ];
+    }];
+    XCTAssertTrue(catResult1);
+    
+    NSString *sex = [GetService(CatProtocol) sex];
+    XCTAssertNil(sex);
+    
+    //----------------------------------
+    
+    BOOL dogResult1 = [GetServiceWithPriority(AnimalProtocol, 1) zdm_handleEvent:200 userInfo:@{} callback:^id(NSUInteger x) {
+        return @(x);
+    }];
+    XCTAssertTrue(dogResult1);
+    
+    BOOL dogResult2 = [GetService(DogProtocol) zdm_handleEvent:200 userInfo:@{} callback:^id(NSUInteger x, NSString *y) {
+        NSString *a = [NSString stringWithFormat:@"%zd, %@", x, y];
+        XCTAssertEqual(x, 2);
+        return a;
+    }];
+    XCTAssertFalse(dogResult2);
+    
+    NSArray *dogResult3 = [GetService(ZDClassProtocol) foo:@[ @1, @2 ] bar:@[ @3, @4, @5 ]];
+    XCTAssertEqual(dogResult3.count, 5);
+    
+    [ZDMOneForAll dispatchWithProtocol:@protocol(AnimalProtocol) selAndArgs:@selector(eatFood), nil];
 }
 
 @end

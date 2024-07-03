@@ -11,8 +11,9 @@
 #import "AnimalProtocol.h"
 
 // ZDMediator1V1Register(CatProtocol, ZDCat)
-ZDMediator1VMRegister(ZDMCommonProtocol, ZDCat, 1)
-ZDMediator1VMRegister(AnimalProtocol, ZDCat, 0)
+//ZDMediator1VMRegister(ZDMCommonProtocol, ZDCat, 1)
+//ZDMediator1VMRegister(AnimalProtocol, ZDCat, 0)
+ZDMediatorOFARegister(AnimalProtocol, ZDCat, 0)
 
 @implementation ZDCat
 

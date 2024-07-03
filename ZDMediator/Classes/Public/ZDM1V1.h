@@ -102,24 +102,24 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Macro
 #pragma mark -
 
-#ifndef GetService
-#define GetService(proto) ((id<proto>)[ZDM1V1 service:@protocol(proto)])
-#endif
-
-#ifndef GetClassService
-#define GetClassService(proto) ((id<proto>)[[ZDM1V1 service:@protocol(proto)] class])
-#endif
-
-#ifndef GetServiceWithClass
-#define GetServiceWithClass(proto, clz)                                        \
-  ({                                                                           \
-    clz *obj = (clz *)[ZDM1V1 service:@protocol(proto)];                       \
-    if (!obj || ![obj isKindOfClass:clz.class]) {                              \
-      obj = nil;                                                               \
-    }                                                                          \
-    obj;                                                                       \
-  })
-#endif
+//#ifndef GetService
+//#define GetService(proto) ((id<proto>)[ZDM1V1 service:@protocol(proto)])
+//#endif
+//
+//#ifndef GetClassService
+//#define GetClassService(proto) ((id<proto>)[[ZDM1V1 service:@protocol(proto)] class])
+//#endif
+//
+//#ifndef GetServiceWithClass
+//#define GetServiceWithClass(proto, clz)                                        \
+//  ({                                                                           \
+//    clz *obj = (clz *)[ZDM1V1 service:@protocol(proto)];                       \
+//    if (!obj || ![obj isKindOfClass:clz.class]) {                              \
+//      obj = nil;                                                               \
+//    }                                                                          \
+//    obj;                                                                       \
+//  })
+//#endif
 
 //------------------------------------------
 
