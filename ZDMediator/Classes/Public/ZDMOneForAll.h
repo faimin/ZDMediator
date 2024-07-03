@@ -63,7 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// - Parameters:
 ///   - serviceProtocol: protocol of service
 ///   - priority: priority
-///   - eventId: multi number event
+///   - eventId: multi event
 + (void)registerResponder:(Protocol *)serviceProtocol
                  priority:(NSInteger)priority
                   eventId:(NSString *)eventId, ...;
