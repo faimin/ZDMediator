@@ -97,7 +97,7 @@ struct ZDMMachO1VMRegisterKV {
           .autoInit = (int)(auto_init),                                        \
           .allClsMethod = (int)(protocol_all_cls_method),                      \
           .priority = (int)(_priority),                                        \
-  };
+      };
 #endif
 
 #ifndef ZDMediator1VMRegister
@@ -135,7 +135,7 @@ struct ZDMMachOOFARegisterKV {
           .autoInit = (int)(auto_init),                                        \
           .allClsMethod = (int)(protocol_all_cls_method),                      \
           .priority = (int)(_priority),                                        \
-  };
+      };
 #endif
 
 #ifndef ZDMediatorOFARegister

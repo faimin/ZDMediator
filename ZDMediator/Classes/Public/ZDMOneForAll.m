@@ -129,7 +129,10 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
                 }
 #if DEBUG
                 if ([orderSet containsObject:priorityNum]) {
-                    NSAssert(NO, @"注册了相同priority的类，请修改");
+                    Class aClass = storeMap[zdmStoreKey(serviceName, priorityNum)].cls;
+                    NSString *aClassName = NSStringFromClass(aClass);
+                    NSString *bClassName = [NSString stringWithUTF8String:item.value];
+                    NSAssert3(NO, @"注册了相同priority的类请修改 => priority: %d, %@, %@", item.priority, aClassName, bClassName);
                 }
 #endif
                 [orderSet addObject:priorityNum];
@@ -193,7 +196,7 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     ZDMServiceBox *box = [[ZDMServiceBox alloc] init];
     box.priority = priority;
     box.autoInit = NO;
-    // 如果手动注册的是类，则认为协议都是类方法
+    // 如果手动注册的是类对象，则认为协议都是类方法
     box.isAllClsMethod = object_isClass(obj);
     if (weakStore) {
         box.weakObj = obj;
@@ -506,6 +509,10 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 #if DEBUG
     if ([orderSet containsObject:priorityNum]) {
         NSAssert(NO, @"注册了相同优先级的service，请修改优先级");
+        Class aClass = mediator.storeMap[zdmStoreKey(serviceName, priorityNum)].cls;
+        NSString *aClassName = NSStringFromClass(aClass);
+        NSString *bClassName = NSStringFromClass(box.cls);
+        NSAssert3(NO, @"注册了相同priority的service,请修改 => priority: %ld, %@, %@", box.priority, aClassName, bClassName);
     }
 #endif
     [orderSet addObject:priorityNum];
