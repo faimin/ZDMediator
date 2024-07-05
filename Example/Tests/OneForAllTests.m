@@ -12,6 +12,7 @@
 #import "DogProtocol.h"
 #import "AnimalProtocol.h"
 #import "ZDCat.h"
+#import "ZDClassProtocol.h"
 
 @interface OneForAllTests : XCTestCase
 
@@ -32,12 +33,19 @@
 - (void)testExample {
     // This is an example of a functional test case.
     // Use XCTAssert and related functions to verify your tests produce the correct results.
+    
+    [self measureBlock:^{
+        [ZDMOneForAll _loadRegisterFromMacho];
+    }];
 }
 
 - (void)testPerformanceExample {
     // This is an example of a performance test case.
     [self measureBlock:^{
         // Put the code you want to measure the time of here.
+        BOOL catResult1 = [GetService(AnimalProtocol) zdm_handleEvent:100 userInfo:@{} callback:^id(NSString *x) {
+            return @[ x ];
+        }];
     }];
 }
 
