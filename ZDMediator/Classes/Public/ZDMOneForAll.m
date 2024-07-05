@@ -370,7 +370,9 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         id module = box.strongObj ?: box.weakObj;
         if (!module) {
             id o = nil;
-            if ([box.cls respondsToSelector:@selector(zdm_createInstance:)]) {
+            if (box.isAllClsMethod) {
+                o = box.cls;
+            } else if ([box.cls respondsToSelector:@selector(zdm_createInstance:)]) {
                 o = [box.cls zdm_createInstance:mediator.context];
             } else {
                 o = [[box.cls alloc] init];
