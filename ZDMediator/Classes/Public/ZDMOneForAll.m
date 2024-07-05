@@ -111,8 +111,8 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
                     ZDMServiceBox *box = [[ZDMServiceBox alloc] initWithClass:value];
                     box.priority = item.priority;
                     box.autoInit = item.autoInit == 1;
-                    box.isProtocolAllClsMethod = item.allClsMethod == 1;
-                    if (box.isProtocolAllClsMethod) {
+                    box.isAllClsMethod = item.allClsMethod == 1;
+                    if (box.isAllClsMethod) {
                         box.strongObj = (id)value; // cast forbid warning
                     }
                     box;
@@ -194,7 +194,7 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     box.priority = priority;
     box.autoInit = NO;
     // 如果手动注册的是类，则认为协议都是类方法
-    box.isProtocolAllClsMethod = object_isClass(obj);
+    box.isAllClsMethod = object_isClass(obj);
     if (weakStore) {
         box.weakObj = obj;
     } else {
@@ -245,7 +245,7 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
             return nil;
         }
         
-        if (box.isProtocolAllClsMethod) {
+        if (box.isAllClsMethod) {
             serviceInstance = aCls;
         } else if ([aCls respondsToSelector:@selector(zdm_createInstance:)]) {
             serviceInstance = [aCls zdm_createInstance:mediator.context];
@@ -267,12 +267,13 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
              priority:(NSInteger)priority
         autoInitAgain:(BOOL)autoInitAgain {
     if (!serviceProtocol) {
+        NSAssert(NO, @"the protocol is nil");
         return NO;
     }
     
     NSString *serviceName = NSStringFromProtocol(serviceProtocol);
     if (!serviceName) {
-        NSAssert(NO, @"the protocol is nil");
+        NSAssert(NO, @"the protocol name is nil");
         return NO;
     }
     
@@ -502,7 +503,7 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     }
 #if DEBUG
     if ([orderSet containsObject:priorityNum]) {
-        NSAssert(NO, @"注册了相同优先级的服务，请修改");
+        NSAssert(NO, @"注册了相同优先级的service，请修改优先级");
     }
 #endif
     [orderSet addObject:priorityNum];

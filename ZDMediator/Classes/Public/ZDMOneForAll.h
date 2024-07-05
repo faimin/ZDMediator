@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// - Parameters:
 ///   - serviceProtocol: protocol
 ///   - obj: protocol implementer (instance or Class),
-///   if obj is a class, the `isProtocolAllClsMethod` will be set `true`
+///   if obj is a class, the `isAllClsMethod` will be set `true`
 ///   - weakStore: strong ref or weak ref, default is NO (strong ref)
 + (void)manualRegisterService:(Protocol *)serviceProtocol
                      priority:(NSInteger)priority
@@ -59,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Event
 
-/// register number event to service module
+/// register event to service module
 /// - Parameters:
 ///   - serviceProtocol: protocol of service
 ///   - priority: priority

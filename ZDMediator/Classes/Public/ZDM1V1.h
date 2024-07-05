@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// - Parameters:
 ///   - serviceProtocol: protocol
 ///   - obj: protocol implementer (instance or Class),
-///   if obj is a class, the `isProtocolAllClsMethod` will be set `true`
+///   if obj is a class, the `isAllClsMethod` will be set `true`
 ///   - weakStore: strong ref or weak ref, default is NO (strong ref)
 + (void)manualRegisterService:(Protocol *)serviceProtocol
                   implementer:(id)obj

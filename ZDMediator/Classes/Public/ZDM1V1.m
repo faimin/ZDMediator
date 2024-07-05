@@ -98,8 +98,8 @@
                 __auto_type serviceBox = ({
                     ZDMServiceBox *box = [[ZDMServiceBox alloc] initWithClass:value];
                     box.autoInit = item.autoInit == 1;
-                    box.isProtocolAllClsMethod = item.allClsMethod == 1;
-                    if (box.isProtocolAllClsMethod) {
+                    box.isAllClsMethod = item.allClsMethod == 1;
+                    if (box.isAllClsMethod) {
                         box.strongObj = (id)value; // cast forbid warning
                     }
                     box;
@@ -160,7 +160,7 @@
     ZDMServiceBox *box = [self _createServiceBoxIfNeedWithKey:key];
     box.autoInit = NO;
     // 如果手动注册的是类，则认为协议都是类方法
-    box.isProtocolAllClsMethod = object_isClass(obj);
+    box.isAllClsMethod = object_isClass(obj);
     if (weakStore) {
         box.weakObj = obj;
     } else {
@@ -203,7 +203,7 @@
             return nil;
         }
         
-        if (box.isProtocolAllClsMethod) {
+        if (box.isAllClsMethod) {
             serviceInstance = aCls;
         } else if ([aCls respondsToSelector:@selector(zdm_createInstance:)]) {
             serviceInstance = [aCls zdm_createInstance:router.context];
