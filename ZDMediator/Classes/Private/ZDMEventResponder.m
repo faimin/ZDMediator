@@ -19,12 +19,12 @@
     if (![self isKindOfClass:object.class]) {
         return NO;
     }
-    BOOL res = [self.name isEqualToString:object.name];
+    BOOL res = [self.serviceName isEqualToString:object.serviceName];
     return res;
 }
 
 - (NSUInteger)hash {
-    return self.name.hash ^ self.priority;
+    return self.serviceName.hash ^ self.priority;
 }
 
 @end

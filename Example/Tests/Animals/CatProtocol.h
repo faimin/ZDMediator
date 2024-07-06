@@ -18,6 +18,10 @@
 
 + (NSString *)sex;
 
+@optional
+
+- (NSString *)eatWhatFood;
+
 @end
 
 #endif /* CatProtocol_h */

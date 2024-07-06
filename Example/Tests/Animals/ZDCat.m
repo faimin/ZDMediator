@@ -10,9 +10,8 @@
 #import <ZDMediator/ZDMediator.h>
 #import "AnimalProtocol.h"
 
-// ZDMediator1V1Register(CatProtocol, ZDCat)
-ZDMediator1VMRegister(ZDMCommonProtocol, ZDCat, 1)
-ZDMediator1VMRegister(AnimalProtocol, ZDCat, 0)
+ZDMediatorOFARegister(AnimalProtocol, ZDCat, 0)
+ZDMediatorOFARegister(CatProtocol, ZDCat, 0)
 
 @implementation ZDCat
 
@@ -20,13 +19,35 @@ ZDMediator1VMRegister(AnimalProtocol, ZDCat, 0)
     NSLog(@"%s", __PRETTY_FUNCTION__);
 }
 
-- (void)moduleWillDealloc {
+- (void)zdm_willDispose {
     NSLog(@"小猫要释放了， %@", self);
 }
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        NSLog(@"创建了小猫");
+    }
+    return self;
+}
+
+#pragma mark - CatProtocol
 
 - (NSString *)name {
     return @"animal - cat";
 }
+
++ (NSString *)sex {
+    return @"M";
+}
+
+#if 0
+- (NSString *)eatWhatFood {
+    return @"小鱼";
+}
+#endif
+
+#pragma mark - AnimalProtocol
 
 - (NSString *)animalName {
     return @"小猫";
@@ -35,6 +56,8 @@ ZDMediator1VMRegister(AnimalProtocol, ZDCat, 0)
 - (void)eatFood {
     NSLog(@"小猫吃饼干");
 }
+
+#pragma mark - ZDMCommonProtocol
 
 - (BOOL)zdm_handleEvent:(NSInteger)event
                userInfo:(id)userInfo
@@ -48,8 +71,5 @@ ZDMediator1VMRegister(AnimalProtocol, ZDCat, 0)
     return NO;
 }
 
-+ (NSString *)sex {
-    return @"M";
-}
 
 @end

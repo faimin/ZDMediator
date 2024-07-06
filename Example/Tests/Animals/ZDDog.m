@@ -11,25 +11,44 @@
 #import <ZDMediator/ZDMediator.h>
 #import "AnimalProtocol.h"
 
-ZDMediator1V1Register(DogProtocol, ZDDog)
-ZDMediator1VMRegister(ZDMCommonProtocol, ZDDog, 1)
-ZDMediator1VMRegister(AnimalProtocol, ZDDog, 0)
+ZDMediatorOFARegister(DogProtocol, ZDDog, 0)
+ZDMediatorOFARegister(AnimalProtocol, ZDDog, 1)
 
 @implementation ZDDog
 
 + (void)initialize {
     if (self == [ZDDog class]) {
-        [ZDM1V1 manualRegisterService:@protocol(ZDClassProtocol) implementer:self];
+        [ZDMOneForAll manualRegisterService:@protocol(ZDClassProtocol) implementer:self];
     }
+}
+
+- (void)dealloc {
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+}
+
+- (void)zdm_willDispose {
+    NSLog(@"小狗要释放了， %@", self);
+}
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        NSLog(@"创建了小狗");
+    }
+    return self;
 }
 
 + (instancetype)zdm_createInstance:(ZDMContext *)context {
     return self.new;
 }
 
+#pragma mark - DogProtocol
+
 - (NSUInteger)age {
     return 2;
 }
+
+#pragma mark - AnimalProtocol
 
 - (NSString *)animalName {
     return @"小狗";
@@ -39,13 +58,18 @@ ZDMediator1VMRegister(AnimalProtocol, ZDDog, 0)
     NSLog(@"小狗吃骨头");
 }
 
+#pragma mark -
+
 - (void)foo:(NSInteger)a {
     NSLog(@"%zd", a);
 }
 
-- (void)bar:(NSDictionary *)dict {
+- (NSString *)bar:(NSDictionary *)dict {
     NSLog(@"%@", dict);
+    return [dict.allKeys componentsJoinedByString:@"+"] ?: @"9999999999";
 }
+
+#pragma mark - ZDMCommonProtocol
 
 - (BOOL)zdm_handleEvent:(NSInteger)event
                userInfo:(id)userInfo
@@ -69,6 +93,8 @@ ZDMediator1VMRegister(AnimalProtocol, ZDDog, 0)
 @end
 
 @implementation ZDDog (ZDClassProtocol)
+
+#pragma mark - ZDClassProtocol
 
 + (NSArray *)foo:(NSArray *)foo bar:(NSArray *)bar {
     return [[NSArray arrayWithArray:foo] arrayByAddingObjectsFromArray:bar];

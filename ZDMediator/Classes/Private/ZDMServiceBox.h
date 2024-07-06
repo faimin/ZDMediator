@@ -6,17 +6,14 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ZDMCommonProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ZDMServiceBox : NSObject
 
 @property (nonatomic, unsafe_unretained) Class cls;
-@property (nonatomic, strong, nullable) id strongObj;
-@property (nonatomic, weak, nullable) id weakObj;
 @property (nonatomic, assign) BOOL autoInit;
-@property (nonatomic, assign) BOOL isProtocolAllClsMethod;
+@property (nonatomic, assign) BOOL isAllClsMethod;
 @property (nonatomic, assign) NSInteger priority;
 
 - (instancetype)initWithClass:(Class _Nullable)cls;
