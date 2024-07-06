@@ -1,6 +1,5 @@
 # ZDMediator
 
-[![CI Status](https://img.shields.io/travis/8207436/ZDMediator.svg?style=flat)](https://travis-ci.org/8207436/ZDMediator)
 [![Version](https://img.shields.io/cocoapods/v/ZDMediator.svg?style=flat)](https://cocoapods.org/pods/ZDMediator)
 [![License](https://img.shields.io/cocoapods/l/ZDMediator.svg?style=flat)](https://cocoapods.org/pods/ZDMediator)
 [![Platform](https://img.shields.io/cocoapods/p/ZDMediator.svg?style=flat)](https://cocoapods.org/pods/ZDMediator)
@@ -24,34 +23,53 @@ pod 'ZDMediator'
 
 ## Feature
 
-- Macho自动注册 或 手动注册
-- 生命周期可以自主控制
-- 实例方法协议、类方法协议
+- 自动或手动注册
+- 自主控制生命周期
+- 实例方法、类方法
 - 事件分发
+- 一个对象注册多个协议
+- 一个协议多个对象支持
+- 安全
 
 ## Usage
+
+> 更多用例请查看`Test.m`文件 
 
 - 注册
 
 ```objectivec
 /// 自动注册
-// 一对一
-ZDMediator1V1Register(CatProtocol, ZDCat)
+ZDMediatorOFARegister(CatProtocol, ZDCat, 10)
 
-// 一对多
-ZDMediator1VMRegister(ZDMCommonProtocol, ZDCat, 1)
+//⚠️ 如果是一对多（一个协议多个对象遵守），priority一定不能重复，
+//⚠️ 如下面的cat和dog不能使用同一个priority
+ZDMediatorOFARegister(AnimalProtocol, ZDCat, 0)
+ZDMediatorOFARegister(AnimalProtocol, ZDDog, 1)
 
  ------
 
 /// 手动注册
-[ZDM1V1 manualRegisterService:@protocol(ZDClassProtocol) implementer:self weakStore:YES];
+ZDCat *cat = [ZDCat new];
+[ZDMOneForAll manualRegisterService:@protocol(CatProtocol) priority:1 implementer:cat weakStore:YES];
 ```
 
 - 读取
 
 ```objectivec
-NSString *sex = [GetService(CatProtocol) sex];
+// 通过priority拿到的是dog对象，如果不传则默认取数组中第一个
+NSString *animalName = [GetServiceWithPriority(AnimalProtocol, 1) animalName];
+XCTAssertTrue([animalName isEqualToString:@"小狗"]);
 ```
+
+## Q&A
+
+1. priority是做什么用的？
+
+查表`key`的一部分，是必须要设置的
+
+2. 如何保证安全性的？
+
+执行方法调用的其实是`proxy`对象，内部通过消息转发把异常吃掉了
 
 ## Author
 

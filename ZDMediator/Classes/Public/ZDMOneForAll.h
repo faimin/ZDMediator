@@ -23,7 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// register implementer Class to map
 /// @param serviceProtocol protocol
 /// @param cls implementer Class (instance or Class)
-+ (void)registerService:(Protocol *)serviceProtocol priority:(NSInteger)priority implementClass:(Class)cls;
++ (void)registerService:(Protocol *)serviceProtocol 
+               priority:(NSInteger)priority
+         implementClass:(Class)cls;
 
 /// manual register implementer to map
 /// - Parameters:
@@ -62,7 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// register event to service module
 /// - Parameters:
 ///   - serviceProtocol: protocol of service
-///   - priority: priority
+///   - priority: responder priority, != service priority
 ///   - eventId: multi event
 + (void)registerResponder:(Protocol *)serviceProtocol
                  priority:(NSInteger)priority
@@ -71,7 +73,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// register SEL event to service module
 /// - Parameters:
 ///   - serviceProtocol: protocol of service
-///   - priority: priority
+///   - priority: reponder priority, != service priority
 ///   - selector: multi SEL event, end with nil
 + (void)registerResponder:(Protocol *)serviceProtocol
                  priority:(NSInteger)priority
@@ -94,11 +96,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param eventId event id
 /// @param selector SEL and multi any type paramters, end with nil
 ///
-/// @warning 参数类型必须与SEL中的参数类选一一对应。
+/// @warning 参数类型必须与SEL中的参数类型一一对应。
 ///
 /// @note float 与 int 不能混用，浮点数需要加小数点，type也一样。
 /// 如果sel的第一个参数为整数，那么param传nil为跳过，其它参数正常传。
-+ (NSArray<id> *)dispatchWithEventId:(NSString *)eventId selAndArgs:(SEL)selector, ...;
++ (NSArray<id> *)dispatchWithEventId:(NSString *)eventId 
+                          selAndArgs:(SEL)selector, ...;
 
 /// dispatch event with SEL event
 /// @param selector SEL and multi any type paramters

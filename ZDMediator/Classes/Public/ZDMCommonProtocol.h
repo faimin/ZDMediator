@@ -8,8 +8,8 @@
 #ifndef ZDMCommonProtocol_h
 #define ZDMCommonProtocol_h
 
-#import "ZDMediatorDefine.h"
 #import <Foundation/Foundation.h>
+#import "ZDMediatorDefine.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

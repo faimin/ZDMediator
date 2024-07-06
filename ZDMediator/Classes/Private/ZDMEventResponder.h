@@ -6,14 +6,13 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ZDMediatorDefine.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ZDMEventResponder : NSObject
 
-@property (nonatomic, copy) NSString *name;
-@property (nonatomic, assign) ZDMPriority priority;
+@property (nonatomic, copy) NSString *serviceName;
+@property (nonatomic, assign) NSInteger priority;
 
 @end
 
