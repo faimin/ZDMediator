@@ -62,18 +62,4 @@
     }
 }
 
-#pragma mark -
-
-- (BOOL)isEqual:(ZDMServiceItem *)other {
-    if (other == self) {
-        return YES;
-    } else if (self.strongObj && [self.strongObj isEqual:other.strongObj]) {
-        return YES;
-    } else if (self.weakObj && [self.weakObj isEqual:other.weakObj]) {
-        return YES;
-    } else {
-        return [super isEqual:other];
-    }
-}
-
 @end
