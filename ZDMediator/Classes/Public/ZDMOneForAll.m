@@ -126,7 +126,9 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
                         ZDMServiceItem *serviceItem = [ZDMServiceItem itemWithStrongObj:value weakObj:nil];
                         NSString *clsName = [NSString stringWithCString:item.value encoding:NSUTF8StringEncoding];
                         if (clsName) {
+                            [lock lock];
                             instanceMap[clsName] = serviceItem;
+                            [lock unlock];
                         }
                     }
                     box;
@@ -557,7 +559,7 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 #endif
     [orderSet addObject:priorityNum];
     [orderSet sortUsingComparator:^NSComparisonResult(id _Nonnull obj1, id _Nonnull obj2) {
-        return [obj1 compare:obj2];
+        return [obj2 compare:obj1];
     }];
     
     mediator.registerInfoMap[zdmStoreKey(serviceName, priorityNum)] = box;
