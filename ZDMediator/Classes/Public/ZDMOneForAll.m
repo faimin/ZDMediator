@@ -26,9 +26,11 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 @interface ZDMOneForAll ()
 
 // key(protocol+priority) -> box
-@property (nonatomic, strong) NSMutableDictionary<NSString *, ZDMServiceBox *> *storeMap;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, ZDMServiceBox *> *registerInfoMap;
+
 // key(protocol) -> [priority]，用于事件分发
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableOrderedSet<NSNumber *> *> *priorityMap;
+
 // key(className) -> item，避免一个类注册多个协议被多次创建的问题
 @property (nonatomic, strong) NSMutableDictionary<NSString *, ZDMServiceItem *> *instanceMap;
 
@@ -65,10 +67,9 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         lock.name = @"ZDMOneForAll_lock";
         lock;
     });
-    _storeMap = @{}.mutableCopy;
+    _registerInfoMap = @{}.mutableCopy;
     _priorityMap = @{}.mutableCopy;
     _instanceMap = @{}.mutableCopy;
-//    _instanceMap = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsStrongMemory valueOptions:NSPointerFunctionsWeakMemory];
     _serviceResponderMap = @{}.mutableCopy;
 }
 
@@ -86,7 +87,7 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 
 + (void)_loadRegisterFromMacho {
     ZDMOneForAll *mediator = [self shareInstance];
-    NSMutableDictionary<NSString *, ZDMServiceBox *> *storeMap = mediator.storeMap;
+    NSMutableDictionary<NSString *, ZDMServiceBox *> *storeMap = mediator.registerInfoMap;
     NSMutableDictionary<NSString *, NSMutableOrderedSet<NSNumber *> *> *priorityMap = mediator.priorityMap;
     NSMutableDictionary<NSString *, ZDMServiceItem *> *instanceMap = mediator.instanceMap;
     
@@ -247,7 +248,7 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     
     [mediator.lock lock];
     [mediator.priorityMap[serviceName] removeObject:@(priority)];
-    ZDMServiceBox *serviceBox = mediator.storeMap[key];
+    ZDMServiceBox *serviceBox = mediator.registerInfoMap[key];
     serviceBox.autoInit = autoInitAgain;
     
     NSString *clsName = NSStringFromClass([serviceBox.cls class]);
@@ -332,7 +333,7 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     for (NSNumber *priorityNum in orderSet.copy) {
         NSString *key = zdmStoreKey(serviceName, priorityNum);
         [mediator.lock lock];
-        ZDMServiceBox *box = mediator.storeMap[key];
+        ZDMServiceBox *box = mediator.registerInfoMap[key];
         [mediator.lock unlock];
         if (!box) {
             continue;
@@ -491,11 +492,11 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     ZDMOneForAll *mediator = [self shareInstance];
     NSString *key = zdmStoreKey(serviceName, @(priority));
     [mediator.lock lock];
-    ZDMServiceBox *box = mediator.storeMap[key];
+    ZDMServiceBox *box = mediator.registerInfoMap[key];
     if (!box && priority == 0) {
         NSNumber *prioNum = mediator.priorityMap[serviceName].firstObject;
         NSString *newKey = zdmStoreKey(serviceName, prioNum);
-        box = mediator.storeMap[newKey];
+        box = mediator.registerInfoMap[newKey];
     }
     [mediator.lock unlock];
     if (!box) {
@@ -548,7 +549,7 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     }
 #if DEBUG
     if ([orderSet containsObject:priorityNum]) {
-        Class aClass = mediator.storeMap[zdmStoreKey(serviceName, priorityNum)].cls;
+        Class aClass = mediator.registerInfoMap[zdmStoreKey(serviceName, priorityNum)].cls;
         NSString *aClassName = NSStringFromClass(aClass);
         NSString *bClassName = NSStringFromClass(box.cls);
         NSAssert3(NO, @"❎ >>>>> 注册了相同priority的service,请修改 => priority: %ld, %@, %@", box.priority, aClassName, bClassName);
@@ -559,7 +560,7 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         return [obj1 compare:obj2];
     }];
     
-    mediator.storeMap[zdmStoreKey(serviceName, priorityNum)] = box;
+    mediator.registerInfoMap[zdmStoreKey(serviceName, priorityNum)] = box;
     [mediator.lock unlock];
 }
 
@@ -595,4 +596,3 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 }
 
 @end
-
