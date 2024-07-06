@@ -27,8 +27,8 @@ pod 'ZDMediator'
 - 自主控制生命周期
 - 实例方法、类方法
 - 事件分发
-- 一个对象注册多个协议
-- 一个协议多个对象支持
+- 一个对象对应多个协议
+- 一个协议多个对象对应
 - 安全
 
 ## Usage
@@ -61,15 +61,22 @@ NSString *animalName = [GetServiceWithPriority(AnimalProtocol, 1) animalName];
 XCTAssertTrue([animalName isEqualToString:@"小狗"]);
 ```
 
+## 结构
+
+![architecture](./Resources/architecture.png)
+
+## 粗略流程
+![process](./Resources/process.png)
+
 ## Q&A
 
-1. priority是做什么用的？
+1. `priority`是做什么用的？
 
-查表`key`的一部分，是必须要设置的
+    查表`key`的一部分，是必须要设置的
 
 2. 如何保证安全性的？
 
-执行方法调用的其实是`proxy`对象，内部通过消息转发把异常吃掉了
+    执行方法调用的其实是`proxy`对象，内部通过消息转发把异常吃掉了
 
 ## Author
 
