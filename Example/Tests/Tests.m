@@ -152,4 +152,24 @@
     NSLog(@"++++++++++++");
 }
 
+- (void)testPerformance1 {
+    __auto_type dog = [ZDDog new];
+    
+    [self measureBlock:^{
+        NSInteger age = [dog age];
+        NSLog(@"age = %ld", (long)age);
+    }];
+}
+
+- (void)testPerformance2 {
+    __auto_type dog = [ZDDog new];
+    [ZDMOneForAll manualRegisterService:@protocol(DogProtocol) priority:200 implementer:dog weakStore:NO];
+    
+    [self measureBlock:^{
+        ZDDog *dog = GetServiceWithPriority(DogProtocol, 200);
+        NSInteger age = [dog age];
+        NSLog(@"age = %ld", (long)age);
+    }];
+}
+
 @end
