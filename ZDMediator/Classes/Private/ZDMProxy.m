@@ -6,6 +6,7 @@
 //
 
 #import "ZDMProxy.h"
+#import "ZDMConst.h"
 
 @implementation ZDMProxy
 
@@ -35,7 +36,17 @@
     } else if ([[_target class] respondsToSelector:selector]) {
         return [_target class];
     }
+    
+    [NSNotificationCenter.defaultCenter postNotificationName:ZDMUnrecognizedMethodNotification object:nil userInfo:@{
+        @"class": [NSString stringWithUTF8String:object_getClassName(_target)],
+        @"selector": NSStringFromSelector(@selector(selector)) ?: @"",
+        @"source": @"ZDMProxy",
+    }];
+    
+#if DEBUG
     NSLog(@"❎ >>>>> target: %@ don't recognized selector：%@", _target, NSStringFromSelector(selector));
+#endif
+    
     return nil;
 }
 

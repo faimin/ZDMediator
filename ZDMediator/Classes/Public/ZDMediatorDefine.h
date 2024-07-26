@@ -11,6 +11,9 @@
 #import <Foundation/Foundation.h>
 #import <mach-o/loader.h>
 
+// 异常
+FOUNDATION_EXPORT NSNotificationName const ZDMUnrecognizedMethodNotification;
+
 typedef NS_ENUM(NSInteger, ZDMPriority) {
     ZDMPriorityLow = -100,
     ZDMPriorityDefalut = 0,

@@ -8,6 +8,7 @@
 #import "ZDMInvocation.h"
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
+#import "ZDMConst.h"
 
 @implementation ZDMInvocation
 
@@ -25,7 +26,14 @@
         if ([[target class] respondsToSelector:selector]) {
             target = [target class];
         } else {
+            [NSNotificationCenter.defaultCenter postNotificationName:ZDMUnrecognizedMethodNotification object:nil userInfo:@{
+                @"class": [NSString stringWithUTF8String:object_getClassName(target)],
+                @"selector": NSStringFromSelector(@selector(selector)) ?: @"",
+                @"source": @"ZDMInvocation",
+            }];
+#if DEBUG
             NSLog(@"❎ >>>>> %@ doesNotRecognizeSelector: %@", target, NSStringFromSelector(selector));
+#endif
             return nil;
         }
     }
