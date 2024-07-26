@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// manual register implementer to map
 /// - Parameters:
 ///   - serviceProtocol: protocol
+///   - priority: priority of service
 ///   - obj: protocol implementer (instance or Class),
 ///   if obj is a class, the `isAllClsMethod` will be set `true`
 ///   - weakStore: strong ref or weak ref, default is NO (strong ref)
@@ -120,7 +121,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark -
 
 #ifndef GetService
-#define GetService(proto) GetServiceWithPriority(proto, 0)
+#define GetService(proto) GetServiceWithPriority(proto, ZDMDefaultPriority)
 #endif
 
 #ifndef GetServiceWithPriority

@@ -17,6 +17,9 @@ typedef NS_ENUM(NSInteger, ZDMPriority) {
     ZDMPriorityHigh = 100,
 };
 
+// 1v1 priority
+static NSInteger const ZDMDefaultPriority = 0;
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wstrict-prototypes"
 // 参数不能为bool类型，会报错
@@ -46,7 +49,7 @@ struct ZDMMachOOFARegisterKV {
 #endif
 
 // 【Usage】:
-//  ZDMediatorOFARegisterManual(protocolName, Class, 100, 1, 0)
+//  ZDMediatorOFARegisterManual(protocolName, Class, 100, true, false)
 #ifndef ZDMediatorOFARegisterManual
 #define ZDMediatorOFARegisterManual(protocol_name, cls, _priority, auto_init,  \
                                     protocol_all_cls_method)                   \
@@ -66,7 +69,12 @@ struct ZDMMachOOFARegisterKV {
 
 #ifndef ZDMediatorOFARegister
 #define ZDMediatorOFARegister(protocol_name, cls, _priority)                   \
-  ZDMediatorOFARegisterManual(protocol_name, cls, _priority, 1, 0)
+  ZDMediatorOFARegisterManual(protocol_name, cls, _priority, true, false)
+#endif
+
+#ifndef ZDMediator1V1Register
+#define ZDMediator1V1Register(protocol_name, cls)                              \
+  ZDMediatorOFARegister(protocol_name, cls, ZDMDefaultPriority)
 #endif
 
 #endif /* ZDMediatorDefine_h */

@@ -193,7 +193,7 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 
 + (void)manualRegisterService:(Protocol *)serviceProtocol 
                   implementer:(id)obj {
-    [self manualRegisterService:serviceProtocol priority:0 implementer:obj weakStore:NO];
+    [self manualRegisterService:serviceProtocol priority:ZDMDefaultPriority implementer:obj weakStore:NO];
 }
 
 + (void)manualRegisterService:(Protocol *)serviceProtocol
@@ -495,7 +495,7 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     NSString *key = zdmStoreKey(serviceName, @(priority));
     [mediator.lock lock];
     ZDMServiceBox *box = mediator.registerInfoMap[key];
-    if (!box && priority == 0) {
+    if (!box && priority == ZDMDefaultPriority) {
         NSNumber *prioNum = mediator.priorityMap[serviceName].firstObject;
         NSString *newKey = zdmStoreKey(serviceName, prioNum);
         box = mediator.registerInfoMap[newKey];
