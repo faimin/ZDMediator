@@ -27,6 +27,17 @@ Pod::Spec.new do |s|
      'DEFINES_MODULE' => 'YES'
   }
   s.ios.deployment_target = '10.0'
-  s.source_files = 'ZDMediator/Classes/**/*.{h,m}'
-  s.project_header_files = 'ZDMediator/Classes/Private/*.h'
+  s.default_subspec = 'Core'
+  
+  s.subspec 'Core' do |ss|
+    ss.source_files = 'ZDMediator/Classes/**/*.{h,m}'
+    ss.project_header_files = 'ZDMediator/Classes/Private/*.h'
+  end
+    
+  s.subspec 'DisableAssert' do |ss|
+    ss.source_files = 'ZDMediator/Classes/Public/ZDMediatorDefine.h'
+    ss.pod_target_xcconfig = {
+      'GCC_PREPROCESSOR_DEFINITIONS' => 'ASSERTDISABLE=1',
+    }
+  end
 end

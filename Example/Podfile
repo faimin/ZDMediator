@@ -3,7 +3,7 @@ use_frameworks!
 platform :ios, '10.0'
 
 target 'ZDMediator_Example' do
-  pod 'ZDMediator', :path => '../'
+  pod 'ZDMediator', :path => '../'#, :subspecs => ['Core', 'DisableAssert']
 
   target 'ZDMediator_Tests' do
     inherit! :search_paths

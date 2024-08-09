@@ -148,7 +148,9 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
                     Class aClass = storeMap[zdmStoreKey(serviceName, priorityNum)].cls;
                     NSString *aClassName = NSStringFromClass(aClass);
                     NSString *bClassName = [NSString stringWithUTF8String:item.value];
+#if !ASSERTDISABLE
                     NSAssert3(NO, @"⚠️有多个类注册了相同的priority => %d, Class => [%@, %@] ", item.priority, aClassName, bClassName);
+#endif
                 }
 #endif
                 [orderSet addObject:priorityNum];
@@ -235,13 +237,17 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
              priority:(NSInteger)priority
         autoInitAgain:(BOOL)autoInitAgain {
     if (!serviceProtocol) {
+#if !ASSERTDISABLE
         NSAssert(NO, @"the protocol is nil");
+#endif
         return NO;
     }
     
     NSString *serviceName = NSStringFromProtocol(serviceProtocol);
     if (!serviceName) {
+#if !ASSERTDISABLE
         NSAssert(NO, @"the protocol name is nil");
+#endif
         return NO;
     }
     
@@ -554,7 +560,9 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         Class aClass = mediator.registerInfoMap[zdmStoreKey(serviceName, priorityNum)].cls;
         NSString *aClassName = NSStringFromClass(aClass);
         NSString *bClassName = NSStringFromClass(box.cls);
+#if !ASSERTDISABLE
         NSAssert3(NO, @"❎ >>>>> 注册了相同priority的service,请修改 => priority: %ld, %@, %@", box.priority, aClassName, bClassName);
+#endif
     }
 #endif
     [orderSet addObject:priorityNum];
