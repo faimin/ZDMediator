@@ -45,6 +45,9 @@
     
 #if DEBUG
     NSLog(@"❎ >>>>> target: %@ don't recognized selector：%@", _target, NSStringFromSelector(selector));
+#if !ASSERTDISABLE
+    NSAssert2(NO, @"❎ >>>>> target: %@ don't recognized selector：%@", _target, NSStringFromSelector(selector));
+#endif
 #endif
     
     return nil;
