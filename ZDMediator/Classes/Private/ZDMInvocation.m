@@ -6,7 +6,11 @@
 //
 
 #import "ZDMInvocation.h"
+#if TARGET_OS_IOS
 #import <UIKit/UIKit.h>
+#elif defined(__MAC_OS_X_VERSION_MIN_REQUIRED)
+#import <AppKit/AppKit.h>
+#endif
 #import <objc/runtime.h>
 #import "ZDMConst.h"
 
@@ -135,11 +139,13 @@
                 } else if (strcmp(argType, @encode(CGAffineTransform)) == 0) {
                     CGAffineTransform arg = va_arg(args, CGAffineTransform);
                     [invocation setArgument:&arg atIndex:index];
-                } else if (strcmp(argType, @encode(CATransform3D)) == 0) {
-                    CATransform3D arg = va_arg(args, CATransform3D);
-                    [invocation setArgument:&arg atIndex:index];
                 } else if (strcmp(argType, @encode(NSRange)) == 0) {
                     NSRange arg = va_arg(args, NSRange);
+                    [invocation setArgument:&arg atIndex:index];
+                }
+#if TARGET_OS_IOS
+                else if (strcmp(argType, @encode(CATransform3D)) == 0) {
+                    CATransform3D arg = va_arg(args, CATransform3D);
                     [invocation setArgument:&arg atIndex:index];
                 } else if (strcmp(argType, @encode(UIOffset)) == 0) {
                     UIOffset arg = va_arg(args, UIOffset);
@@ -147,7 +153,9 @@
                 } else if (strcmp(argType, @encode(UIEdgeInsets)) == 0) {
                     UIEdgeInsets arg = va_arg(args, UIEdgeInsets);
                     [invocation setArgument:&arg atIndex:index];
-                } else {
+                } 
+#endif
+                else {
                     unsupportedType = YES;
                 }
             } break;

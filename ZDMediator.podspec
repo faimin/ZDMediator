@@ -27,6 +27,8 @@ Pod::Spec.new do |s|
      'DEFINES_MODULE' => 'YES'
   }
   s.ios.deployment_target = '10.0'
+  s.osx.deployment_target = '10.12'
+  
   s.default_subspec = 'Core'
   
   s.subspec 'Core' do |ss|
