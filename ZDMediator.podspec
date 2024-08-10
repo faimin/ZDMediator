@@ -42,7 +42,7 @@ Pod::Spec.new do |s|
   end
     
   s.subspec 'DisableAssert' do |ss|
-    ss.source_files = 'Sources/ZDMediator/Classes/Public/ZDMediatorDefine.h'
+    ss.source_files = 'Sources/ZDMediator/Classes/ZDMediatorDefine.h'
     ss.pod_target_xcconfig = {
       'GCC_PREPROCESSOR_DEFINITIONS' => 'ASSERTDISABLE=1',
     }
