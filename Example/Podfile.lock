@@ -1,6 +1,6 @@
 PODS:
-  - ZDMediator/Core (0.3.1)
-  - ZDMediator/DisableAssert (0.3.1)
+  - ZDMediator/Core (0.3.2)
+  - ZDMediator/DisableAssert (0.3.2)
 
 DEPENDENCIES:
   - ZDMediator/Core (from `../`)
@@ -11,7 +11,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  ZDMediator: df6e70c9012d8783701dd0f1c5e857825bdb2113
+  ZDMediator: dc3ba887db9082e1ebdcd9906765c351c83067cd
 
 PODFILE CHECKSUM: bedaa3a9d899eb1cbf1c029ef7dce57bff619487
 
