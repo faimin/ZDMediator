@@ -4,6 +4,7 @@
 
 - 支持禁用断言
 - 添加`macOS`的支持
+- 支持`Swift Package Manager`
 
 
 ## 0.3.1

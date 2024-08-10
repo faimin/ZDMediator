@@ -22,22 +22,27 @@ Pod::Spec.new do |s|
   }
   s.social_media_url = 'https://faimin.github.io/'
   s.prefix_header_file = false
-  s.module_name  = 'ZDMediator'
+  s.module_name = 'ZDMediator'
   s.pod_target_xcconfig = {
      'DEFINES_MODULE' => 'YES'
   }
   s.ios.deployment_target = '10.0'
   s.osx.deployment_target = '10.12'
+  # s.platforms = { 
+  #   :ios => "10.0",
+  #   :osx => "10.12",
+  # }
   
   s.default_subspec = 'Core'
   
   s.subspec 'Core' do |ss|
-    ss.source_files = 'ZDMediator/Classes/**/*.{h,m}'
-    ss.project_header_files = 'ZDMediator/Classes/Private/*.h'
+    ss.source_files = 'Sources/ZDMediator/Classes/**/*.{h,m}'
+    #ss.project_header_files = 'Sources/ZDMediator/Classes/Private/*.h'
+    ss.project_header_files = 'Sources/ZDMediator/Classes/{ZDMConst,ZDMEventResponder,ZDMServiceItem,ZDMProxy,ZDMServiceBox}.h'
   end
     
   s.subspec 'DisableAssert' do |ss|
-    ss.source_files = 'ZDMediator/Classes/Public/ZDMediatorDefine.h'
+    ss.source_files = 'Sources/ZDMediator/Classes/Public/ZDMediatorDefine.h'
     ss.pod_target_xcconfig = {
       'GCC_PREPROCESSOR_DEFINITIONS' => 'ASSERTDISABLE=1',
     }
