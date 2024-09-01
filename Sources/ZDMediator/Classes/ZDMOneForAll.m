@@ -145,10 +145,10 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
                 }
 #if DEBUG
                 if ([orderSet containsObject:priorityNum]) {
+#if !ASSERTDISABLE
                     Class aClass = storeMap[zdmStoreKey(serviceName, priorityNum)].cls;
                     NSString *aClassName = NSStringFromClass(aClass);
                     NSString *bClassName = [NSString stringWithUTF8String:item.value];
-#if !ASSERTDISABLE
                     NSAssert3(NO, @"⚠️有多个类注册了相同的priority => %d, Class => [%@, %@] ", item.priority, aClassName, bClassName);
 #endif
                 }
@@ -557,10 +557,10 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     }
 #if DEBUG
     if ([orderSet containsObject:priorityNum]) {
+#if !ASSERTDISABLE
         Class aClass = mediator.registerInfoMap[zdmStoreKey(serviceName, priorityNum)].cls;
         NSString *aClassName = NSStringFromClass(aClass);
         NSString *bClassName = NSStringFromClass(box.cls);
-#if !ASSERTDISABLE
         NSAssert3(NO, @"❎ >>>>> 注册了相同priority的service,请修改 => priority: %ld, %@, %@", box.priority, aClassName, bClassName);
 #endif
     }
