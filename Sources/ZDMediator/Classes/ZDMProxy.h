@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ZDMProxy<__covariant T> : NSProxy
 
-@property (nonatomic, strong, readonly, nullable) T target;
+@property (nonatomic, weak, readonly, nullable) T target;
 
 + (instancetype)proxyWithTarget:(T _Nullable)target;
 
