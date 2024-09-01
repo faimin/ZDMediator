@@ -110,6 +110,7 @@
     XCTAssertTrue(res);
 }
 
+// 测试方法不是别的异常处理
 - (void)testUnrecognizedMethod {
     NSObject *cat = GetServiceWithPriority(CatProtocol, 0);
     XCTAssertTrue([NSStringFromClass([cat class]) isEqualToString:@"ZDCat"]);
@@ -120,6 +121,16 @@
     
     NSObject *dog = GetServiceWithClass(CatProtocol, 0, ZDDog);
     XCTAssertNil(dog);
+}
+
+// 测试注册时说明全是类方法，但其实并不是的异常情况
+- (void)testAllClassMethodException {
+    __auto_type dog = GetService(DogProtocol);
+    NSInteger age = [dog age];
+    XCTAssertEqual(age, 2);
+    
+    __auto_type dog2 = GetService(DogProtocol);
+    XCTAssertTrue([dog2 isKindOfClass:NSClassFromString(@"ZDDog")]);
 }
 
 - (void)testDispatch {

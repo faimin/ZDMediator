@@ -25,7 +25,7 @@ static NSInteger const ZDMDefaultPriority = 0;
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wstrict-prototypes"
-// 参数不能为bool类型，会报错
+// 参数不能为bool类型，因为会报错
 //typedef id (^ZDMCommonCallback)() NS_SWIFT_UNAVAILABLE("ZDMCommonCallback not available");
 typedef id (^ZDMCommonCallback)();
 #pragma clang diagnostic pop
@@ -33,8 +33,9 @@ typedef id (^ZDMCommonCallback)();
 #ifndef ZDMIGNORE_SELWARNING
 #define ZDMIGNORE_SELWARNING(...)                                              \
   _Pragma("clang diagnostic push")                                             \
-      _Pragma("clang diagnostic ignored \"-Wundeclared-selector\"")            \
-          __VA_ARGS__ _Pragma("clang diagnostic pop")
+  _Pragma("clang diagnostic ignored \"-Wundeclared-selector\"")                \
+    __VA_ARGS__                                                                \
+  _Pragma("clang diagnostic pop")
 #endif
 
 //-------------------------One For All------------------------------

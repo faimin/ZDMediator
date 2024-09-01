@@ -517,21 +517,27 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     if (clsName) {
         serviceInstance = [self _serviceInstaceWithClassName:clsName];
     }
-    if (!serviceInstance && box.autoInit) {
-        Class aCls = box.cls;
+    
+    __auto_type createInstanceBlock = ^id(ZDMServiceBox *innerBox, ZDMContext *context){
+        Class aCls = innerBox.cls;
         if (!aCls) {
             NSLog(@"❎ >>>>> %d, %s => please register first", __LINE__, __FUNCTION__);
             return nil;
         }
-        
-        if (box.isAllClsMethod) {
-            serviceInstance = aCls;
+        id instanceOrCls = nil;
+        if (innerBox.isAllClsMethod) {
+            instanceOrCls = aCls;
         } else if ([aCls respondsToSelector:@selector(zdm_createInstance:)]) {
-            serviceInstance = [aCls zdm_createInstance:mediator.context];
+            instanceOrCls = [aCls zdm_createInstance:context];
         } else {
-            serviceInstance = [[aCls alloc] init];
+            instanceOrCls = [[aCls alloc] init];
         }
-        [self _storeServiceWithStrongObj:serviceInstance weakObj:nil];
+        [self _storeServiceWithStrongObj:instanceOrCls weakObj:nil];
+        return instanceOrCls;
+    };
+    
+    if (!serviceInstance && box.autoInit) {
+        serviceInstance = createInstanceBlock(box, mediator.context);
     }
     
     if (!serviceInstance) {
@@ -541,6 +547,17 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     // prevent crashes
     if (serviceInstance && needWrap) {
         ZDMProxy *proxyValue = [ZDMProxy proxyWithTarget:serviceInstance];
+        __weak typeof(box) weakBox = box;
+        __weak typeof(mediator) weakMediator = mediator;
+        [proxyValue fixmeWithCallback:^id{
+            __strong typeof(weakBox) box = weakBox;
+            __strong typeof(weakMediator) mediator = weakMediator;
+            // 执行到这个闭包说明协议中不都是类方法，需要修改这个属性
+            box.isAllClsMethod = NO;
+            
+            id value = createInstanceBlock(box, mediator.context);
+            return value;
+        }];
         return proxyValue;
     }
     return serviceInstance;

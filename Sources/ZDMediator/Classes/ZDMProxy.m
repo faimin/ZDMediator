@@ -6,12 +6,18 @@
 //
 
 #import "ZDMProxy.h"
+#import <objc/runtime.h>
 #import "ZDMConst.h"
+
+@interface ZDMProxy ()
+@property (nonatomic, copy, nullable) ZDMFixCallback callback;
+@end
 
 @implementation ZDMProxy
 
 - (void)dealloc {
     _target = nil;
+    _callback = nil;
 }
 
 - (instancetype)initWithTarget:(id)target {
@@ -21,6 +27,12 @@
 
 + (instancetype)proxyWithTarget:(id)target {
     return [[ZDMProxy alloc] initWithTarget:target];
+}
+
+#pragma mark - Fix
+
+- (void)fixmeWithCallback:(ZDMFixCallback)callback {
+    _callback = callback;
 }
 
 #pragma mark - Forward Message
@@ -35,6 +47,20 @@
         return _target;
     } else if ([[_target class] respondsToSelector:selector]) {
         return [_target class];
+    } else if (
+        object_isClass(_target)
+        && [(Class)_target instancesRespondToSelector:selector]
+    ) {
+#if !ASSERTDISABLE
+        NSAssert2(NO, @"❎ >>>>> %@ 遵守的协议中不全是类方法，请您修改注册设置。SEL：%@", NSStringFromClass([_target class]), NSStringFromSelector(selector));
+#endif
+        // 容错处理
+        if (self.callback) {
+            id newTarget = self.callback();
+            if ([newTarget respondsToSelector:selector]) {
+                return newTarget;
+            }
+        }
     }
     
     [NSNotificationCenter.defaultCenter postNotificationName:ZDMUnrecognizedMethodNotification object:nil userInfo:@{

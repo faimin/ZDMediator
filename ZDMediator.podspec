@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.version          = '0.3.2'
   s.summary          = '模块通信中间件'
   s.description      = <<-DESC
-    用于模块间通信的中间件，支持自动注册和手动注册
+    用于模块间通信的中间件，支持自动注册、手动注册、强弱引用、方法调用容错
                        DESC
   s.homepage         = 'https://github.com/faimin/ZDMediator'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
@@ -33,12 +33,9 @@ Pod::Spec.new do |s|
   #   :osx => "10.12",
   # }
   
-  s.default_subspec = 'Core'
-  
   s.subspec 'Core' do |ss|
     ss.source_files = 'Sources/ZDMediator/Classes/**/*.{h,m}'
-    #ss.project_header_files = 'Sources/ZDMediator/Classes/Private/*.h'
-    ss.project_header_files = 'Sources/ZDMediator/Classes/{ZDMConst,ZDMEventResponder,ZDMServiceItem,ZDMProxy,ZDMServiceBox}.h'
+    ss.project_header_files = 'Sources/ZDMediator/Classes/{ZDMConst,ZDMEventResponder,ZDMServiceItem,ZDMServiceBox}.h'
   end
     
   s.subspec 'DisableAssert' do |ss|
@@ -47,4 +44,6 @@ Pod::Spec.new do |s|
       'GCC_PREPROCESSOR_DEFINITIONS' => 'ASSERTDISABLE=1',
     }
   end
+  
+  s.default_subspec = 'Core'
 end

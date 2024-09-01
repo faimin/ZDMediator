@@ -207,7 +207,7 @@
                 };
                 for (int i = 0; i < size; i++)
                     va_arg(args, struct dummy);
-                NSLog(@"ZDMInvocation _buildInvocation:signature:args: unsupported type:%s (%lu " @"bytes)", [signature getArgumentTypeAtIndex:index], (unsigned long)size);
+                NSLog(@"%@ unsupported type:%s (%lu " @"bytes)", NSStringFromSelector(_cmd), [signature getArgumentTypeAtIndex:index], (unsigned long)size);
             }
 #undef case_size
         }

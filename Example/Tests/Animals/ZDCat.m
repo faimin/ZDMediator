@@ -10,8 +10,8 @@
 #import <ZDMediator/ZDMediator.h>
 #import "AnimalProtocol.h"
 
-ZDMediatorOFARegister(AnimalProtocol, ZDCat, 0)
-ZDMediatorOFARegister(CatProtocol, ZDCat, 0)
+ZDMediator1V1Register(AnimalProtocol, ZDCat)
+ZDMediator1V1Register(CatProtocol, ZDCat)
 
 @implementation ZDCat
 
