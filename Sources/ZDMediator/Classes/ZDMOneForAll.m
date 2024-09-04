@@ -275,6 +275,17 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     return NO;
 }
 
++ (NSHashTable *)allInitializedObjects {
+    NSHashTable *table = [NSHashTable weakObjectsHashTable];
+    [[self shareInstance].instanceMap enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, ZDMServiceItem * _Nonnull obj, BOOL * _Nonnull stop) {
+        id value = obj.obj;
+        if (value) {
+            [table addObject:value];
+        }
+    }];
+    return table;
+}
+
 #pragma mark - Register Event
 
 + (void)registerResponder:(Protocol *)serviceProtocol

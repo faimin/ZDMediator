@@ -113,6 +113,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// 如果sel的第一个参数为整数，则param传nil为跳过，其它参数正常传。
 + (NSArray<id> *)dispatchWithEventSelAndArgs:(SEL)selector, ...;
 
+/// get all initialized objects in mediator
+/// store in weakTable
++ (NSHashTable *)allInitializedObjects;
+
 @end
 
 //------------------------------------------

@@ -42,11 +42,6 @@
 }
 
 - (void)tearDown {
-    [ZDMOneForAll removeService:@protocol(CatProtocol) priority:0 autoInitAgain:NO];
-    
-    NSString *name = [GetService(CatProtocol) name];
-    XCTAssertNil(name);
-    
     // Put teardown code here. This method is called after the invocation of each
     // test method in the class.
     [super tearDown];
@@ -161,6 +156,27 @@
     XCTAssertGreaterThanOrEqual(names.count, 2);
     
     NSLog(@"++++++++++++");
+}
+
+- (void)testRemoveService {
+    id cat = GetService(CatProtocol);
+    XCTAssertNotNil(cat);
+    
+    [ZDMOneForAll removeService:@protocol(CatProtocol) priority:0 autoInitAgain:NO];
+    XCTAssertNil(GetService(CatProtocol));
+    
+    NSString *name = [GetService(CatProtocol) name];
+    XCTAssertNil(name);
+}
+
+- (void)testBroadcast {
+    __auto_type dog = [ZDDog new];
+    [ZDMOneForAll manualRegisterService:@protocol(DogProtocol) implementer:dog];
+    
+    ZDMBroadcastProxy<ZDMCommonProtocol> *proxy = [[ZDMBroadcastProxy alloc] initWithHashTable:[ZDMOneForAll allInitializedObjects]];
+    [proxy zdm_handleEvent:999 userInfo:@{@"a": @"aaaaa"} callback:^id{
+        return @(YES);
+    }];
 }
 
 - (void)testPerformance1 {
