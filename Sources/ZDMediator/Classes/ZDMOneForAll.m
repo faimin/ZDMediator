@@ -45,7 +45,7 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 
 #pragma mark - Singleton
 
-+ (instancetype)shareInstance {
++ (ZDMOneForAll *)shareInstance {
     static ZDMOneForAll *instance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
