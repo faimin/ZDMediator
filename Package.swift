@@ -7,14 +7,14 @@ let package = Package(
     name: "ZDMediator",
     platforms: [
         .iOS(.v10),
-        .macOS(.v10_12),
+        .macOS(.v10_12)
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "ZDMediator",
             targets: ["ZDMediator"]
-        ),
+        )
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -22,6 +22,6 @@ let package = Package(
         .target(
             name: "ZDMediator",
             publicHeadersPath: "Classes"
-        ),
+        )
     ]
 )

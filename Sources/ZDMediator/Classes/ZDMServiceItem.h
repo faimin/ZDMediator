@@ -9,14 +9,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ZDMServiceItem : NSObject
+@interface ZDMServiceItem<__covariant T> : NSObject
 
-@property (nonatomic, strong, nullable) id strongObj;
-@property (nonatomic, weak, nullable) id weakObj;
+@property (nonatomic, strong, nullable) T strongObj;
+@property (nonatomic, weak, nullable) T weakObj;
 
-@property (nonatomic, readonly, nullable) id obj;
+@property (nonatomic, readonly, nullable) T obj;
 
-+ (instancetype)itemWithStrongObj:(id _Nullable)strongObj weakObj:(id _Nullable)weakObj;
++ (instancetype)itemWithStrongObj:(T _Nullable)strongObj weakObj:(T _Nullable)weakObj;
 
 - (void)clear;
 

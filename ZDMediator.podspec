@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.version          = '0.3.3'
   s.summary          = '模块通信中间件'
   s.description      = <<-DESC
-    用于模块间通信的中间件，支持自动注册、手动注册、强弱引用、方法调用容错
+    用于模块间通信的中间件，支持自动注册、手动注册、强弱引用、实例方法、类方法调用
                        DESC
   s.homepage         = 'https://github.com/faimin/ZDMediator'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
@@ -22,7 +22,7 @@ Pod::Spec.new do |s|
   }
   s.social_media_url = 'https://faimin.github.io/'
   s.prefix_header_file = false
-  s.module_name = 'ZDMediator'
+  s.module_name = "#{s.name}"
   s.pod_target_xcconfig = {
      'DEFINES_MODULE' => 'YES'
   }
