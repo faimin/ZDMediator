@@ -76,7 +76,19 @@ XCTAssertTrue([animalName isEqualToString:@"小狗"]);
 
 2. 如何保证安全性的？
 
-    执行方法调用的其实是`proxy`对象，内部通过消息转发把异常吃掉了
+    执行方法调用的其实是`proxy`对象，内部通过消息转发把异常处理掉
+
+## Swift Macho
+
+> [一个实用的Swift属性](https://mp.weixin.qq.com/s/fEFL3GxYaRJ_f5n4UuwuiA)
+
+```swift
+@_used 
+@_section("__DATA,__mod_init_func")
+let initialize: @convention(c) () -> Void = {
+    debugPrint("Swift Macho")
+}
+```
 
 ## Author
 

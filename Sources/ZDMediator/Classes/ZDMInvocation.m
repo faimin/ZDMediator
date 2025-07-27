@@ -6,13 +6,21 @@
 //
 
 #import "ZDMInvocation.h"
-#if TARGET_OS_IOS
+#import <QuartzCore/CoreAnimation.h>
+#if TARGET_OS_IPHONE
 #import <UIKit/UIKit.h>
-#elif defined(__MAC_OS_X_VERSION_MIN_REQUIRED)
+#elif TARGET_OS_OSX
 #import <AppKit/AppKit.h>
 #endif
 #import <objc/runtime.h>
 #import "ZDMConst.h"
+
+#if TARGET_OS_OSX
+typedef NSEdgeInsets ZDMEdgeInsets;
+#else
+typedef UIEdgeInsets ZDMEdgeInsets;
+#endif
+
 
 @implementation ZDMInvocation
 
@@ -145,18 +153,18 @@
                 } else if (strcmp(argType, @encode(NSRange)) == 0) {
                     NSRange arg = va_arg(args, NSRange);
                     [invocation setArgument:&arg atIndex:index];
-                }
-#if TARGET_OS_IOS
-                else if (strcmp(argType, @encode(CATransform3D)) == 0) {
+                } else if (strcmp(argType, @encode(CATransform3D)) == 0) {
                     CATransform3D arg = va_arg(args, CATransform3D);
                     [invocation setArgument:&arg atIndex:index];
-                } else if (strcmp(argType, @encode(UIOffset)) == 0) {
+                } else if (strcmp(argType, @encode(ZDMEdgeInsets)) == 0) {
+                    ZDMEdgeInsets arg = va_arg(args, ZDMEdgeInsets);
+                    [invocation setArgument:&arg atIndex:index];
+                }
+#if TARGET_OS_IPHONE
+                else if (strcmp(argType, @encode(UIOffset)) == 0) {
                     UIOffset arg = va_arg(args, UIOffset);
                     [invocation setArgument:&arg atIndex:index];
-                } else if (strcmp(argType, @encode(UIEdgeInsets)) == 0) {
-                    UIEdgeInsets arg = va_arg(args, UIEdgeInsets);
-                    [invocation setArgument:&arg atIndex:index];
-                } 
+                }
 #endif
                 else {
                     unsupportedType = YES;

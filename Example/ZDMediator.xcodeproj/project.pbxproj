@@ -25,6 +25,7 @@
 		873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 873B8AEA1B1F5CCA007FD442 /* Main.storyboard */; };
 		C224A7692A6BAC5D004295EB /* ZDDog.m in Sources */ = {isa = PBXBuildFile; fileRef = C224A7662A6BAC5D004295EB /* ZDDog.m */; };
 		C224A76C2A6BAC84004295EB /* ZDCat.m in Sources */ = {isa = PBXBuildFile; fileRef = C224A76B2A6BAC84004295EB /* ZDCat.m */; };
+		DA26B1852D24DCA800275688 /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA26B1842D24DCA800275688 /* Test.swift */; };
 		E71BCAA0CD1D2CF53610451B /* Pods_ZDMediator_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D93062865AF6D43151EBB7C3 /* Pods_ZDMediator_Tests.framework */; };
 /* End PBXBuildFile section */
 
@@ -76,6 +77,8 @@
 		C23F65C72A70CE16003CA9F3 /* ZDClassProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZDClassProtocol.h; sourceTree = "<group>"; };
 		C2A9DE192C3087C300B90BCC /* AnimalProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AnimalProtocol.h; sourceTree = "<group>"; };
 		D93062865AF6D43151EBB7C3 /* Pods_ZDMediator_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ZDMediator_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA26B1832D24DCA700275688 /* ZDMediator_Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZDMediator_Tests-Bridging-Header.h"; sourceTree = "<group>"; };
+		DA26B1842D24DCA800275688 /* Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
 		E25D135A9E653646EC1F4E93 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -172,6 +175,8 @@
 				C224A7642A6BAC5D004295EB /* Animals */,
 				6003F5BB195388D20070C39A /* Tests.m */,
 				6003F5B6195388D20070C39A /* Supporting Files */,
+				DA26B1842D24DCA800275688 /* Test.swift */,
+				DA26B1832D24DCA700275688 /* ZDMediator_Tests-Bridging-Header.h */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -274,6 +279,7 @@
 				ORGANIZATIONNAME = 8207436;
 				TargetAttributes = {
 					6003F5AD195388D20070C39A = {
+						LastSwiftMigration = 1620;
 						TestTargetID = 6003F589195388D20070C39A;
 					};
 				};
@@ -401,6 +407,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C224A76C2A6BAC84004295EB /* ZDCat.m in Sources */,
+				DA26B1852D24DCA800275688 /* Test.swift in Sources */,
 				C224A7692A6BAC5D004295EB /* ZDDog.m in Sources */,
 				6003F5BC195388D20070C39A /* Tests.m in Sources */,
 			);
@@ -566,6 +573,7 @@
 			baseConfigurationReference = AC187F2FB62C6CF1EF284273 /* Pods-ZDMediator_Tests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
@@ -581,6 +589,8 @@
 				INFOPLIST_FILE = "Tests/Tests-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Tests/ZDMediator_Tests-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ZDMediator_Example.app/ZDMediator_Example";
 				WRAPPER_EXTENSION = xctest;
@@ -592,6 +602,7 @@
 			baseConfigurationReference = B840DCFB954C6B7D6F2D43AC /* Pods-ZDMediator_Tests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
@@ -603,6 +614,7 @@
 				INFOPLIST_FILE = "Tests/Tests-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Tests/ZDMediator_Tests-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ZDMediator_Example.app/ZDMediator_Example";
 				WRAPPER_EXTENSION = xctest;

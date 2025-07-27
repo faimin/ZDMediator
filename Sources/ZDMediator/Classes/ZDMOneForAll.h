@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ZDMOneForAll : NSObject
+@interface ZDMOneForAll<__covariant S> : NSObject
 
 @property (nonatomic, strong, nullable) ZDMContext *context;
 
@@ -36,22 +36,22 @@ NS_ASSUME_NONNULL_BEGIN
 ///   - weakStore: strong ref or weak ref, default is NO (strong ref)
 + (void)manualRegisterService:(Protocol *)serviceProtocol
                      priority:(NSInteger)priority
-                  implementer:(id)obj
+                  implementer:(S)obj
                     weakStore:(BOOL)weakStore;
 + (void)manualRegisterService:(Protocol *)serviceProtocol
-                  implementer:(id)obj;
+                  implementer:(S)obj;
 
 #pragma mark - Get
 
 /// get service instance with protocol
 /// - Parameter serviceProtocol: protocol of service
 /// - Parameter priority: priority
-+ (id _Nullable)service:(Protocol *)serviceProtocol priority:(NSInteger)priority;
++ (S _Nullable)service:(Protocol *)serviceProtocol priority:(NSInteger)priority;
 
 /// get service instance with protocol name
 /// - Parameter serviceName: protocol of service
 /// - Parameter priority: priority
-+ (id _Nullable)serviceWithName:(NSString *)serviceName priority:(NSInteger)priority;
++ (S _Nullable)serviceWithName:(NSString *)serviceName priority:(NSInteger)priority;
 
 /// delete service from store map
 /// @param serviceProtocol protocol of service
@@ -90,8 +90,8 @@ NS_ASSUME_NONNULL_BEGIN
 ///
 /// @note float 与 int 不能混用，浮点数需要加小数点，type也一样。
 /// 如果sel的第一个参数为整数，那么param传nil为跳过，其它参数正常传。
-+ (NSArray<id> *)dispatchWithProtocol:(Protocol *)protocol
-                           selAndArgs:(SEL)selector, ...;
++ (NSArray<S> *)dispatchWithProtocol:(Protocol *)protocol
+                          selAndArgs:(SEL)selector, ...;
 
 /// dispatch event with eventId
 /// @param eventId event id
@@ -101,8 +101,8 @@ NS_ASSUME_NONNULL_BEGIN
 ///
 /// @note float 与 int 不能混用，浮点数需要加小数点，type也一样。
 /// 如果sel的第一个参数为整数，那么param传nil为跳过，其它参数正常传。
-+ (NSArray<id> *)dispatchWithEventId:(NSString *)eventId 
-                          selAndArgs:(SEL)selector, ...;
++ (NSArray<S> *)dispatchWithEventId:(NSString *)eventId
+                         selAndArgs:(SEL)selector, ...;
 
 /// dispatch event with SEL event
 /// @param selector SEL and multi any type paramters
@@ -111,7 +111,7 @@ NS_ASSUME_NONNULL_BEGIN
 ///
 /// @note float 与 int 不能混用，浮点数需要加小数点，type也一样。
 /// 如果sel的第一个参数为整数，则param传nil为跳过，其它参数正常传。
-+ (NSArray<id> *)dispatchWithEventSelAndArgs:(SEL)selector, ...;
++ (NSArray<S> *)dispatchWithEventSelAndArgs:(SEL)selector, ...;
 
 /// get all initialized objects in mediator
 /// store in weakTable
@@ -119,7 +119,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-//------------------------------------------
+//-------------------Macro begin-----------------------
 
 #pragma mark - Macro
 #pragma mark -
@@ -143,6 +143,6 @@ NS_ASSUME_NONNULL_BEGIN
   })
 #endif
 
-//------------------------------------------
+//-------------------Macro end-----------------------
 
 NS_ASSUME_NONNULL_END
