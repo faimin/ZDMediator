@@ -45,5 +45,10 @@ Pod::Spec.new do |s|
     }
   end
   
+  s.subspec 'All' do |ss|
+    ss.dependency 'ZDMediator/Core'
+    ss.dependency 'ZDMediator/DisableAssert'
+  end
+  
   s.default_subspec = 'Core'
 end
