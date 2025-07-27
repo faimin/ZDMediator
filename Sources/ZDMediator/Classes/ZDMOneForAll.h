@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
                priority:(NSInteger)priority
          implementClass:(Class)cls;
 
-/// manual register implementer to map
+/// register implementer to map manually
 /// - Parameters:
 ///   - serviceProtocol: protocol
 ///   - priority: priority of service
@@ -119,21 +119,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-//-------------------Macro begin-----------------------
+//-------------------Macro BEGIN-----------------------
 
 #pragma mark - Macro
 #pragma mark -
 
-#ifndef GetService
-#define GetService(proto) GetServiceWithPriority(proto, ZDMDefaultPriority)
+#ifndef ZDMGetService
+#define ZDMGetService(proto) ZDMGetServiceWithPriority(proto, ZDMDefaultPriority)
 #endif
 
-#ifndef GetServiceWithPriority
-#define GetServiceWithPriority(proto, _priority) ((id<proto>)[ZDMOneForAll service:@protocol(proto) priority:_priority])
+#ifndef ZDMGetServiceWithPriority
+#define ZDMGetServiceWithPriority(proto, _priority) ((id<proto>)[ZDMOneForAll service:@protocol(proto) priority:_priority])
 #endif
 
-#ifndef GetServiceWithClass
-#define GetServiceWithClass(proto, _priority, clz)                                  \
+#ifndef ZDMGetServiceWithClass
+#define ZDMGetServiceWithClass(proto, _priority, clz)                                  \
   ({                                                                                \
     clz *obj = (clz *)[ZDMOneForAll service:@protocol(proto) priority:_priority];   \
     if (!obj || ![obj isKindOfClass:clz.class]) {                                   \
@@ -143,6 +143,6 @@ NS_ASSUME_NONNULL_BEGIN
   })
 #endif
 
-//-------------------Macro end-----------------------
+//-------------------Macro END-----------------------
 
 NS_ASSUME_NONNULL_END

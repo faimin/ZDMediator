@@ -48,32 +48,32 @@
 }
 
 - (void)testExample {
-    BOOL catResult1 = [GetService(CatProtocol) zdm_handleEvent:100 userInfo:@{} callback:^id(NSString *x) {
+    BOOL catResult1 = [ZDMGetService(CatProtocol) zdm_handleEvent:100 userInfo:@{} callback:^id(NSString *x) {
         return @[ x ];
     }];
     XCTAssertTrue(catResult1);
     
-    NSString *sex = [GetService(CatProtocol) sex];
+    NSString *sex = [ZDMGetService(CatProtocol) sex];
     XCTAssertNotNil(sex);
     
     //----------------------------------
     
-    BOOL dogResult1 = [GetService(DogProtocol) zdm_handleEvent:123 userInfo:@{} callback:^id(NSUInteger x) {
+    BOOL dogResult1 = [ZDMGetService(DogProtocol) zdm_handleEvent:123 userInfo:@{} callback:^id(NSUInteger x) {
         return @(x);
     }];
     XCTAssertFalse(dogResult1);
     
-    BOOL dogResult2 = [GetService(DogProtocol) zdm_handleEvent:200 userInfo:@{} callback:^id(NSUInteger x, NSString *y) {
+    BOOL dogResult2 = [ZDMGetService(DogProtocol) zdm_handleEvent:200 userInfo:@{} callback:^id(NSUInteger x, NSString *y) {
         XCTAssertEqual(x, 2);
         NSString *a = [NSString stringWithFormat:@"%zd, %@", x, y];
         return a;
     }];
     XCTAssertTrue(dogResult2);
     
-    NSArray *dogResult3 = [GetService(ZDClassProtocol) foo:@[ @1, @2 ] bar:@[ @3, @4, @5 ]];
+    NSArray *dogResult3 = [ZDMGetService(ZDClassProtocol) foo:@[ @1, @2 ] bar:@[ @3, @4, @5 ]];
     XCTAssertEqual(dogResult3.count, 5);
     
-    NSString *animalName = [GetServiceWithPriority(AnimalProtocol, 1) animalName];
+    NSString *animalName = [ZDMGetServiceWithPriority(AnimalProtocol, 1) animalName];
     XCTAssertTrue([animalName isEqualToString:@"小狗"]);
 }
 
@@ -85,7 +85,7 @@
     
     XCTestExpectation *expect = [self expectationWithDescription:@"弱引用测试"];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        NSObject *dog = GetServiceWithPriority(DogProtocol, 100);
+        NSObject *dog = ZDMGetServiceWithPriority(DogProtocol, 100);
         NSLog(@"%@", dog);
         XCTAssertNil(dog);
         [expect fulfill];
@@ -96,10 +96,10 @@
 }
 
 - (void)testPriority {
-    NSString *clsName = NSStringFromClass([GetServiceWithPriority(AnimalProtocol, 1) class]);
+    NSString *clsName = NSStringFromClass([ZDMGetServiceWithPriority(AnimalProtocol, 1) class]);
     XCTAssertTrue([clsName isEqualToString:@"ZDDog"]);
     
-    BOOL res = [GetServiceWithPriority(AnimalProtocol, 1) zdm_handleEvent:200 userInfo:@{} callback:^id(NSUInteger x) {
+    BOOL res = [ZDMGetServiceWithPriority(AnimalProtocol, 1) zdm_handleEvent:200 userInfo:@{} callback:^id(NSUInteger x) {
         return @(x);
     }];
     XCTAssertTrue(res);
@@ -107,24 +107,24 @@
 
 // 测试方法不是别的异常处理
 - (void)testUnrecognizedMethod {
-    NSObject *cat = GetServiceWithPriority(CatProtocol, 0);
+    NSObject *cat = ZDMGetServiceWithPriority(CatProtocol, 0);
     XCTAssertTrue([NSStringFromClass([cat class]) isEqualToString:@"ZDCat"]);
     
     // 是否crash
-    NSString *foodName = [GetServiceWithPriority(CatProtocol, 0) eatWhatFood];
+    NSString *foodName = [ZDMGetServiceWithPriority(CatProtocol, 0) eatWhatFood];
     XCTAssertNil(foodName);
     
-    NSObject *dog = GetServiceWithClass(CatProtocol, 0, ZDDog);
+    NSObject *dog = ZDMGetServiceWithClass(CatProtocol, 0, ZDDog);
     XCTAssertNil(dog);
 }
 
 // 测试注册时说明全是类方法，但其实并不是的异常情况
 - (void)testAllClassMethodException {
-    __auto_type dog = GetService(DogProtocol);
+    __auto_type dog = ZDMGetService(DogProtocol);
     NSInteger age = [dog age];
     XCTAssertEqual(age, 2);
     
-    __auto_type dog2 = GetService(DogProtocol);
+    __auto_type dog2 = ZDMGetService(DogProtocol);
     XCTAssertTrue([dog2 isKindOfClass:NSClassFromString(@"ZDDog")]);
 }
 
@@ -159,13 +159,13 @@
 }
 
 - (void)testRemoveService {
-    id cat = GetService(CatProtocol);
+    id cat = ZDMGetService(CatProtocol);
     XCTAssertNotNil(cat);
     
     [ZDMOneForAll removeService:@protocol(CatProtocol) priority:0 autoInitAgain:NO];
-    XCTAssertNil(GetService(CatProtocol));
+    XCTAssertNil(ZDMGetService(CatProtocol));
     
-    NSString *name = [GetService(CatProtocol) name];
+    NSString *name = [ZDMGetService(CatProtocol) name];
     XCTAssertNil(name);
 }
 
@@ -173,7 +173,7 @@
     __auto_type dog = [ZDDog new];
     [ZDMOneForAll manualRegisterService:@protocol(DogProtocol) implementer:dog];
     
-    ZDMBroadcastProxy<ZDMCommonProtocol> *proxy = [[ZDMBroadcastProxy alloc] initWithHashTable:[ZDMOneForAll allInitializedObjects]];
+    __auto_type proxy = (ZDMBroadcastProxy<ZDMCommonProtocol> *)[[ZDMBroadcastProxy alloc] initWithHashTable:[ZDMOneForAll allInitializedObjects]];
     [proxy zdm_handleEvent:999 userInfo:@{@"a": @"aaaaa"} callback:^id{
         return @(YES);
     }];
@@ -190,7 +190,7 @@
 
 - (void)testPerformance2 {
     [self measureBlock:^{
-        ZDDog *dog = GetService(DogProtocol);
+        ZDDog *dog = ZDMGetService(DogProtocol);
         NSInteger age = [dog age];
         NSLog(@"age = %ld", (long)age);
     }];
