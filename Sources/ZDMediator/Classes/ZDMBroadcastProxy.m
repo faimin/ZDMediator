@@ -8,13 +8,13 @@
 #import "ZDMBroadcastProxy.h"
 
 @interface ZDMBroadcastProxy ()
-@property (nonatomic, strong) NSHashTable *weaktable;
+@property (nonatomic, strong) NSHashTable *weakTable;
 @end
 
 @implementation ZDMBroadcastProxy
 
 - (void)dealloc {
-    _weaktable = nil;
+    _weakTable = nil;
     NSLog(@"%s", __PRETTY_FUNCTION__);
 }
 
@@ -23,14 +23,14 @@
 }
 
 - (instancetype)initWithHashTable:(NSHashTable *)table {
-    _weaktable = table;
+    _weakTable = table;
     return self;
 }
 
 #pragma mark - forward
 
 - (BOOL)respondsToSelector:(SEL)aSelector {
-    for (id obj in self.weaktable) {
+    for (id obj in self.weakTable) {
         if ([obj respondsToSelector:aSelector]) {
             return YES;
         }
@@ -40,7 +40,7 @@
 
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)sel {
     NSMethodSignature *signature = nil;
-    for (id obj in self.weaktable) {
+    for (id obj in self.weakTable) {
         signature = [obj methodSignatureForSelector:sel];
         if (signature) {
             break;
@@ -50,7 +50,7 @@
 }
 
 - (void)forwardInvocation:(NSInvocation *)invocation {
-    for (id obj in self.weaktable) {
+    for (id obj in self.weakTable) {
         if ([obj respondsToSelector:invocation.selector]) {
             [invocation invokeWithTarget:obj];
         }
