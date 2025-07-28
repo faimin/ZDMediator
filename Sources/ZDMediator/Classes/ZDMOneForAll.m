@@ -117,8 +117,10 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
                 }
                 
                 Class value = objc_getClass(item.value);
+                NSString *serviceName = [NSString stringWithUTF8String:item.key];
                 __auto_type serviceBox = ({
                     ZDMServiceBox *box = [[ZDMServiceBox alloc] initWithClass:value];
+                    box.protocolName = serviceName;
                     box.priority = item.priority;
                     box.autoInit = item.autoInit == 1;
                     box.isAllClsMethod = item.allClsMethod == 1;
@@ -134,7 +136,6 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
                     box;
                 });
                 
-                NSString *serviceName = [NSString stringWithUTF8String:item.key];
                 NSNumber *priorityNum = @(item.priority);
                 
                 [lock lock];
