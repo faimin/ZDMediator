@@ -135,6 +135,9 @@
                          __unused NSArray *barRes1 = [ZDMOneForAll dispatchWithEventSelAndArgs:@selector(bar:), @{@"name" : @"zero.d.saber"}];
                          
                          [ZDMOneForAll dispatchWithEventId:@"100" selAndArgs:@selector(zdr_handleEvent:userInfo:callback:), 200, @{@100 : @"100"}, nil];
+                         
+                         NSArray *broadcastResult = [ZDMOneForAll dispatchWithSELAndArgs:@selector(application: didFinishLaunchingWithOptions:), UIApplication.sharedApplication, @{@"1111": @"---2222"}];
+                         NSLog(@"事件分发结果 = %@", broadcastResult);
                          )
     
     

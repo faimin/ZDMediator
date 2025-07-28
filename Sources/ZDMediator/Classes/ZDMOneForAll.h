@@ -62,7 +62,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Event
 
-/// register event to service module
+/// register event to service module, match with `+dispatchWithEventId:selAndArgs:`
+///
 /// - Parameters:
 ///   - serviceProtocol: protocol of service
 ///   - priority: responder priority, != service priority
@@ -71,7 +72,8 @@ NS_ASSUME_NONNULL_BEGIN
                  priority:(NSInteger)priority
                   eventId:(NSString *)eventId, ...;
 
-/// register SEL event to service module
+/// register SEL event to service module, match with `+dispatchWithEventSelAndArgs:`
+///
 /// - Parameters:
 ///   - serviceProtocol: protocol of service
 ///   - priority: reponder priority, != service priority
@@ -83,6 +85,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Dispatch
 
 /// dispatch event with serviceName
+///
 /// @param protocol service
 /// @param selector SEL and multi any type paramters, end with nil
 ///
@@ -93,7 +96,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSArray<S> *)dispatchWithProtocol:(Protocol *)protocol
                           selAndArgs:(SEL)selector, ...;
 
-/// dispatch event with eventId
+/// dispatch event with eventId, match with `+registerResponder:priority:eventId:`
+///
 /// @param eventId event id
 /// @param selector SEL and multi any type paramters, end with nil
 ///
@@ -104,7 +108,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSArray<S> *)dispatchWithEventId:(NSString *)eventId
                          selAndArgs:(SEL)selector, ...;
 
-/// dispatch event with SEL event
+/// dispatch event with SEL as eventId, match with `+registerResponder:priority:selectors:`
+///
 /// @param selector SEL and multi any type paramters
 ///
 /// @warning 参数类型必须与SEL中的参数类选一一对应。
@@ -112,6 +117,16 @@ NS_ASSUME_NONNULL_BEGIN
 /// @note float 与 int 不能混用，浮点数需要加小数点，type也一样。
 /// 如果sel的第一个参数为整数，则param传nil为跳过，其它参数正常传。
 + (NSArray<S> *)dispatchWithEventSelAndArgs:(SEL)selector, ...;
+
+/// dispatch SEL to registered services if it implement the SEL
+///
+/// @param selector SEL and multi any type paramters
+///
+/// @warning 参数类型必须与SEL中的参数类选一一对应。
+///
+/// @note float 与 int 不能混用，浮点数需要加小数点，type也一样。
+/// 如果sel的第一个参数为整数，则param传nil为跳过，其它参数正常传。
++ (NSArray<S> *)dispatchWithSELAndArgs:(SEL)selector, ...;
 
 /// get all initialized objects in mediator
 /// store in weakTable

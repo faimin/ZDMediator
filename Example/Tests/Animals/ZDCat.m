@@ -6,6 +6,7 @@
 //  Copyright © 2023 8207436. All rights reserved.
 //
 
+#import <UIKit/UIKit.h>
 #import "ZDCat.h"
 #import <ZDMediator/ZDMediator.h>
 #import "AnimalProtocol.h"
@@ -29,6 +30,11 @@ ZDMediator1V1Register(CatProtocol, ZDCat)
         NSLog(@"创建了小猫");
     }
     return self;
+}
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    NSLog(@"----> %s", __PRETTY_FUNCTION__);
+    return NO;
 }
 
 #pragma mark - CatProtocol

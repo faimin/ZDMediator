@@ -19,8 +19,10 @@
 #import "ZDMServiceItem.h"
 #import "ZDMProxy.h"
 
-static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
-    return [NSString stringWithFormat:@"%@+%@", serviceName, priority];
+static NSString * const zdmJoinKey = @"--->";
+
+NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
+    return [NSString stringWithFormat:@"%@%@%@", serviceName, zdmJoinKey, priority];
 }
 
 @interface ZDMOneForAll ()
@@ -459,6 +461,41 @@ static NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
             }
         }
     }
+    return results;
+}
+
++ (NSArray<id> *)dispatchWithSELAndArgs:(SEL)selector, ... {
+    if (!selector) {
+        return @[];
+    }
+    
+    [self _loadRegisterIfNeed];
+    
+    ZDMOneForAll *mediator = [self shareInstance];
+    NSMutableArray *results = @[].mutableCopy;
+    [mediator.lock lock];
+    for (NSString *key in mediator.registerInfoMap.allKeys) {
+        ZDMServiceBox *serviceBox = mediator.registerInfoMap[key];
+        NSString *serviceName = serviceBox.protocolName;
+        NSString *clsName = NSStringFromClass(serviceBox.cls) ?: @"";
+        NSObject *serviceObj = mediator.instanceMap[clsName].obj;
+        if (!serviceObj || ![serviceObj respondsToSelector:selector]) {
+            serviceObj = [self _serviceWithName:serviceName priority:serviceBox.priority needProxyWrap:NO];
+        }
+        if (!serviceObj) {
+            continue;
+        }
+        
+        va_list args;
+        va_start(args, selector);
+        id res = [ZDMInvocation target:serviceObj invokeSelector:selector args:args];
+        va_end(args);
+        
+        if (res) {
+            [results addObject:res];
+        }
+    }
+    [mediator.lock unlock];
     return results;
 }
 
