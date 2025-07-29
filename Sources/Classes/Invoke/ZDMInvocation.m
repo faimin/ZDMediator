@@ -41,7 +41,7 @@ typedef UIEdgeInsets ZDMEdgeInsets;
 #if ZDM_EXCEPTION_NTF
             [NSNotificationCenter.defaultCenter postNotificationName:ZDMUnrecognizedMethodNotification object:nil userInfo:@{
                 @"class": [NSString stringWithUTF8String:object_getClassName(target)],
-                @"selector": NSStringFromSelector(@selector(selector)) ?: @"",
+                @"selector": NSStringFromSelector(selector) ?: @"",
                 @"source": @"ZDMInvocation",
             }];
 #endif
