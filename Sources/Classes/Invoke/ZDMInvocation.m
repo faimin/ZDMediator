@@ -13,6 +13,7 @@
 #import <AppKit/AppKit.h>
 #endif
 #import <objc/runtime.h>
+#import "ZDMConst.h"
 
 #if TARGET_OS_OSX
 typedef NSEdgeInsets ZDMEdgeInsets;
@@ -38,7 +39,7 @@ typedef UIEdgeInsets ZDMEdgeInsets;
             target = [target class];
         } else {
 #if ZDM_EXCEPTION_NTF
-            [NSNotificationCenter.defaultCenter postNotificationName:@"ZDMUnrecognizedMethodNotification" object:nil userInfo:@{
+            [NSNotificationCenter.defaultCenter postNotificationName:ZDMUnrecognizedMethodNotification object:nil userInfo:@{
                 @"class": [NSString stringWithUTF8String:object_getClassName(target)],
                 @"selector": NSStringFromSelector(@selector(selector)) ?: @"",
                 @"source": @"ZDMInvocation",
