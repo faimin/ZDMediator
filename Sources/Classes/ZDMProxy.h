@@ -11,7 +11,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef id _Nullable (^_Nullable ZDMFixCallback)(void);
 
-@class ZDMServiceBox;
 @interface ZDMProxy<__covariant T> : NSProxy
 
 @property (nonatomic, weak, readonly, nullable) T target;

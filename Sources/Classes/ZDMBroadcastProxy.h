@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithTargetSet:(NSSet *)targetSet;
 
-- (void)replaceTargetSet:(NSSet *)targetSet;
+- (void)replaceTargetSet:(NSSet *_Nullable)targetSet;
 
 @end
 
