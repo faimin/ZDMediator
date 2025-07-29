@@ -274,6 +274,8 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 }
 
 + (NSHashTable *)allInitializedObjects {
+    [self _loadRegisterIfNeed];
+    
     NSHashTable *table = [NSHashTable weakObjectsHashTable];
     [[self shareInstance].instanceMap enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, ZDMServiceItem * _Nonnull obj, BOOL * _Nonnull stop) {
         id value = obj.obj;
@@ -487,12 +489,20 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     
     ZDMOneForAll *mediator = [self shareInstance];
     NSMutableArray *results = @[].mutableCopy;
+    
+    NSArray<NSString *> *allKeys = nil;
     [mediator.lock lock];
-    for (NSString *key in mediator.registerInfoMap.allKeys) {
+    allKeys = mediator.registerInfoMap.allKeys.copy;
+    [mediator.lock unlock];
+    
+    for (NSString *key in allKeys) {
+        [mediator.lock lock];
         ZDMServiceBox *serviceBox = mediator.registerInfoMap[key];
         NSString *serviceName = serviceBox.protocolName;
         NSString *clsName = NSStringFromClass(serviceBox.cls) ?: @"";
         NSObject *serviceObj = mediator.instanceMap[clsName].obj;
+        [mediator.lock unlock];
+        
         if (!serviceObj || ![serviceObj respondsToSelector:selector]) {
             serviceObj = [self _serviceWithName:serviceName priority:serviceBox.priority needProxyWrap:NO];
         }
@@ -509,7 +519,6 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
             [results addObject:res];
         }
     }
-    [mediator.lock unlock];
     return results;
 }
 

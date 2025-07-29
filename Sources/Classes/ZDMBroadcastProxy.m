@@ -11,7 +11,7 @@
 #import "ZDMServiceBox.h"
 
 @interface ZDMBroadcastProxy ()
-@property (nonatomic, strong) NSSet *targetSet;
+@property (nonatomic, copy) NSSet *targetSet;
 @end
 
 @implementation ZDMBroadcastProxy
@@ -26,12 +26,12 @@
 }
 
 - (instancetype)initWithTargetSet:(NSSet *)targetSet {
-    _targetSet = targetSet;
+    _targetSet = [targetSet copy];
     return self;
 }
 
 - (void)replaceTargetSet:(NSSet *)targetSet {
-    _targetSet = targetSet;
+    self.targetSet = targetSet;
 }
 
 #pragma mark - forward
