@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'ZDMediator'
-  s.version          = '0.3.5'
+  s.version          = '0.3.4'
   s.summary          = '模块通信中间件'
   s.description      = <<-DESC
     用于模块间通信的中间件，支持自动注册、手动注册、强弱引用、实例方法、类方法调用
@@ -28,24 +28,27 @@ Pod::Spec.new do |s|
   }
   s.ios.deployment_target = '10.0'
   s.osx.deployment_target = '10.12'
-  # s.platforms = { 
+  # s.platforms = {
   #   :ios => "10.0",
   #   :osx => "10.12",
   # }
+  s.resource_bundles = {
+    "#{s.name}_Privacy" => ['Sources/Resource/PrivacyInfo.xcprivacy']
+  }
   
   s.subspec 'Invoke' do |ss|
-    ss.source_files = 'Sources/ZDMediator/Classes/Invoke/*.{h,m}'
+    ss.source_files = 'Sources/Classes/Invoke/*.{h,m}'
   end
   
   s.subspec 'Core' do |ss|
-    ss.source_files = 'Sources/ZDMediator/Classes/**/*.{h,m}'
-    ss.exclude_files = 'Sources/ZDMediator/Classes/Invoke/*.{h,m}'
-    ss.project_header_files = 'Sources/ZDMediator/Classes/Private/*.{h,m}'
+    ss.source_files = 'Sources/Classes/**/*.{h,m}'
+    ss.exclude_files = 'Sources/Classes/Invoke/*.{h,m}'
+    ss.project_header_files = 'Sources/Classes/Private/*.{h,m}'
     ss.dependency "#{s.name}/Invoke"
   end
     
   s.subspec 'DisableAssert' do |ss|
-    ss.source_files = 'Sources/ZDMediator/Classes/ZDMediatorDefine.h'
+    ss.source_files = 'Sources/Classes/ZDMediatorDefine.h'
     ss.pod_target_xcconfig = {
       'GCC_PREPROCESSOR_DEFINITIONS' => 'ASSERTDISABLE=1',
     }
