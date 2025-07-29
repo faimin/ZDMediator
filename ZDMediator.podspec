@@ -43,7 +43,7 @@ Pod::Spec.new do |s|
   s.subspec 'Core' do |ss|
     ss.source_files = 'Sources/Classes/**/*.{h,m}'
     ss.exclude_files = 'Sources/Classes/Invoke/*.{h,m}'
-    ss.project_header_files = 'Sources/Classes/Private/*.{h,m}'
+    ss.project_header_files = 'Sources/Classes/Private/*.{h}'
     ss.dependency "#{s.name}/Invoke"
   end
     

@@ -13,7 +13,6 @@
 #import <AppKit/AppKit.h>
 #endif
 #import <objc/runtime.h>
-#import "ZDMConst.h"
 
 #if TARGET_OS_OSX
 typedef NSEdgeInsets ZDMEdgeInsets;
