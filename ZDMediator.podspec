@@ -32,9 +32,6 @@ Pod::Spec.new do |s|
   #   :ios => "10.0",
   #   :osx => "10.12",
   # }
-  s.resource_bundles = {
-    "#{s.name}_Privacy" => ['Sources/Resource/PrivacyInfo.xcprivacy']
-  }
   
   s.subspec 'Invoke' do |ss|
     ss.source_files = 'Sources/Classes/Invoke/*.{h,m}'
@@ -44,6 +41,9 @@ Pod::Spec.new do |s|
     ss.source_files = 'Sources/Classes/**/*.{h,m}'
     ss.exclude_files = 'Sources/Classes/Invoke/*.{h,m}'
     ss.project_header_files = 'Sources/Classes/Private/*.{h}'
+    ss.resource_bundles = {
+      "#{s.name}_Privacy" => ['Sources/Resource/PrivacyInfo.xcprivacy']
+    }
     ss.dependency "#{s.name}/Invoke"
   end
     
