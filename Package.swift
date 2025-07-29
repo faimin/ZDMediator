@@ -21,7 +21,14 @@ let package = Package(
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "ZDMediator",
-            publicHeadersPath: "Classes"
+            path: "Sources",
+            resources: [.process("Resource/PrivacyInfo.xcprivacy")],
+            publicHeadersPath: "Classes",
+            cSettings: [
+                .headerSearchPath("Classes"),
+                .headerSearchPath("Classes/Invoke"),
+                .headerSearchPath("Classes/Private")
+            ]
         )
     ]
 )
