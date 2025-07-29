@@ -40,7 +40,7 @@ typedef id (^ZDMCommonCallback)();
 
 //-------------------------One For All------------------------------
 
-struct ZDMMachOOFARegisterKV {
+struct ZDMMachoOFARegisterKV {
     const char *key;
     const char *value;
     const int autoInit;     ///< 0,1
@@ -61,7 +61,7 @@ struct ZDMMachOOFARegisterKV {
       used,                                                                    \
       section(                                                                 \
           SEG_DATA                                                             \
-          "," ZDMediatorOFASectionName))) static struct ZDMMachOOFARegisterKV  \
+          "," ZDMediatorOFASectionName))) static struct ZDMMachoOFARegisterKV  \
       ZDMKV_OFA_##protocol_name##_##cls = {                                    \
           .key = (NO && ((void)@protocol(protocol_name), NO), #protocol_name), \
           .value = (NO && ((void)[cls class], NO), #cls),                      \

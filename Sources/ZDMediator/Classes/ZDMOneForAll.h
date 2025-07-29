@@ -8,6 +8,7 @@
 #import <Foundation/Foundation.h>
 #import "ZDMContext.h"
 #import "ZDMediatorDefine.h"
+#import "ZDMBroadcastProxy.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -15,7 +16,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, nullable) ZDMContext *context;
 
-/// singleton
+/// A simple way to distribute events
+///
+/// default targets is registered all classes,
+/// you can replace targets with `-replaceTargetSet:`
+@property (nonatomic, strong) ZDMBroadcastProxy *proxy;
+
+/// singleton, call `alloc init`、`new` is OK
 + (instancetype)shareInstance;
 
 #pragma mark - Set
@@ -150,6 +157,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// get all initialized objects in mediator
 /// store in weakTable
 + (NSHashTable *)allInitializedObjects;
+
+/// get all register classes in mediator
++ (NSSet<Class> *)allRegisterCls;
 
 @end
 

@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'ZDMediator'
-  s.version          = '0.3.4'
+  s.version          = '0.3.5'
   s.summary          = '模块通信中间件'
   s.description      = <<-DESC
     用于模块间通信的中间件，支持自动注册、手动注册、强弱引用、实例方法、类方法调用
@@ -33,9 +33,15 @@ Pod::Spec.new do |s|
   #   :osx => "10.12",
   # }
   
+  s.subspec 'Invoke' do |ss|
+    ss.source_files = 'Sources/ZDMediator/Classes/Invoke/*.{h,m}'
+  end
+  
   s.subspec 'Core' do |ss|
     ss.source_files = 'Sources/ZDMediator/Classes/**/*.{h,m}'
-    ss.project_header_files = 'Sources/ZDMediator/Classes/{ZDMConst,ZDMEventResponder,ZDMServiceItem,ZDMServiceBox}.h'
+    ss.exclude_files = 'Sources/ZDMediator/Classes/Invoke/*.{h,m}'
+    ss.project_header_files = 'Sources/ZDMediator/Classes/Private/*.{h,m}'
+    ss.dependency "#{s.name}/Invoke"
   end
     
   s.subspec 'DisableAssert' do |ss|

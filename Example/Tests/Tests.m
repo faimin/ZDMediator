@@ -176,7 +176,7 @@
     __auto_type dog = [ZDDog new];
     [ZDMOneForAll manualRegisterService:@protocol(DogProtocol) implementer:dog];
     
-    __auto_type proxy = (ZDMBroadcastProxy<ZDMCommonProtocol> *)[[ZDMBroadcastProxy alloc] initWithHashTable:[ZDMOneForAll allInitializedObjects]];
+    __auto_type proxy = (ZDMBroadcastProxy<ZDMCommonProtocol> *)ZDMOneForAll.shareInstance.proxy;
     [proxy zdm_handleEvent:999 userInfo:@{@"a": @"aaaaa"} callback:^id{
         return @(YES);
     }];

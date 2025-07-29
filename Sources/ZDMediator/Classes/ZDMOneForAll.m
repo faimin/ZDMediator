@@ -5,7 +5,7 @@
 //  Created by Zero.D.Saber on 2024/7/2.
 //
 
-#import "ZDMOneForAll.h"
+#import "ZDMOneForAll+Private.h"
 #import <dlfcn.h>
 #import <mach-o/dyld.h>
 #import <mach-o/getsect.h>
@@ -13,10 +13,7 @@
 #import <objc/runtime.h>
 #import "ZDMCommonProtocol.h"
 #import "ZDMContext.h"
-#import "ZDMEventResponder.h"
 #import "ZDMInvocation.h"
-#import "ZDMServiceBox.h"
-#import "ZDMServiceItem.h"
 #import "ZDMProxy.h"
 
 static NSString * const zdmJoinKey = @"--->";
@@ -25,30 +22,15 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     return [NSString stringWithFormat:@"%@%@%@", serviceName, zdmJoinKey, priority];
 }
 
-@interface ZDMOneForAll ()
-
-// key(protocol+priority) -> box
-@property (nonatomic, strong) NSMutableDictionary<NSString *, ZDMServiceBox *> *registerInfoMap;
-
-// key(protocol) -> [priority]，用于事件分发
-@property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableOrderedSet<NSNumber *> *> *priorityMap;
-
-// key(className) -> item，避免一个类注册多个协议被多次创建的问题
-@property (nonatomic, strong) NSMutableDictionary<NSString *, ZDMServiceItem *> *instanceMap;
-
-// key -> [responderModel] 响应事件的Map
-@property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDMEventResponder *> *> *serviceResponderMap;
-
-@property (nonatomic, strong) NSRecursiveLock *lock;
-
-@end
-
 @implementation ZDMOneForAll
 
 #pragma mark - Singleton
 
 + (instancetype)shareInstance {
     static ZDMOneForAll *instance = nil;
+    if (instance) {
+        return instance;
+    }
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         instance = [[super allocWithZone:NULL] init];
@@ -70,6 +52,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         lock;
     });
     _registerInfoMap = @{}.mutableCopy;
+    _registerClsMap = @{}.mutableCopy;
     _priorityMap = @{}.mutableCopy;
     _instanceMap = @{}.mutableCopy;
     _serviceResponderMap = @{}.mutableCopy;
@@ -83,13 +66,14 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         CFAbsoluteTime start = CFAbsoluteTimeGetCurrent();
         [self _loadRegisterFromMacho];
         CFAbsoluteTime end = CFAbsoluteTimeGetCurrent();
-        printf("读取one for all macho耗时：%f 毫秒\n", (end - start)*1000);
+        printf(">>>> times of read one for all macho：%f millisecond\n", (end - start)*1000);
     });
 }
 
 + (void)_loadRegisterFromMacho {
     ZDMOneForAll *mediator = [self shareInstance];
     NSMutableDictionary<NSString *, ZDMServiceBox *> *storeMap = mediator.registerInfoMap;
+    NSMutableDictionary<NSString *, NSMutableSet<NSString *> *> *clsMap = mediator.registerClsMap;
     NSMutableDictionary<NSString *, NSMutableOrderedSet<NSNumber *> *> *priorityMap = mediator.priorityMap;
     NSMutableDictionary<NSString *, ZDMServiceItem *> *instanceMap = mediator.instanceMap;
     
@@ -109,17 +93,18 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
             continue;
         }
         
-        struct ZDMMachOOFARegisterKV *items = (struct ZDMMachOOFARegisterKV *)sectionData;
-        uint64_t itemCount = size / sizeof(struct ZDMMachOOFARegisterKV);
+        struct ZDMMachoOFARegisterKV *items = (struct ZDMMachoOFARegisterKV *)sectionData;
+        uint64_t itemCount = size / sizeof(struct ZDMMachoOFARegisterKV);
         for (uint64_t i = 0; i < itemCount; ++i) {
             @autoreleasepool {
-                struct ZDMMachOOFARegisterKV item = items[i];
+                struct ZDMMachoOFARegisterKV item = items[i];
                 if (!item.key || !item.value) {
                     continue;
                 }
                 
                 Class value = objc_getClass(item.value);
                 NSString *serviceName = [NSString stringWithUTF8String:item.key];
+                NSString *clsName = [NSString stringWithCString:item.value encoding:NSUTF8StringEncoding];
                 __auto_type serviceBox = ({
                     ZDMServiceBox *box = [[ZDMServiceBox alloc] initWithClass:value];
                     box.protocolName = serviceName;
@@ -128,7 +113,6 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
                     box.isAllClsMethod = item.allClsMethod == 1;
                     if (box.isAllClsMethod) {
                         ZDMServiceItem *serviceItem = [ZDMServiceItem itemWithStrongObj:value weakObj:nil];
-                        NSString *clsName = [NSString stringWithCString:item.value encoding:NSUTF8StringEncoding];
                         if (clsName) {
                             [lock lock];
                             instanceMap[clsName] = serviceItem;
@@ -158,7 +142,18 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 #endif
                 [orderSet addObject:priorityNum];
                 
-                storeMap[zdmStoreKey(serviceName, priorityNum)] = serviceBox;
+                // store to storeMap
+                NSString *protocolPriorityKey = zdmStoreKey(serviceName, priorityNum);
+                storeMap[protocolPriorityKey] = serviceBox;
+                
+                // store to clsMap
+                NSMutableSet<NSString *> *protocolPriorityKeySet = clsMap[clsName];
+                if (!protocolPriorityKeySet) {
+                    protocolPriorityKeySet = [[NSMutableSet alloc] initWithCapacity:2];
+                    clsMap[clsName] = protocolPriorityKeySet;
+                }
+                [protocolPriorityKeySet addObject:protocolPriorityKey];
+                
                 [lock unlock];
             }
         }
@@ -287,6 +282,25 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         }
     }];
     return table;
+}
+
++ (NSSet<Class> *)allRegisterCls {
+    static NSSet<Class> *set = nil;
+    if (set) {
+        return set;
+    }
+    
+    [self _loadRegisterIfNeed];
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NSMutableSet<Class> *clsSet = [[NSMutableSet alloc] init];
+        [[self shareInstance].registerInfoMap enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, ZDMServiceBox * _Nonnull obj, BOOL * _Nonnull stop) {
+            [clsSet addObject:obj.cls];
+        }];
+        set = clsSet.copy;
+    });
+    return set;
 }
 
 #pragma mark - Register Event
@@ -574,14 +588,22 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
             return nil;
         }
         id instanceOrCls = nil;
+        BOOL needInitialize = NO;
         if (innerBox.isAllClsMethod) {
             instanceOrCls = aCls;
         } else if ([aCls respondsToSelector:@selector(zdm_createInstance:)]) {
             instanceOrCls = [aCls zdm_createInstance:context];
         } else {
-            instanceOrCls = [[aCls alloc] init];
+            // initialize after store to avoid loop call
+            instanceOrCls = [aCls alloc];
+            needInitialize = YES;
         }
+        
         [self _storeServiceWithStrongObj:instanceOrCls weakObj:nil];
+        
+        if (needInitialize) {
+            __unused id _ = [instanceOrCls init];
+        }
         return instanceOrCls;
     };
     
@@ -669,6 +691,15 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     [mediator.lock unlock];
     
     return item.obj;
+}
+
+#pragma mark - Property
+
+- (ZDMBroadcastProxy *)proxy {
+    if (!_proxy) {
+        _proxy = [[ZDMBroadcastProxy alloc] initWithTargetSet:[ZDMOneForAll allRegisterCls]];
+    }
+    return _proxy;
 }
 
 @end

@@ -9,9 +9,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ZDMBroadcastProxy<__covariant TargetType> : NSProxy
+@interface ZDMBroadcastProxy : NSProxy
 
-- (instancetype)initWithHashTable:(NSHashTable *)table;
+- (instancetype)initWithTargetSet:(NSSet *)targetSet;
+
+- (void)replaceTargetSet:(NSSet *)targetSet;
 
 @end
 
