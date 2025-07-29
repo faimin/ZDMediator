@@ -21,13 +21,17 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Set
 
 /// register implementer Class to map
-/// @param serviceProtocol protocol
-/// @param cls implementer Class (instance or Class)
-+ (void)registerService:(Protocol *)serviceProtocol 
+///
+/// - Parameters:
+///   - serviceProtocol: protocol
+///   - priority: priority of service
+///   - cls: implementer Class (instance or Class)
++ (void)registerService:(Protocol *)serviceProtocol
                priority:(NSInteger)priority
          implementClass:(Class)cls;
 
 /// register implementer to map manually
+///
 /// - Parameters:
 ///   - serviceProtocol: protocol
 ///   - priority: priority of service
@@ -44,18 +48,25 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Get
 
 /// get service instance with protocol
-/// - Parameter serviceProtocol: protocol of service
-/// - Parameter priority: priority
+///
+/// - Parameters:
+///   - serviceProtocol: protocol of service
+///   - priority: priority
 + (S _Nullable)service:(Protocol *)serviceProtocol priority:(NSInteger)priority;
 
 /// get service instance with protocol name
-/// - Parameter serviceName: protocol of service
-/// - Parameter priority: priority
+///
+/// - Parameters:
+///   - serviceName: protocol of service
+///   - priority: priority
 + (S _Nullable)serviceWithName:(NSString *)serviceName priority:(NSInteger)priority;
 
 /// delete service from store map
-/// @param serviceProtocol protocol of service
-/// @param autoInitAgain whether init again
+///
+/// - Parameters:
+///   - serviceProtocol protocol of service
+///   - autoInitAgain whether init again
+/// - Returns: whether removed success
 + (BOOL)removeService:(Protocol *)serviceProtocol
              priority:(NSInteger)priority
         autoInitAgain:(BOOL)autoInitAgain;
@@ -86,46 +97,54 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// dispatch event with serviceName
 ///
-/// @param protocol service
-/// @param selector SEL and multi any type paramters, end with nil
+/// 参数类型必须与SEL中的参数类选一一对应。
 ///
-/// @warning 参数类型必须与SEL中的参数类选一一对应。
-///
-/// @note float 与 int 不能混用，浮点数需要加小数点，type也一样。
+/// float 与 int 不能混用，浮点数需要加小数点，type也一样。
 /// 如果sel的第一个参数为整数，那么param传nil为跳过，其它参数正常传。
+///
+/// - Parameters:
+///   - protocol: service
+///   - selector: SEL and multi any type paramters, end with nil
+/// - Returns: values of methods result
 + (NSArray<S> *)dispatchWithProtocol:(Protocol *)protocol
                           selAndArgs:(SEL)selector, ...;
 
 /// dispatch event with eventId, match with `+registerResponder:priority:eventId:`
 ///
-/// @param eventId event id
-/// @param selector SEL and multi any type paramters, end with nil
+/// 参数类型必须与SEL中的参数类选一一对应。
 ///
-/// @warning 参数类型必须与SEL中的参数类型一一对应。
-///
-/// @note float 与 int 不能混用，浮点数需要加小数点，type也一样。
+/// float 与 int 不能混用，浮点数需要加小数点，type也一样。
 /// 如果sel的第一个参数为整数，那么param传nil为跳过，其它参数正常传。
+///
+/// - Parameters:
+///   - eventId: event id
+///   - selector: SEL and multi any type paramters, end with nil
+/// - Returns: values of methods result
 + (NSArray<S> *)dispatchWithEventId:(NSString *)eventId
                          selAndArgs:(SEL)selector, ...;
 
 /// dispatch event with SEL as eventId, match with `+registerResponder:priority:selectors:`
 ///
-/// @param selector SEL and multi any type paramters
+/// 参数类型必须与SEL中的参数类选一一对应。
 ///
-/// @warning 参数类型必须与SEL中的参数类选一一对应。
+/// float 与 int 不能混用，浮点数需要加小数点，type也一样。
+/// 如果sel的第一个参数为整数，那么param传nil为跳过，其它参数正常传。
 ///
-/// @note float 与 int 不能混用，浮点数需要加小数点，type也一样。
-/// 如果sel的第一个参数为整数，则param传nil为跳过，其它参数正常传。
+/// - Parameters:
+///   - selector: SEL and multi any type paramters
+/// - Returns: values of methods result
 + (NSArray<S> *)dispatchWithEventSelAndArgs:(SEL)selector, ...;
 
 /// dispatch SEL to registered services if it implement the SEL
 ///
-/// @param selector SEL and multi any type paramters
+/// 参数类型必须与SEL中的参数类选一一对应。
 ///
-/// @warning 参数类型必须与SEL中的参数类选一一对应。
+/// float 与 int 不能混用，浮点数需要加小数点，type也一样。
+/// 如果sel的第一个参数为整数，那么param传nil为跳过，其它参数正常传。
 ///
-/// @note float 与 int 不能混用，浮点数需要加小数点，type也一样。
-/// 如果sel的第一个参数为整数，则param传nil为跳过，其它参数正常传。
+/// - Parameters:
+///   - selector: SEL and multi any type paramters
+/// - Returns: return values of methods
 + (NSArray<S> *)dispatchWithSELAndArgs:(SEL)selector, ...;
 
 /// get all initialized objects in mediator
