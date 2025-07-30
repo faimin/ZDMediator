@@ -584,7 +584,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     }
     [mediator.lock unlock];
     if (!box) {
-        NSLog(@"❎ >>>>> please register class first");
+        NSLog(@"❌ >>>>> please register class first");
         return nil;
     }
     
@@ -597,7 +597,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     __auto_type createInstanceBlock = ^id(ZDMServiceBox *innerBox, ZDMContext *context){
         Class aCls = innerBox.cls;
         if (!aCls) {
-            NSLog(@"❎ >>>>> %d, %s => please register first", __LINE__, __FUNCTION__);
+            NSLog(@"❌ >>>>> %d, %s => please register first", __LINE__, __FUNCTION__);
             return nil;
         }
         id instanceOrCls = nil;
@@ -625,7 +625,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     }
     
     if (!serviceInstance) {
-        NSLog(@"❎ >>>>> Finally, the instance object was not found");
+        NSLog(@"❌ >>>>> Finally, the instance object was not found");
     }
     
     // prevent crashes
