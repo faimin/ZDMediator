@@ -383,14 +383,19 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         NSString *clsName = NSStringFromClass(box.cls);
         id serviceInstance = [self _serviceInstaceWithClassName:clsName];
         if (!serviceInstance) {
+            BOOL needInitialize = NO;
             if (box.isAllClsMethod) {
                 serviceInstance = box.cls;
             } else if ([box.cls respondsToSelector:@selector(zdm_createInstance:)]) {
                 serviceInstance = [box.cls zdm_createInstance:mediator.context];
             } else {
-                serviceInstance = [[box.cls alloc] init];
+                serviceInstance = [box.cls alloc];
+                needInitialize = YES;
             }
             [self _storeServiceWithStrongObj:serviceInstance weakObj:nil];
+            if (needInitialize) {
+                __unused id _ = [serviceInstance init];
+            }
         };
         
         va_list args;
@@ -494,22 +499,32 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     ZDMOneForAll *mediator = [self shareInstance];
     NSMutableArray *results = @[].mutableCopy;
     
-    NSArray<NSString *> *allKeys = nil;
+    NSArray<NSString *> *registerClsNames = nil;
     [mediator.lock lock];
-    allKeys = mediator.registerInfoMap.allKeys.copy;
+    registerClsNames = mediator.registerClsMap.allKeys.copy;
     [mediator.lock unlock];
     
-    for (NSString *key in allKeys) {
+    for (NSString *clsName in registerClsNames) {
         [mediator.lock lock];
+        NSString *key = mediator.registerClsMap[clsName].anyObject;
         ZDMServiceBox *serviceBox = mediator.registerInfoMap[key];
-        NSString *serviceName = serviceBox.protocolName;
-        NSString *clsName = NSStringFromClass(serviceBox.cls) ?: @"";
-        NSObject *serviceObj = mediator.instanceMap[clsName].obj;
+        id serviceObj = mediator.instanceMap[clsName].obj;
         [mediator.lock unlock];
         
-        if (!serviceObj || ![serviceObj respondsToSelector:selector]) {
+        // serviceObj不存在,但cls或其实例响应该方法,则创建实例
+        if (
+            !serviceObj
+            && ([serviceBox.cls instancesRespondToSelector:selector] || [serviceBox.cls respondsToSelector:selector])
+            && serviceBox.autoInit
+        ) {
+            NSString *serviceName = serviceBox.protocolName;
             serviceObj = [self _serviceWithName:serviceName priority:serviceBox.priority needProxyWrap:NO];
         }
+        // serviceObj存在,但其不响应此该方法,不过其cls响应该方法,则把cls赋值给serviceObj
+        else if (serviceObj && ![serviceObj respondsToSelector:selector] && [serviceBox.cls instancesRespondToSelector:selector]) {
+            serviceObj = serviceBox.cls;
+        }
+        
         if (!serviceObj) {
             continue;
         }
@@ -620,7 +635,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         return instanceOrCls;
     };
     
-    if (!serviceInstance && box.autoInit) {
+    if ((!serviceInstance || object_isClass(serviceInstance)) && box.autoInit) {
         serviceInstance = createInstanceBlock(box, mediator.context);
     }
     
