@@ -58,11 +58,6 @@
             break;
         }
     }
-#if false
-    if (!signature) {
-        signature = [NSObject instanceMethodSignatureForSelector:@selector(init)];
-    }
-#endif
     return signature;
 }
 
@@ -72,30 +67,44 @@
         if ([obj respondsToSelector:selector]) {
             [invocation invokeWithTarget:obj];
         } else if (object_isClass(obj) && [(Class)obj instancesRespondToSelector:selector]) {
-            NSString *clsName = NSStringFromClass((Class)obj);
-            ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
-            id serviceInstance = mediator.instanceMap[clsName].obj;
-            if (serviceInstance) {
-                [invocation invokeWithTarget:serviceInstance];
-                continue;
-            }
-            
-            NSString *protocolPriorityKey = mediator.registerClsMap[clsName].anyObject;
-            if (!protocolPriorityKey) {
-                continue;
-            }
-            ZDMServiceBox *box = mediator.registerInfoMap[protocolPriorityKey];
-            // intilize service mediatory
-            serviceInstance = [ZDMOneForAll serviceWithName:box.protocolName priority:box.priority];
-            if (serviceInstance) {
-                [invocation invokeWithTarget:serviceInstance];
-            }
+            [self _executeInstanceMethodWithCls:obj invocation:invocation];
         }
     }
 }
 
 - (void)doesNotRecognizeSelector:(SEL)aSelector {
     NSLog(@"❌ - doesNotRecognizeSelector: %@", NSStringFromSelector(aSelector));
+}
+
+#pragma mark - Private
+
+/// execute instance method for a class, create a instance if it is not exist
+- (void)_executeInstanceMethodWithCls:(Class)cls invocation:(NSInvocation *)invocation {
+    NSString *clsName = NSStringFromClass(cls);
+    if (!clsName) {
+        return;
+    }
+    ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
+    [mediator.lock lock];
+    id serviceInstance = mediator.instanceMap[clsName].obj;
+    [mediator.lock unlock];
+    if (serviceInstance) {
+        [invocation invokeWithTarget:serviceInstance];
+        return;
+    }
+    
+    [mediator.lock lock];
+    NSString *protocolPriorityKey = mediator.registerClsMap[clsName].anyObject;
+    ZDMServiceBox *box = protocolPriorityKey ? mediator.registerInfoMap[protocolPriorityKey] : nil;
+    [mediator.lock unlock];
+    if (!box) {
+        return;
+    }
+    // intilize service mediatory
+    serviceInstance = [ZDMOneForAll serviceWithName:box.protocolName priority:box.priority];
+    if (serviceInstance) {
+        [invocation invokeWithTarget:serviceInstance];
+    }
 }
 
 @end
