@@ -132,12 +132,10 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
                 }
 #if DEBUG
                 if ([orderSet containsObject:priorityNum]) {
-#if !ASSERTDISABLE
                     Class aClass = storeMap[zdmStoreKey(serviceName, priorityNum)].cls;
                     NSString *aClassName = NSStringFromClass(aClass);
                     NSString *bClassName = [NSString stringWithUTF8String:item.value];
-                    NSAssert3(NO, @"⚠️有多个类注册了相同的priority => %d, Class => [%@, %@] ", item.priority, aClassName, bClassName);
-#endif
+                    NSAssert3(NO, @"⚠️同一Protocol下有多个类注册了相同的Priority => %d, Class => [%@, %@] ", item.priority, aClassName, bClassName);
                 }
 #endif
                 [orderSet addObject:priorityNum];
@@ -235,16 +233,22 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
              priority:(NSInteger)priority
         autoInitAgain:(BOOL)autoInitAgain {
     if (!serviceProtocol) {
-#if !ASSERTDISABLE
+#if DEBUG
+        NSLog(@"❌ >>>>> the protocol is nil");
+#if ENABLE_ASSERT
         NSAssert(NO, @"the protocol is nil");
+#endif
 #endif
         return NO;
     }
     
     NSString *serviceName = NSStringFromProtocol(serviceProtocol);
     if (!serviceName) {
-#if !ASSERTDISABLE
+#if DEBUG
+        NSLog(@"❌ >>>>> the protocol name is nil");
+#if ENABLE_ASSERT
         NSAssert(NO, @"the protocol name is nil");
+#endif
 #endif
         return NO;
     }
@@ -654,12 +658,10 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     }
 #if DEBUG
     if ([orderSet containsObject:priorityNum]) {
-#if !ASSERTDISABLE
         Class aClass = mediator.registerInfoMap[zdmStoreKey(serviceName, priorityNum)].cls;
         NSString *aClassName = NSStringFromClass(aClass);
         NSString *bClassName = NSStringFromClass(box.cls);
-        NSAssert3(NO, @"❎ >>>>> 注册了相同priority的service,请修改 => priority: %ld, %@, %@", box.priority, aClassName, bClassName);
-#endif
+        NSAssert3(NO, @"❌ >>>>> 注册了相同priority的service,请修改 => priority: %ld, %@, %@", box.priority, aClassName, bClassName);
     }
 #endif
     [orderSet addObject:priorityNum];

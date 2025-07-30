@@ -51,8 +51,11 @@
         object_isClass(_target)
         && [(Class)_target instancesRespondToSelector:selector]
     ) {
-#if !ASSERTDISABLE
-        NSAssert2(NO, @"❎ >>>>> %@ 遵守的协议中不全是类方法，请您修改注册设置。SEL：%@", NSStringFromClass([_target class]), NSStringFromSelector(selector));
+#if DEBUG
+        NSLog(@"❌ >>>>> %@ 遵守的协议中不全是类方法，请您修改注册设置。SEL：%@", NSStringFromClass([_target class]), NSStringFromSelector(selector));
+#if ENABLE_ASSERT
+        NSAssert2(NO, @"❌ >>>>> %@ 遵守的协议中不全是类方法，请您修改注册设置。SEL：%@", NSStringFromClass([_target class]), NSStringFromSelector(selector));
+#endif
 #endif
         // 容错处理
         if (self.callback) {
@@ -63,16 +66,18 @@
         }
     }
     
+#if ZDM_EXCEPTION_NTF
     [NSNotificationCenter.defaultCenter postNotificationName:ZDMUnrecognizedMethodNotification object:nil userInfo:@{
         @"class": [NSString stringWithUTF8String:object_getClassName(_target)],
-        @"selector": NSStringFromSelector(@selector(selector)) ?: @"",
+        @"selector": NSStringFromSelector(selector) ?: @"",
         @"source": @"ZDMProxy",
     }];
+#endif
     
 #if DEBUG
-    NSLog(@"❎ >>>>> target: %@ don't recognized selector：%@", _target, NSStringFromSelector(selector));
-#if !ASSERTDISABLE
-    NSAssert2(NO, @"❎ >>>>> target: %@ don't recognized selector：%@", _target, NSStringFromSelector(selector));
+    NSLog(@"❌ >>>>> target: %@ don't recognized selector：%@", _target, NSStringFromSelector(selector));
+#if ENABLE_ASSERT
+    NSAssert2(NO, @"❌ >>>>> target: %@ don't recognized selector：%@", _target, NSStringFromSelector(selector));
 #endif
 #endif
     

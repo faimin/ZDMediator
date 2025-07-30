@@ -47,16 +47,16 @@ Pod::Spec.new do |s|
     ss.dependency "#{s.name}/Invoke"
   end
     
-  s.subspec 'DisableAssert' do |ss|
-    ss.source_files = 'Sources/Classes/ZDMediatorDefine.h'
+  s.subspec 'EnableAssert' do |ss|
+    ss.dependency "#{s.name}/Invoke"
     ss.pod_target_xcconfig = {
-      'GCC_PREPROCESSOR_DEFINITIONS' => 'ASSERTDISABLE=1',
+      'GCC_PREPROCESSOR_DEFINITIONS' => 'ENABLE_ASSERT=1',
     }
   end
   
   s.subspec 'All' do |ss|
     ss.dependency 'ZDMediator/Core'
-    ss.dependency 'ZDMediator/DisableAssert'
+    ss.dependency 'ZDMediator/EnableAssert'
   end
   
   s.default_subspec = 'Core'

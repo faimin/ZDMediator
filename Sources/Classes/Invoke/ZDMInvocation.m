@@ -46,9 +46,9 @@ typedef UIEdgeInsets ZDMEdgeInsets;
             }];
 #endif
 #if DEBUG
-            NSLog(@"❎ >>>>> %@ doesNotRecognizeSelector: %@", target, NSStringFromSelector(selector));
-#if !ASSERTDISABLE
-            NSAssert2(NO, @"❎ >>>>> %@ doesNotRecognizeSelector: %@", target, NSStringFromSelector(selector));
+            NSLog(@"❌ >>>>> %@ doesNotRecognizeSelector: %@", target, NSStringFromSelector(selector));
+#if ENABLE_ASSERT
+            NSAssert2(NO, @"❌ >>>>> %@ doesNotRecognizeSelector: %@", target, NSStringFromSelector(selector));
 #endif
 #endif
             return nil;
