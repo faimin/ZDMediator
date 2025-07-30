@@ -6,15 +6,18 @@ import PackageDescription
 let package = Package(
     name: "ZDMediator",
     platforms: [
-        .iOS(.v10),
-        .macOS(.v10_12)
+        .iOS(.v12),
+        .tvOS(.v12),
+        .watchOS(.v5),
+        .macOS(.v10_13),
+        .visionOS(.v1),
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "ZDMediator",
             targets: ["ZDMediator"]
-        )
+        ),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -25,10 +28,10 @@ let package = Package(
             resources: [.process("Resource/PrivacyInfo.xcprivacy")],
             publicHeadersPath: "Classes",
             cSettings: [
-                .headerSearchPath("Classes"),
+                .headerSearchPath("Classes/Public"),
                 .headerSearchPath("Classes/Invoke"),
-                .headerSearchPath("Classes/Private")
+                .headerSearchPath("Classes/Private"),
             ]
-        )
+        ),
     ]
 )

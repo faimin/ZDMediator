@@ -37,7 +37,7 @@ Pod::Spec.new do |s|
     ss.source_files = 'Sources/Classes/Invoke/*.{h,m}'
   end
   
-  s.subspec 'Core' do |ss|
+  s.subspec 'Mediator' do |ss|
     ss.source_files = 'Sources/Classes/**/*.{h,m}'
     ss.exclude_files = 'Sources/Classes/Invoke/*.{h,m}'
     ss.project_header_files = 'Sources/Classes/Private/*.{h}'
@@ -55,9 +55,9 @@ Pod::Spec.new do |s|
   end
   
   s.subspec 'All' do |ss|
-    ss.dependency 'ZDMediator/Core'
+    ss.dependency 'ZDMediator/Mediator'
     ss.dependency 'ZDMediator/EnableAssert'
   end
   
-  s.default_subspec = 'Core'
+  s.default_subspec = 'Mediator'
 end
