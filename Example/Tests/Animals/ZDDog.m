@@ -88,6 +88,9 @@ ZDMediatorOFARegister(AnimalProtocol, ZDDog, 1)
     } else if (event == 100) {
         !callback ? NULL : callback(@"小狗");
         return YES;
+    } else if (event == 12345) {
+        !callback ? NULL : callback(@"12345-12345");
+        return YES;
     }
     return NO;
 }

@@ -105,7 +105,7 @@
     XCTAssertTrue(res);
 }
 
-// 测试方法不是别的异常处理
+// 测试方法不识别的异常处理
 - (void)testUnrecognizedMethod {
     NSObject *cat = ZDMGetServiceWithPriority(CatProtocol, 0);
     XCTAssertTrue([NSStringFromClass([cat class]) isEqualToString:@"ZDCat"]);
@@ -128,19 +128,18 @@
     XCTAssertTrue([dog2 isKindOfClass:NSClassFromString(@"ZDDog")]);
 }
 
-- (void)testDispatch {
-    ZDMIGNORE_SELWARNING(
-                         __unused NSArray *fooRes1 = [ZDMOneForAll dispatchWithEventSelAndArgs:@selector(foo:), 1];
-                         __unused NSArray *fooRes2 = [ZDMOneForAll dispatchWithEventSelAndArgs:@selector(foo:), 1];
-                         __unused NSArray *barRes1 = [ZDMOneForAll dispatchWithEventSelAndArgs:@selector(bar:), @{@"name" : @"zero.d.saber"}];
-                         
-                         [ZDMOneForAll dispatchWithEventId:@"100" selAndArgs:@selector(zdr_handleEvent:userInfo:callback:), 200, @{@100 : @"100"}, nil];
-                         
-                         NSArray *broadcastResult = [ZDMOneForAll dispatchWithSELAndArgs:@selector(application: didFinishLaunchingWithOptions:), UIApplication.sharedApplication, @{@"1111": @"---2222"}];
-                         NSLog(@"事件分发结果 = %@", broadcastResult);
-                         )
+- (void)testDispatchWithEvent {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundeclared-selector"
+    __unused NSArray *fooRes1 = [ZDMOneForAll dispatchWithEventSelAndArgs:@selector(foo:), 1];
+    __unused NSArray *fooRes2 = [ZDMOneForAll dispatchWithEventSelAndArgs:@selector(foo:), 1];
+    __unused NSArray *barRes1 = [ZDMOneForAll dispatchWithEventSelAndArgs:@selector(bar:), @{@"name" : @"zero.d.saber"}];
     
-    
+    [ZDMOneForAll dispatchWithEventId:@"100" selAndArgs:@selector(zdr_handleEvent:userInfo:callback:), 200, @{@100 : @"100"}, nil];
+#pragma clang diagnostic pop
+}
+
+- (void)testDispatchWithProtocol {
     {
         NSMutableArray *results1 = @[].mutableCopy;
         [ZDMOneForAll dispatchWithProtocol:@protocol(ZDMCommonProtocol) selAndArgs:@selector(zdm_handleEvent:userInfo:callback:), 100, @{}, ^id(NSString *name){
@@ -161,6 +160,26 @@
     NSLog(@"++++++++++++");
 }
 
+- (void)testDispatchWithSEL {
+    NSArray *broadcastResult1 = [ZDMOneForAll dispatchWithSELAndArgs:@selector(application: didFinishLaunchingWithOptions:), UIApplication.sharedApplication, @{@"1111": @"---2222"}];
+    NSLog(@"事件分发结果1 = %@", broadcastResult1);
+    
+    NSArray *broadcastResult2 = [ZDMOneForAll dispatchWithSELAndArgs:@selector(zdm_handleEvent:userInfo:callback:), 12345, @{@"3333": @"---4444"}, ^id{
+        return @"++++++++++";
+    }];
+    NSLog(@"事件分发结果2 = %@", broadcastResult2);
+}
+
+- (void)testBroadcastWithProxy {
+    __auto_type dog = [ZDDog new];
+    [ZDMOneForAll manualRegisterService:@protocol(DogProtocol) implementer:dog];
+    
+    __auto_type proxy = (ZDMBroadcastProxy<ZDMCommonProtocol> *)ZDMOneForAll.shareInstance.proxy;
+    [proxy zdm_handleEvent:999 userInfo:@{@"a": @"aaaaa"} callback:^id{
+        return @(YES);
+    }];
+}
+
 - (void)testRemoveService {
     id cat = ZDMGetService(CatProtocol);
     XCTAssertNotNil(cat);
@@ -170,16 +189,6 @@
     
     NSString *name = [ZDMGetService(CatProtocol) name];
     XCTAssertNil(name);
-}
-
-- (void)testBroadcast {
-    __auto_type dog = [ZDDog new];
-    [ZDMOneForAll manualRegisterService:@protocol(DogProtocol) implementer:dog];
-    
-    __auto_type proxy = (ZDMBroadcastProxy<ZDMCommonProtocol> *)ZDMOneForAll.shareInstance.proxy;
-    [proxy zdm_handleEvent:999 userInfo:@{@"a": @"aaaaa"} callback:^id{
-        return @(YES);
-    }];
 }
 
 - (void)testPerformance1 {
