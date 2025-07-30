@@ -100,6 +100,9 @@
     if (!box) {
         return;
     }
+    if (!box.autoInit) {
+        return;
+    }
     // intilize service mediatory
     serviceInstance = [ZDMOneForAll serviceWithName:box.protocolName priority:box.priority];
     if (serviceInstance) {
