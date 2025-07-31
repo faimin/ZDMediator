@@ -207,14 +207,44 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         return;
     }
     
-    ZDMServiceBox *box = [[ZDMServiceBox alloc] init];
-    box.priority = priority;
-    box.autoInit = NO;
-    // 如果手动注册的是类对象，则认为协议都是类方法
-    box.isAllClsMethod = object_isClass(obj);
-    box.cls = [obj class];
+    Class cls = [obj class];
+    NSString *clsName = NSStringFromClass(cls);
+    if (!clsName) {
+        return;
+    }
     
-    [self _storeServiceWithName:serviceName serviceBox:box];
+    // 检查是否已经存在自动注册的信息, 有的话就不创建
+    ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
+    [mediator.lock lock];
+    NSMutableSet<NSString *> *keySet = mediator.registerClsMap[clsName];
+    [mediator.lock unlock];
+    NSString *key = zdmStoreKey(serviceName, @(priority));
+    if (![keySet containsObject:key]) {
+#if DEBUG
+        NSMutableSet *serviceNameSet = [[NSMutableSet alloc] init];
+        for (NSString *key in keySet) {
+            NSString *tempServiceName = [key componentsSeparatedByString:zdmJoinKey].firstObject;
+            if (!tempServiceName) {
+                continue;
+            }
+            [serviceNameSet addObject:tempServiceName];
+        }
+        if ([serviceNameSet containsObject:serviceName]) {
+            NSAssert2(NO, @"❌ >>>>> you had registered the service: (%@), class: (%@) with another priority", serviceName, clsName);
+        } else {
+#endif
+            ZDMServiceBox *box = [[ZDMServiceBox alloc] init];
+            box.priority = priority;
+            box.autoInit = NO;
+            // 如果手动注册的是类对象，则认为协议都是类方法
+            box.isAllClsMethod = object_isClass(obj);
+            box.cls = [obj class];
+            
+            [self _storeServiceWithName:serviceName serviceBox:box];
+#if DEBUG
+        }
+#endif
+    }
     [self _storeServiceWithStrongObj:(weakStore ? nil : obj) weakObj:(weakStore ? obj : nil)];
 }
 
