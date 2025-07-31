@@ -753,7 +753,9 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 
 - (ZDMBroadcastProxy *)proxy {
     if (!_proxy) {
+        [self.lock lock];
         _proxy = [[ZDMBroadcastProxy alloc] initWithTargetSet:[ZDMOneForAll allRegisterCls]];
+        [self.lock unlock];
     }
     return _proxy;
 }

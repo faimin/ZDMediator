@@ -11,7 +11,7 @@
 #import "ZDMServiceBox.h"
 
 @interface ZDMBroadcastProxy ()
-@property (nonatomic, strong) id<NSFastEnumeration> targetSet;
+@property (atomic, strong) id<NSFastEnumeration> targetSet;
 @end
 
 @implementation ZDMBroadcastProxy
@@ -73,7 +73,9 @@
 }
 
 - (void)doesNotRecognizeSelector:(SEL)aSelector {
+#if DEBUG
     NSLog(@"❌ - doesNotRecognizeSelector: %@", NSStringFromSelector(aSelector));
+#endif
 }
 
 #pragma mark - Private

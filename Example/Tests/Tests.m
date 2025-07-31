@@ -166,11 +166,13 @@
 - (void)testDispatchWithSEL {
     NSArray *broadcastResult1 = [ZDMOneForAll dispatchWithSELAndArgs:@selector(application: didFinishLaunchingWithOptions:), UIApplication.sharedApplication, @{@"1111": @"---2222"}];
     NSLog(@"事件分发结果1 = %@", broadcastResult1);
+    XCTAssertNotNil(broadcastResult1, @"Dispatch result should not be nil");
     
     NSArray *broadcastResult2 = [ZDMOneForAll dispatchWithSELAndArgs:@selector(zdm_handleEvent:userInfo:callback:), 12345, @{@"3333": @"---4444"}, ^id{
         return @"++++++++++";
     }];
     NSLog(@"事件分发结果2 = %@", broadcastResult2);
+    XCTAssertNotNil(broadcastResult2, @"Dispatch result should not be nil");
 }
 
 - (void)testBroadcastWithProxy {
@@ -178,16 +180,19 @@
     [ZDMOneForAll manualRegisterService:@protocol(DogProtocol) implementer:dog];
     
     __auto_type proxy = (ZDMBroadcastProxy<ZDMCommonProtocol> *)ZDMOneForAll.shareInstance.proxy;
-    [proxy zdm_handleEvent:999 userInfo:@{@"a": @"aaaaa"} callback:^id{
+    XCTAssertTrue([proxy conformsToProtocol:@protocol(ZDMCommonProtocol)], @"Proxy should conform to ZDMCommonProtocol");
+    // result只是最后一个结果
+    BOOL result = [proxy zdm_handleEvent:100 userInfo:@{@"a": @"aaaaa"} callback:^id{
         return @(YES);
     }];
+    XCTAssertTrue(result, @"Broadcast should succeed");
 }
 
 - (void)testRemoveService {
     id cat = ZDMGetService(CatProtocol);
     XCTAssertNotNil(cat);
     
-    [ZDMOneForAll removeService:@protocol(CatProtocol) priority:0 autoInitAgain:NO];
+    [ZDMOneForAll removeService:@protocol(CatProtocol) priority:ZDMDefaultPriority autoInitAgain:NO];
     XCTAssertNil(ZDMGetService(CatProtocol));
     
     NSString *name = [ZDMGetService(CatProtocol) name];

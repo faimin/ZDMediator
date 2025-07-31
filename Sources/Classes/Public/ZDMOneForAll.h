@@ -186,11 +186,11 @@ NS_ASSUME_NONNULL_BEGIN
 #ifndef ZDMGetServiceWithClass
 #define ZDMGetServiceWithClass(proto, _priority, clz)                               \
   ({                                                                                \
-    clz *obj = (clz *)[ZDMOneForAll service:@protocol(proto) priority:_priority];   \
-    if (!obj || ![obj isKindOfClass:clz.class]) {                                   \
-      obj = nil;                                                                    \
-    }                                                                               \
-    obj;                                                                            \
+    clz *__zdm_obj = (clz *)[ZDMOneForAll service:@protocol(proto) priority:_priority]; \
+    if (!__zdm_obj || ![__zdm_obj isKindOfClass:clz.class]) {                        \
+        __zdm_obj = nil;                                                             \
+    }                                                                                \
+    __zdm_obj;                                                                       \
   })
 #endif
 

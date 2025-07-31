@@ -26,7 +26,6 @@
 		C224A7692A6BAC5D004295EB /* ZDDog.m in Sources */ = {isa = PBXBuildFile; fileRef = C224A7662A6BAC5D004295EB /* ZDDog.m */; };
 		C224A76C2A6BAC84004295EB /* ZDCat.m in Sources */ = {isa = PBXBuildFile; fileRef = C224A76B2A6BAC84004295EB /* ZDCat.m */; };
 		C28BFC872E3B296500AFE1E5 /* ZDTiger.m in Sources */ = {isa = PBXBuildFile; fileRef = C28BFC862E3B296500AFE1E5 /* ZDTiger.m */; };
-		C28BFC882E3B296500AFE1E5 /* ZDTiger.m in Sources */ = {isa = PBXBuildFile; fileRef = C28BFC862E3B296500AFE1E5 /* ZDTiger.m */; };
 		DA26B1852D24DCA800275688 /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA26B1842D24DCA800275688 /* Test.swift */; };
 		E71BCAA0CD1D2CF53610451B /* Pods_ZDMediator_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D93062865AF6D43151EBB7C3 /* Pods_ZDMediator_Tests.framework */; };
 /* End PBXBuildFile section */
