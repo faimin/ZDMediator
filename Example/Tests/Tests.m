@@ -29,9 +29,12 @@
     __auto_type cat = [ZDCat new];
     [ZDMOneForAll manualRegisterService:@protocol(CatProtocol) implementer:cat];
     
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundeclared-selector"
     [ZDMOneForAll registerResponder:@protocol(DogProtocol)
                            priority:ZDMPriorityHigh
                           selectors:@selector(foo:), @selector(bar:), nil];
+#pragma clang diagnostic pop
     
     [ZDMOneForAll registerResponder:@protocol(DogProtocol)
                            priority:ZDMPriorityDefalut
