@@ -11,7 +11,7 @@
 #import "ZDMServiceBox.h"
 
 @interface ZDMBroadcastProxy ()
-@property (nonatomic, copy) NSSet *targetSet;
+@property (nonatomic, strong) id<NSFastEnumeration> targetSet;
 @end
 
 @implementation ZDMBroadcastProxy
@@ -21,17 +21,17 @@
     NSLog(@"%s", __PRETTY_FUNCTION__);
 }
 
-- (BOOL)isProxy {
-    return YES;
-}
-
-- (instancetype)initWithTargetSet:(NSSet *)targetSet {
-    _targetSet = [targetSet copy];
+- (instancetype)initWithTargetSet:(id<NSFastEnumeration>)targetSet {
+    _targetSet = targetSet;
     return self;
 }
 
-- (void)replaceTargetSet:(NSSet *)targetSet {
+- (void)replaceTargetSet:(id<NSFastEnumeration>)targetSet {
     self.targetSet = targetSet;
+}
+
+- (BOOL)isProxy {
+    return YES;
 }
 
 #pragma mark - forward
