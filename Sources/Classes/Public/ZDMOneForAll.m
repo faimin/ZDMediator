@@ -702,6 +702,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     NSMutableOrderedSet<NSNumber *> *orderSet = mediator.priorityMap[serviceName];
     if (!orderSet) {
         orderSet = [[NSMutableOrderedSet alloc] init];
+        mediator.priorityMap[serviceName] = orderSet;
     }
 #if DEBUG
     if ([orderSet containsObject:priorityNum]) {
