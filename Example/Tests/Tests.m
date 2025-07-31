@@ -14,6 +14,7 @@
 #import "ZDClassProtocol.h"
 #import "ZDCat.h"
 #import "ZDDog.h"
+#import "ZDTiger.h"
 
 @interface Tests : XCTestCase
 
@@ -82,15 +83,14 @@
 
 - (void)testWeakStore {
     {
-        __auto_type dog = [ZDDog new];
-        [ZDMOneForAll manualRegisterService:@protocol(DogProtocol) priority:100 implementer:dog weakStore:YES];
+        __auto_type tiger = [ZDTiger new];
+        [ZDMOneForAll manualRegisterService:@protocol(AnimalProtocol) priority:100 implementer:tiger weakStore:YES];
     }
     
     XCTestExpectation *expect = [self expectationWithDescription:@"弱引用测试"];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        NSObject *dog = ZDMGetServiceWithPriority(DogProtocol, 100);
-        NSLog(@"%@", dog);
-        XCTAssertNil(dog);
+        NSObject *tiger = ZDMGetServiceWithPriority(AnimalProtocol, 100);
+        XCTAssertNil(tiger);
         [expect fulfill];
     });
     [self waitForExpectationsWithTimeout:5 handler:^(NSError * _Nullable error) {

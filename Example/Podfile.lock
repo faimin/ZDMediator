@@ -1,15 +1,12 @@
 PODS:
-  - ZDMediator/All (0.3.4):
-    - ZDMediator/EnableAssert
-    - ZDMediator/Mediator
-  - ZDMediator/EnableAssert (0.3.4):
-    - ZDMediator/Invoke
+  - ZDMediator (0.3.4):
+    - ZDMediator/Mediator (= 0.3.4)
   - ZDMediator/Invoke (0.3.4)
   - ZDMediator/Mediator (0.3.4):
     - ZDMediator/Invoke
 
 DEPENDENCIES:
-  - ZDMediator/All (from `../`)
+  - ZDMediator (from `../`)
 
 EXTERNAL SOURCES:
   ZDMediator:
@@ -18,6 +15,6 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   ZDMediator: 6b5fdc6d4ec05aad040fb5739356b1ef57198b58
 
-PODFILE CHECKSUM: c2ecbff5c5e6801e19e15eea8db7bdce6f13f196
+PODFILE CHECKSUM: c1d83561b2c0825ce845956b60ef00441ec3fc5c
 
 COCOAPODS: 1.16.2
