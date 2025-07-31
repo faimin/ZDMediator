@@ -696,6 +696,8 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     __auto_type mediator = ZDMOneForAll.shareInstance;
     NSNumber *priorityNum = @(box.priority);
     
+    NSString *key = zdmStoreKey(serviceName, priorityNum);
+    
     [mediator.lock lock];
     NSMutableOrderedSet<NSNumber *> *orderSet = mediator.priorityMap[serviceName];
     if (!orderSet) {
@@ -714,7 +716,20 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         return [obj2 compare:obj1];
     }];
     
-    mediator.registerInfoMap[zdmStoreKey(serviceName, priorityNum)] = box;
+    mediator.registerInfoMap[key] = box;
+    [mediator.lock unlock];
+    
+    NSString *clsName = NSStringFromClass(box.cls);
+    if (!clsName) {
+        return;
+    }
+    [mediator.lock lock];
+    NSMutableSet<NSString *> *servicePrioritySet = mediator.registerClsMap[clsName];
+    if (!servicePrioritySet) {
+        servicePrioritySet = [[NSMutableSet alloc] init];
+        mediator.registerClsMap[clsName] = servicePrioritySet;
+    }
+    [servicePrioritySet addObject:key];
     [mediator.lock unlock];
 }
 
