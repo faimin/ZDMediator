@@ -49,6 +49,13 @@ NS_ASSUME_NONNULL_BEGIN
                      priority:(NSInteger)priority
                   implementer:(S)obj
                     weakStore:(BOOL)weakStore;
+
+/// register implementer to map manually with default priority and strong store
+///
+/// - Parameters:
+///   - serviceProtocol: protocol
+///   - obj: protocol implementer (instance or Class),
+///   if obj is a class, the `isAllClsMethod` will be set `true`
 + (void)manualRegisterService:(Protocol *)serviceProtocol
                   implementer:(S)obj;
 
@@ -177,7 +184,7 @@ NS_ASSUME_NONNULL_BEGIN
 #endif
 
 #ifndef ZDMGetServiceWithClass
-#define ZDMGetServiceWithClass(proto, _priority, clz)                                  \
+#define ZDMGetServiceWithClass(proto, _priority, clz)                               \
   ({                                                                                \
     clz *obj = (clz *)[ZDMOneForAll service:@protocol(proto) priority:_priority];   \
     if (!obj || ![obj isKindOfClass:clz.class]) {                                   \

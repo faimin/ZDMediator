@@ -640,7 +640,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     }
     
     if (!serviceInstance) {
-        NSLog(@"❌ >>>>> Finally, the instance object was not found");
+        NSLog(@"❌ >>>>> Finally, the instance object of service: (%@), priority: (%zd) was not found", serviceName, priority);
     }
     
     // prevent crashes
@@ -676,7 +676,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         Class aClass = mediator.registerInfoMap[zdmStoreKey(serviceName, priorityNum)].cls;
         NSString *aClassName = NSStringFromClass(aClass);
         NSString *bClassName = NSStringFromClass(box.cls);
-        NSAssert3(NO, @"❌ >>>>> 注册了相同priority的service,请修改 => priority: %ld, %@, %@", box.priority, aClassName, bClassName);
+        NSAssert4(NO, @"❌ >>>>> service被不同class注册了相同priority,请修改 => priority: %ld, serviceName: %@, aClassName: %@, bClassName: %@", box.priority, serviceName, aClassName, bClassName);
     }
 #endif
     [orderSet addObject:priorityNum];
