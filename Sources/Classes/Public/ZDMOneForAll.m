@@ -66,12 +66,12 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         CFAbsoluteTime start = CFAbsoluteTimeGetCurrent();
         [self _loadRegisterFromMacho];
         CFAbsoluteTime end = CFAbsoluteTimeGetCurrent();
-        printf(">>>> times of read one for all macho：%f millisecond\n", (end - start)*1000);
+        printf(">>>> times of read one for all macho：%f milliseconds\n", (end - start)*1000);
     });
 }
 
 + (void)_loadRegisterFromMacho {
-    ZDMOneForAll *mediator = [self shareInstance];
+    ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
     NSMutableDictionary<NSString *, ZDMServiceBox *> *storeMap = mediator.registerInfoMap;
     NSMutableDictionary<NSString *, NSMutableSet<NSString *> *> *clsMap = mediator.registerClsMap;
     NSMutableDictionary<NSString *, NSMutableOrderedSet<NSNumber *> *> *priorityMap = mediator.priorityMap;
@@ -125,7 +125,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
                 NSNumber *priorityNum = @(item.priority);
                 
                 [lock lock];
-                NSMutableOrderedSet *orderSet = priorityMap[serviceName];
+                NSMutableOrderedSet<NSNumber *> *orderSet = priorityMap[serviceName];
                 if (!orderSet) {
                     orderSet = [[NSMutableOrderedSet alloc] initWithCapacity:1];
                     priorityMap[serviceName] = orderSet;
@@ -135,13 +135,18 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
                     Class aClass = storeMap[zdmStoreKey(serviceName, priorityNum)].cls;
                     NSString *aClassName = NSStringFromClass(aClass);
                     NSString *bClassName = [NSString stringWithUTF8String:item.value];
-                    NSAssert3(NO, @"⚠️同一Protocol下有多个类注册了相同的Priority => %d, Class => [%@, %@] ", item.priority, aClassName, bClassName);
+                    if (![aClassName isEqualToString:bClassName]) {
+                        NSAssert3(NO, @"❌ >>>>> 同一Protocol下有多个类注册了相同的Priority => %d, Class => [%@, %@] ", item.priority, aClassName, bClassName);
+                    }
                 }
 #endif
                 [orderSet addObject:priorityNum];
                 
                 // store to storeMap
                 NSString *protocolPriorityKey = zdmStoreKey(serviceName, priorityNum);
+                // storeMap中有可能已经存在serviceBox了,
+                // 不过不管它,用自动注册的这个serviceBox,
+                // 因为自动注册的这个信息更全
                 storeMap[protocolPriorityKey] = serviceBox;
                 
                 // store to clsMap
@@ -292,7 +297,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     serviceBox.autoInit = autoInitAgain;
     
     NSString *clsName = NSStringFromClass([serviceBox.cls class]);
-    ZDMServiceItem *item;
+    ZDMServiceItem *item = nil;
     if (clsName) {
         item = mediator.instanceMap[clsName];
         mediator.instanceMap[clsName] = nil;
@@ -311,7 +316,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     [self _loadRegisterIfNeed];
     
     NSHashTable *table = [NSHashTable weakObjectsHashTable];
-    [[self shareInstance].instanceMap enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, ZDMServiceItem * _Nonnull obj, BOOL * _Nonnull stop) {
+    [ZDMOneForAll.shareInstance.instanceMap enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, ZDMServiceItem * _Nonnull obj, BOOL * _Nonnull stop) {
         id value = obj.obj;
         if (value) {
             [table addObject:value];
@@ -331,7 +336,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         NSMutableSet<Class> *clsSet = [[NSMutableSet alloc] init];
-        [[self shareInstance].registerInfoMap enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, ZDMServiceBox * _Nonnull obj, BOOL * _Nonnull stop) {
+        [ZDMOneForAll.shareInstance.registerInfoMap enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, ZDMServiceBox * _Nonnull obj, BOOL * _Nonnull stop) {
             [clsSet addObject:obj.cls];
         }];
         set = clsSet.copy;
@@ -348,7 +353,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         return;
     }
     
-    __auto_type lock = [self shareInstance].lock;
+    __auto_type lock = ZDMOneForAll.shareInstance.lock;
     [lock lock];
     va_list args;
     va_start(args, eventId);
@@ -368,7 +373,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         return;
     }
     
-    __auto_type lock = [self shareInstance].lock;
+    __auto_type lock = ZDMOneForAll.shareInstance.lock;
     [lock lock];
     va_list args;
     va_start(args, selector);
@@ -393,7 +398,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     [self _loadRegisterIfNeed];
     
     NSString *serviceName = NSStringFromProtocol(protocol);
-    ZDMOneForAll *mediator = [self shareInstance];
+    ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
     [mediator.lock lock];
     NSMutableOrderedSet<NSNumber *> *orderSet = mediator.priorityMap[serviceName];
     [mediator.lock unlock];
@@ -447,7 +452,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     
     [self _loadRegisterIfNeed];
     
-    ZDMOneForAll *mediator = [self shareInstance];
+    ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
     [mediator.lock lock];
     NSMutableOrderedSet<ZDMEventResponder *> *set = mediator.serviceResponderMap[eventId];
     [mediator.lock unlock];
@@ -486,7 +491,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     
     [self _loadRegisterIfNeed];
     
-    ZDMOneForAll *mediator = [self shareInstance];
+    ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
     NSString *eventId = NSStringFromSelector(selector);
     [mediator.lock lock];
     NSMutableOrderedSet<ZDMEventResponder *> *set = mediator.serviceResponderMap[eventId];
@@ -526,7 +531,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     
     [self _loadRegisterIfNeed];
     
-    ZDMOneForAll *mediator = [self shareInstance];
+    ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
     NSMutableArray *results = @[].mutableCopy;
     
     NSArray<NSString *> *registerClsNames = nil;
@@ -580,7 +585,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         return;
     }
     
-    ZDMOneForAll *mediator = [self shareInstance];
+    ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
     NSMutableOrderedSet<ZDMEventResponder *> *orderSet = mediator.serviceResponderMap[eventKey];
     if (!orderSet) {
         orderSet = [[NSMutableOrderedSet alloc] init];
@@ -618,7 +623,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     
     [self _loadRegisterIfNeed];
     
-    ZDMOneForAll *mediator = [self shareInstance];
+    ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
     NSString *key = zdmStoreKey(serviceName, @(priority));
     [mediator.lock lock];
     ZDMServiceBox *box = mediator.registerInfoMap[key];
@@ -740,6 +745,9 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     }
     
     NSString *clsName = NSStringFromClass([strongObj ?: weakObj class]);
+    if (!clsName) {
+        return;
+    }
     
     __auto_type mediator = ZDMOneForAll.shareInstance;
     NSMutableDictionary<NSString *, ZDMServiceItem *> *instanceMap = mediator.instanceMap;
