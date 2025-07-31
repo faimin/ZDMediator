@@ -180,7 +180,7 @@
     [ZDMOneForAll manualRegisterService:@protocol(DogProtocol) implementer:dog];
     
     __auto_type proxy = (ZDMBroadcastProxy<ZDMCommonProtocol> *)ZDMOneForAll.shareInstance.proxy;
-    XCTAssertTrue([proxy conformsToProtocol:@protocol(ZDMCommonProtocol)], @"Proxy should conform to ZDMCommonProtocol");
+    XCTAssertTrue([proxy respondsToSelector:@selector(zdm_handleEvent:userInfo:callback:)], @"Proxy should response to zdm_handleEvent:userInfo:callback:");
     // result只是最后一个结果
     BOOL result = [proxy zdm_handleEvent:100 userInfo:@{@"a": @"aaaaa"} callback:^id{
         return @(YES);
