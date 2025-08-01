@@ -36,6 +36,15 @@
 
 #pragma mark - forward
 
+- (BOOL)conformsToProtocol:(Protocol *)aProtocol {
+    for (id obj in self.targetSet) {
+        if ([obj conformsToProtocol:aProtocol]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
 - (BOOL)respondsToSelector:(SEL)aSelector {
     for (id obj in self.targetSet) {
         if ([obj respondsToSelector:aSelector]) {
