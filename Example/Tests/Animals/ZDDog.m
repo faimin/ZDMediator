@@ -6,6 +6,7 @@
 //  Copyright © 2023 8207436. All rights reserved.
 //
 
+#import <UIKit/UIKit.h>
 #import "ZDDog.h"
 #import "ZDClassProtocol.h"
 #import <ZDMediator/ZDMediator.h>
@@ -40,6 +41,11 @@ ZDMediatorOFARegister(AnimalProtocol, ZDDog, 1)
 
 + (instancetype)zdm_createInstance:(ZDMContext *)context {
     return self.new;
+}
+
++ (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    NSLog(@"----> %s", __PRETTY_FUNCTION__);
+    return YES;
 }
 
 #pragma mark - DogProtocol
@@ -81,6 +87,9 @@ ZDMediatorOFARegister(AnimalProtocol, ZDDog, 1)
         return YES;
     } else if (event == 100) {
         !callback ? NULL : callback(@"小狗");
+        return YES;
+    } else if (event == 12345) {
+        !callback ? NULL : callback(@"12345-12345");
         return YES;
     }
     return NO;

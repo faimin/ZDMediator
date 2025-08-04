@@ -14,6 +14,7 @@
 #import "ZDMCommonProtocol.h"
 #import "ZDMContext.h"
 #import "ZDMediatorDefine.h"
+#import "ZDMBroadcastProxy.h"
 
 #elif __has_include(<ZDMediator/ZDMOneForAll.h>)
 
@@ -21,6 +22,7 @@
 #import <ZDMediator/ZDMCommonProtocol.h>
 #import <ZDMediator/ZDMContext.h>
 #import <ZDMediator/ZDMediatorDefine.h>
+#import <ZDMediator/ZDMBroadcastProxy.h>
 
 #endif
 

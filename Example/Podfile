@@ -3,7 +3,6 @@ use_frameworks!
 platform :ios, '10.0'
 
 target 'ZDMediator_Example' do
-  #pod 'ZDMediator', :path => '../', :subspecs => ['Core', 'DisableAssert']
   pod 'ZDMediator', :path => '../'
 
   target 'ZDMediator_Tests' do

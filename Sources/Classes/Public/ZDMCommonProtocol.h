@@ -18,17 +18,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 @optional
 
-/// 模块初始化方法
-/// - Parameter context: 上下文信息
+/// initialize method of module
+///
+/// - Parameter context: context information
 + (instancetype)zdm_createInstance:(ZDMContext *_Nullable)context;
 
-/// 即将解除对模块的引用
+/// called when it is about to be released
 - (void)zdm_willDispose;
 
-/// 模块间通信
-/// @param event 事件类型
-/// @param userInfo 传递的参数
-/// @param callback 事件回调
+/// common method to communicate with other modules
+///
+/// - Parameters:
+///   - event: event ID
+///   - userInfo: any info
+///   - callback: event callback
 - (BOOL)zdm_handleEvent:(NSInteger)event
                userInfo:(id _Nullable)userInfo
                callback:(ZDMCommonCallback _Nullable)callback

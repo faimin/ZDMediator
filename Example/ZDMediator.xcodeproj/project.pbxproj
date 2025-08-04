@@ -25,6 +25,7 @@
 		873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 873B8AEA1B1F5CCA007FD442 /* Main.storyboard */; };
 		C224A7692A6BAC5D004295EB /* ZDDog.m in Sources */ = {isa = PBXBuildFile; fileRef = C224A7662A6BAC5D004295EB /* ZDDog.m */; };
 		C224A76C2A6BAC84004295EB /* ZDCat.m in Sources */ = {isa = PBXBuildFile; fileRef = C224A76B2A6BAC84004295EB /* ZDCat.m */; };
+		C28B2A1C2E3C6CC400AFE1E5 /* ZDTiger.m in Sources */ = {isa = PBXBuildFile; fileRef = C28B2A1B2E3C6CC400AFE1E5 /* ZDTiger.m */; };
 		DA26B1852D24DCA800275688 /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA26B1842D24DCA800275688 /* Test.swift */; };
 		E71BCAA0CD1D2CF53610451B /* Pods_ZDMediator_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D93062865AF6D43151EBB7C3 /* Pods_ZDMediator_Tests.framework */; };
 /* End PBXBuildFile section */
@@ -75,6 +76,8 @@
 		C224A76A2A6BAC84004295EB /* ZDCat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZDCat.h; sourceTree = "<group>"; };
 		C224A76B2A6BAC84004295EB /* ZDCat.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZDCat.m; sourceTree = "<group>"; };
 		C23F65C72A70CE16003CA9F3 /* ZDClassProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZDClassProtocol.h; sourceTree = "<group>"; };
+		C28B2A1A2E3C6CC400AFE1E5 /* ZDTiger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZDTiger.h; sourceTree = "<group>"; };
+		C28B2A1B2E3C6CC400AFE1E5 /* ZDTiger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZDTiger.m; sourceTree = "<group>"; };
 		C2A9DE192C3087C300B90BCC /* AnimalProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AnimalProtocol.h; sourceTree = "<group>"; };
 		D93062865AF6D43151EBB7C3 /* Pods_ZDMediator_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ZDMediator_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA26B1832D24DCA700275688 /* ZDMediator_Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZDMediator_Tests-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -223,6 +226,8 @@
 				C224A76B2A6BAC84004295EB /* ZDCat.m */,
 				C224A7682A6BAC5D004295EB /* ZDDog.h */,
 				C224A7662A6BAC5D004295EB /* ZDDog.m */,
+				C28B2A1A2E3C6CC400AFE1E5 /* ZDTiger.h */,
+				C28B2A1B2E3C6CC400AFE1E5 /* ZDTiger.m */,
 			);
 			path = Animals;
 			sourceTree = "<group>";
@@ -408,6 +413,7 @@
 			files = (
 				C224A76C2A6BAC84004295EB /* ZDCat.m in Sources */,
 				DA26B1852D24DCA800275688 /* Test.swift in Sources */,
+				C28B2A1C2E3C6CC400AFE1E5 /* ZDTiger.m in Sources */,
 				C224A7692A6BAC5D004295EB /* ZDDog.m in Sources */,
 				6003F5BC195388D20070C39A /* Tests.m in Sources */,
 			);

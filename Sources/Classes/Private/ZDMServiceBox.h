@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ZDMServiceBox : NSObject
 
 @property (nonatomic, unsafe_unretained) Class cls;
+@property (nonatomic, copy) NSString *protocolName;
 @property (nonatomic, assign) BOOL autoInit;
 @property (nonatomic, assign) BOOL isAllClsMethod;
 @property (nonatomic, assign) NSInteger priority;
