@@ -60,8 +60,17 @@
     NSMethodSignature *signature = nil;
     for (id obj in self.targetSet) {
         signature = [obj methodSignatureForSelector:sel];
-        if (!signature && object_isClass(obj)) {
-            signature = [(Class)obj instanceMethodSignatureForSelector:sel];
+        if (!signature) {
+            // class, but SEL is instance selector
+            if (object_isClass(obj)) {
+                signature = [(Class)obj instanceMethodSignatureForSelector:sel];
+            } else {
+                // instance, but SEL is class selector
+                Class cls = [obj class];
+                if ([cls respondsToSelector:sel]) {
+                    signature = [cls methodSignatureForSelector:sel];
+                }
+            }
         }
         if (signature) {
             break;
@@ -75,8 +84,17 @@
         SEL selector = invocation.selector;
         if ([obj respondsToSelector:selector]) {
             [invocation invokeWithTarget:obj];
-        } else if (object_isClass(obj) && [(Class)obj instancesRespondToSelector:selector]) {
-            [self _executeInstanceMethodWithCls:obj invocation:invocation];
+        } else if (object_isClass(obj)) {
+            // obj is class, but SEL is instance selector
+            if ([(Class)obj instancesRespondToSelector:selector]) {
+                [self _executeInstanceMethodWithCls:obj invocation:invocation];
+            }
+        } else {
+            // obj is instance, but SEL is class selector
+            Class cls = [obj class];
+            if ([cls respondsToSelector:selector]) {
+                [invocation respondsToSelector:selector];
+            }
         }
     }
 }
@@ -99,7 +117,7 @@
     [mediator.lock lock];
     id serviceInstance = mediator.instanceMap[clsName].obj;
     [mediator.lock unlock];
-    if (serviceInstance) {
+    if (serviceInstance && [serviceInstance respondsToSelector:invocation.selector]) {
         [invocation invokeWithTarget:serviceInstance];
         return;
     }
@@ -116,7 +134,7 @@
     }
     // intilize service mediatory
     serviceInstance = [ZDMOneForAll serviceWithName:box.protocolName priority:box.priority];
-    if (serviceInstance) {
+    if (serviceInstance && [serviceInstance respondsToSelector:invocation.selector]) {
         [invocation invokeWithTarget:serviceInstance];
     }
 }
