@@ -31,7 +31,7 @@
 /// { key(SEL || eventId): [ZDMEventResponderModel] }, 响应事件的Map
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDMEventResponder *> *> *serviceResponderMap;
 
-/// unfair lock
+/// Lock abstraction (NSRecursiveLock by default, os_unfair_lock if UNFAIR_LOCK=1)
 @property (nonatomic, strong) ZDMLock *lock;
 
 @end
