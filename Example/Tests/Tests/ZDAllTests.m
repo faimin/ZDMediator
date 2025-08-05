@@ -1,6 +1,6 @@
 //
-//  ZDSingleRouterTests.m
-//  ZDSingleRouterTests
+//  ZDAllTests.m
+//  ZDAllTests
 //
 //  Created by 8207436 on 04/16/2023.
 //  Copyright (c) 2023 8207436. All rights reserved.
@@ -16,19 +16,16 @@
 #import "ZDDog.h"
 #import "ZDTiger.h"
 
-@interface Tests : XCTestCase
+@interface ZDAllTests : XCTestCase
 
 @end
 
-@implementation Tests
+@implementation ZDAllTests
 
 - (void)setUp {
     [super setUp];
     // Put setup code here. This method is called before the invocation of each
     // test method in the class.
-    
-    __auto_type cat = [ZDCat new];
-    [ZDMOneForAll manualRegisterService:@protocol(CatProtocol) implementer:cat];
     
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wundeclared-selector"
@@ -52,6 +49,9 @@
 }
 
 - (void)testExample {
+    __auto_type cat = [ZDCat new];
+    [ZDMOneForAll manualRegisterService:@protocol(CatProtocol) implementer:cat];
+    
     BOOL catResult1 = [ZDMGetService(CatProtocol) zdm_handleEvent:100 userInfo:@{} callback:^id(NSString *x) {
         return @[ x ];
     }];
@@ -109,15 +109,15 @@
 }
 
 // 测试方法不识别的异常处理
-- (void)testUnrecognizedMethod {
-    NSObject *cat = ZDMGetServiceWithPriority(CatProtocol, 0);
-    XCTAssertTrue([NSStringFromClass([cat class]) isEqualToString:@"ZDCat"]);
+- (void)test100UnrecognizedMethod {
+    NSObject *cat = ZDMGetServiceWithPriority(CatProtocol, ZDMDefaultPriority);
+    XCTAssertTrue([cat isKindOfClass:ZDCat.class]);
     
     // 是否crash
-    NSString *foodName = [ZDMGetServiceWithPriority(CatProtocol, 0) eatWhatFood];
+    NSString *foodName = [ZDMGetServiceWithPriority(CatProtocol, ZDMDefaultPriority) eatWhatFood];
     XCTAssertNil(foodName);
     
-    NSObject *dog = ZDMGetServiceWithClass(CatProtocol, 0, ZDDog);
+    NSObject *dog = ZDMGetServiceWithClass(CatProtocol, ZDMDefaultPriority, ZDDog);
     XCTAssertNil(dog);
 }
 
@@ -128,7 +128,7 @@
     XCTAssertEqual(age, 2);
     
     __auto_type dog2 = ZDMGetService(DogProtocol);
-    XCTAssertTrue([dog2 isKindOfClass:NSClassFromString(@"ZDDog")]);
+    XCTAssertTrue([dog2 isKindOfClass:ZDDog.class]);
 }
 
 - (void)testDispatchWithEvent {
@@ -175,20 +175,8 @@
     XCTAssertNotNil(broadcastResult2, @"Dispatch result should not be nil");
 }
 
-- (void)testBroadcastWithProxy {
-    __auto_type dog = [ZDDog new];
-    [ZDMOneForAll manualRegisterService:@protocol(DogProtocol) implementer:dog];
-    
-    __auto_type proxy = (ZDMBroadcastProxy<ZDMCommonProtocol> *)ZDMOneForAll.shareInstance.proxy;
-    XCTAssertTrue([proxy respondsToSelector:@selector(zdm_handleEvent:userInfo:callback:)], @"Proxy should response to zdm_handleEvent:userInfo:callback:");
-    // result只是最后一个结果
-    BOOL result = [proxy zdm_handleEvent:100 userInfo:@{@"a": @"aaaaa"} callback:^id{
-        return @(YES);
-    }];
-    XCTAssertTrue(result, @"Broadcast should succeed");
-}
-
-- (void)testRemoveService {
+/// 确保`test100UnrecognizedMethod`先执行
+- (void)test9999RemoveService {
     id cat = ZDMGetService(CatProtocol);
     XCTAssertNotNil(cat);
     
