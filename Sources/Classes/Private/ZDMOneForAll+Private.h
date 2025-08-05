@@ -12,6 +12,7 @@
 #import "ZDMServiceBox.h"
 #import "ZDMServiceItem.h"
 #import "ZDMEventResponder.h"
+#import "ZDMLock.h"
 
 @interface ZDMOneForAll ()
 
@@ -30,8 +31,8 @@
 /// { key(SEL || eventId): [ZDMEventResponderModel] }, 响应事件的Map
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDMEventResponder *> *> *serviceResponderMap;
 
-/// Recursive lock
-@property (nonatomic, strong) NSRecursiveLock *lock;
+/// unfair lock
+@property (nonatomic, strong) ZDMLock *lock;
 
 @end
 

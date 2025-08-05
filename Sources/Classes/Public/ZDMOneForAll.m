@@ -46,11 +46,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 #pragma mark - Inner Method
 
 - (void)_setup {
-    _lock = ({
-        __auto_type *lock = [[NSRecursiveLock alloc] init];
-        lock.name = @"ZDMOneForAll_lock";
-        lock;
-    });
+    _lock = ZDMLock.new;
     _registerInfoMap = @{}.mutableCopy;
     _registerClsMap = @{}.mutableCopy;
     _priorityMap = @{}.mutableCopy;
