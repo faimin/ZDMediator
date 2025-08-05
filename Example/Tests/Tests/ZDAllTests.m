@@ -82,10 +82,17 @@
 }
 
 - (void)testWeakStore {
+    __auto_type proxy = (id<AnimalProtocol>)ZDMOneForAll.shareInstance.proxy;
     {
         __auto_type tiger = [ZDTiger new];
         [ZDMOneForAll manualRegisterService:@protocol(AnimalProtocol) priority:100 implementer:tiger weakStore:YES];
+        [proxy eatFood];
+        
+        id x = (id<AnimalProtocol>)ZDMOneForAll.shareInstance.proxy;
+        XCTAssertEqualObjects(proxy, x);
     }
+    
+    [proxy eatFood];
     
     XCTestExpectation *expect = [self expectationWithDescription:@"弱引用测试"];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{

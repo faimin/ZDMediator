@@ -21,11 +21,6 @@
     NSLog(@"%s", __PRETTY_FUNCTION__);
 }
 
-- (instancetype)initWithTargetSet:(id<NSFastEnumeration>)targetSet {
-    _targetSet = targetSet;
-    return self;
-}
-
 - (void)replaceTargetSet:(id<NSFastEnumeration>)targetSet {
     self.targetSet = targetSet;
 }

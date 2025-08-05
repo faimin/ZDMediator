@@ -47,12 +47,13 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 #pragma mark - Inner Method
 
 - (void)_setup {
-    _lock = ZDMLock.new;
+    _lock = [[ZDMLock alloc] init];
     _registerInfoMap = @{}.mutableCopy;
     _registerClsMap = @{}.mutableCopy;
     _priorityMap = @{}.mutableCopy;
     _instanceMap = @{}.mutableCopy;
     _serviceResponderMap = @{}.mutableCopy;
+    _proxy = [ZDMBroadcastProxy alloc];
 }
 
 #pragma mark - MachO
@@ -361,6 +362,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     [ZDMOneForAll.shareInstance.registerInfoMap enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, ZDMServiceBox * _Nonnull obj, BOOL * _Nonnull stop) {
         Class cls = obj.cls;
         if (cls) {
+            // `addObject`会导致cls的`+initialize`方法被调用
             [clsSet addObject:cls];
         }
     }];
@@ -808,11 +810,21 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 #pragma mark - Property
 
 - (ZDMBroadcastProxy *)proxy {
-    if (!_proxy) {
-        [self.lock lock];
-        _proxy = [[ZDMBroadcastProxy alloc] initWithTargetSet:[ZDMOneForAll allRegisterClses]];
-        [self.lock unlock];
+    // 首次读取时读取全部注册的类.
+    // 由于在`+allRegisterClses`方法内部,当`class`添加到`Set`时会触发类的`+initialize`方法执行,
+    // 此时假如`+initialize`中有注册行为,会导致`proxy`再次被调用,出现`proxy`被多次初始化的问题,
+    // 所以为了规避此类情况,`proxy`放在`ZDMediator`初始化时一起初始化.
+    static BOOL _isFirst = YES;
+    
+    if (!_isFirst) {
+        return _proxy;
     }
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _isFirst = NO;
+        [_proxy replaceTargetSet:[ZDMOneForAll allRegisterClses]];
+    });
     return _proxy;
 }
 

@@ -11,8 +11,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ZDMBroadcastProxy : NSProxy
 
-- (instancetype)initWithTargetSet:(id<NSFastEnumeration>)targetSet;
-
 - (void)replaceTargetSet:(id<NSFastEnumeration> _Nullable)targetSet;
 
 @end
