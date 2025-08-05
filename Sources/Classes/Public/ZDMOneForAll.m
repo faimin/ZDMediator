@@ -284,15 +284,15 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         return NO;
     }
     
-    ZDMOneForAll *mediator = [ZDMOneForAll shareInstance];
     NSString *key = zdmStoreKey(serviceName, @(priority));
     
+    ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
     [mediator.lock lock];
     [mediator.priorityMap[serviceName] removeObject:@(priority)];
     ZDMServiceBox *serviceBox = mediator.registerInfoMap[key];
     serviceBox.autoInit = autoInitAgain;
     
-    NSString *clsName = NSStringFromClass([serviceBox.cls class]);
+    NSString *clsName = NSStringFromClass(serviceBox.cls);
     ZDMServiceItem *item = nil;
     if (clsName) {
         item = mediator.instanceMap[clsName];
@@ -322,22 +322,19 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 }
 
 + (NSSet<Class> *)allRegisterCls {
-    static NSSet<Class> *set = nil;
-    if (set) {
-        return set;
-    }
-    
     [self _loadRegisterIfNeed];
     
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        NSMutableSet<Class> *clsSet = [[NSMutableSet alloc] init];
-        [ZDMOneForAll.shareInstance.registerInfoMap enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, ZDMServiceBox * _Nonnull obj, BOOL * _Nonnull stop) {
-            [clsSet addObject:obj.cls];
-        }];
-        set = clsSet.copy;
-    });
-    return set;
+    NSMutableSet<Class> *clsSet = [[NSMutableSet alloc] init];
+    __auto_type mediator = ZDMOneForAll.shareInstance;
+    [mediator.lock lock];
+    [ZDMOneForAll.shareInstance.registerInfoMap enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, ZDMServiceBox * _Nonnull obj, BOOL * _Nonnull stop) {
+        Class cls = obj.cls;
+        if (cls) {
+            [clsSet addObject:cls];
+        }
+    }];
+    [mediator.lock unlock];
+    return clsSet.copy;
 }
 
 #pragma mark - Register Event
@@ -694,11 +691,11 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 }
 
 + (void)_storeServiceWithName:(NSString *)serviceName serviceBox:(ZDMServiceBox *)box {
-    __auto_type mediator = ZDMOneForAll.shareInstance;
     NSNumber *priorityNum = @(box.priority);
     
     NSString *key = zdmStoreKey(serviceName, priorityNum);
     
+    __auto_type mediator = ZDMOneForAll.shareInstance;
     [mediator.lock lock];
     NSMutableOrderedSet<NSNumber *> *orderSet = mediator.priorityMap[serviceName];
     if (!orderSet) {
@@ -733,6 +730,9 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     }
     [servicePrioritySet addObject:key];
     [mediator.lock unlock];
+    
+    NSSet<Class> *clsSet = [self allRegisterCls];
+    [mediator.proxy replaceTargetSet:clsSet];
 }
 
 + (void)_storeServiceWithStrongObj:(id)strongObj weakObj:(id)weakObj {
