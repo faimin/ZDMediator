@@ -31,12 +31,13 @@
 }
 
 - (void)testBroadcastWithProxy {
+    // Setup: Register services that will respond to broadcast
 //    __auto_type dog = [ZDDog new];
 //    [ZDMOneForAll manualRegisterService:@protocol(DogProtocol) implementer:dog];
     
     __auto_type proxy = (ZDMBroadcastProxy<ZDMCommonProtocol> *)ZDMOneForAll.shareInstance.proxy;
     XCTAssertTrue([proxy respondsToSelector:@selector(zdm_handleEvent:userInfo:callback:)], @"Proxy should response to zdm_handleEvent:userInfo:callback:");
-    // result只是最后一个结果
+    // Note: broadcast result represents the last responder's return value
     BOOL result = [proxy zdm_handleEvent:100 userInfo:@{@"a": @"aaaaa"} callback:^id{
         return @(YES);
     }];
