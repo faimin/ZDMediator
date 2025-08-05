@@ -360,11 +360,6 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     [mediator.lock lock];
     [ZDMOneForAll.shareInstance.registerInfoMap enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, ZDMServiceBox * _Nonnull obj, BOOL * _Nonnull stop) {
         Class cls = obj.cls;
-#if DEBUG
-        if ([clsSet containsObject:cls]) {
-            NSLog(@"包含cls: %s", object_getClassName(cls));
-        }
-#endif
         if (cls) {
             [clsSet addObject:cls];
         }
@@ -663,7 +658,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     }
     [mediator.lock unlock];
     if (!box) {
-        NSLog(@"❌ >>>>> please register class first");
+        NSLog(@"❌ >>>>> please register a class first");
         return nil;
     }
     
