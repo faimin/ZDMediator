@@ -41,15 +41,17 @@
 @implementation NSObject (ZDMOnDealloc)
 
 - (void)zdm_onDealloc:(ZDM_DisposeBlock)deallocBlock {
-    if (!deallocBlock) return;
+    if (!deallocBlock) {
+        return;
+    }
     
-    NSMutableArray *deallocBlocks = objc_getAssociatedObject(self, _cmd);
+    ZDMTaskBlockExecutor *blockExecutor = [[ZDMTaskBlockExecutor alloc] initWithBlock:deallocBlock realTarget:self];
+    
+    NSMutableArray<ZDMTaskBlockExecutor *> *deallocBlocks = objc_getAssociatedObject(self, _cmd);
     if (!deallocBlocks) {
         deallocBlocks = [[NSMutableArray alloc] init];
         objc_setAssociatedObject(self, _cmd, deallocBlocks, OBJC_ASSOCIATION_RETAIN);
     }
-    
-    ZDMTaskBlockExecutor *blockExecutor = [[ZDMTaskBlockExecutor alloc] initWithBlock:deallocBlock realTarget:self];
     [deallocBlocks addObject:blockExecutor];
 }
 
