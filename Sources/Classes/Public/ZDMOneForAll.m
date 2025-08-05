@@ -15,6 +15,7 @@
 #import "ZDMContext.h"
 #import "ZDMInvocation.h"
 #import "ZDMProxy.h"
+#import "NSObject+ZDMOnDealloc.h"
 
 static NSString * const zdmJoinKey = @"--->";
 
@@ -247,6 +248,13 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 #endif
     }
     [self _storeServiceWithStrongObj:(weakStore ? nil : obj) weakObj:(weakStore ? obj : nil)];
+    
+    if (weakStore && !object_isClass(obj)) {
+        // auto cleanup after obj dealloc
+        [((NSObject *)obj) zdm_onDealloc:^(id  _Nullable realTarget) {
+            [self removeService:serviceProtocol priority:priority autoInitAgain:NO];
+        }];
+    }
 }
 
 #pragma mark Get
@@ -288,17 +296,40 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     
     ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
     [mediator.lock lock];
-    [mediator.priorityMap[serviceName] removeObject:@(priority)];
+    NSMutableOrderedSet<NSNumber *> *priorityOrderSet = mediator.priorityMap[serviceName];
+    [priorityOrderSet removeObject:@(priority)];
+    if (priorityOrderSet.count == 0) {
+        mediator.priorityMap[serviceName] = nil;
+    }
+    
     ZDMServiceBox *serviceBox = mediator.registerInfoMap[key];
     serviceBox.autoInit = autoInitAgain;
     
     NSString *clsName = NSStringFromClass(serviceBox.cls);
     ZDMServiceItem *item = nil;
+    BOOL _updateProxy = NO;
     if (clsName) {
         item = mediator.instanceMap[clsName];
         mediator.instanceMap[clsName] = nil;
+        
+        NSMutableSet<NSString *> *protocolPrioprityKeys = mediator.registerClsMap[clsName];
+        [protocolPrioprityKeys removeObject:key];
+        // cleanup register info if it didn't auto init agin
+        if (!autoInitAgain) {
+            if (protocolPrioprityKeys.count == 0) {
+                mediator.registerClsMap[clsName] = nil;
+            }
+            mediator.registerInfoMap[key] = nil;
+            
+            _updateProxy = YES;
+        }
     }
     [mediator.lock unlock];
+    
+    // update proxy targets
+    if (_updateProxy) {
+        [self _updateProxyTargets];
+    }
     
     if (item) {
         [item clear];
@@ -321,7 +352,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     return table;
 }
 
-+ (NSSet<Class> *)allRegisterCls {
++ (NSSet<Class> *)allRegisterClses {
     [self _loadRegisterIfNeed];
     
     NSMutableSet<Class> *clsSet = [[NSMutableSet alloc] init];
@@ -329,6 +360,11 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     [mediator.lock lock];
     [ZDMOneForAll.shareInstance.registerInfoMap enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, ZDMServiceBox * _Nonnull obj, BOOL * _Nonnull stop) {
         Class cls = obj.cls;
+#if DEBUG
+        if ([clsSet containsObject:cls]) {
+            NSLog(@"包含cls: %s", object_getClassName(cls));
+        }
+#endif
         if (cls) {
             [clsSet addObject:cls];
         }
@@ -731,8 +767,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     [servicePrioritySet addObject:key];
     [mediator.lock unlock];
     
-    NSSet<Class> *clsSet = [self allRegisterCls];
-    [mediator.proxy replaceTargetSet:clsSet];
+    [self _updateProxyTargets];
 }
 
 + (void)_storeServiceWithStrongObj:(id)strongObj weakObj:(id)weakObj {
@@ -740,7 +775,8 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         return;
     }
     
-    NSString *clsName = NSStringFromClass([strongObj ?: weakObj class]);
+    id obj = strongObj ?: weakObj;
+    NSString *clsName = NSStringFromClass([obj class]);
     if (!clsName) {
         return;
     }
@@ -769,12 +805,17 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     return item.obj;
 }
 
++ (void)_updateProxyTargets {
+    NSSet<Class> *clsSet = [self allRegisterClses];
+    [ZDMOneForAll.shareInstance.proxy replaceTargetSet:clsSet];
+}
+
 #pragma mark - Property
 
 - (ZDMBroadcastProxy *)proxy {
     if (!_proxy) {
         [self.lock lock];
-        _proxy = [[ZDMBroadcastProxy alloc] initWithTargetSet:[ZDMOneForAll allRegisterCls]];
+        _proxy = [[ZDMBroadcastProxy alloc] initWithTargetSet:[ZDMOneForAll allRegisterClses]];
         [self.lock unlock];
     }
     return _proxy;
