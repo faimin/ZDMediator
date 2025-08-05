@@ -93,7 +93,7 @@
             // obj is instance, but SEL is class selector
             Class cls = [obj class];
             if ([cls respondsToSelector:selector]) {
-                [invocation respondsToSelector:selector];
+                [invocation invokeWithTarget:cls];
             }
         }
     }
