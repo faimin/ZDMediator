@@ -47,12 +47,14 @@
     
     ZDMTaskBlockExecutor *blockExecutor = [[ZDMTaskBlockExecutor alloc] initWithBlock:deallocBlock realTarget:self];
     
-    NSMutableArray<ZDMTaskBlockExecutor *> *deallocBlocks = objc_getAssociatedObject(self, _cmd);
-    if (!deallocBlocks) {
-        deallocBlocks = [[NSMutableArray alloc] init];
-        objc_setAssociatedObject(self, _cmd, deallocBlocks, OBJC_ASSOCIATION_RETAIN);
+    @synchronized (self) {
+        NSMutableArray<ZDMTaskBlockExecutor *> *deallocBlocks = objc_getAssociatedObject(self, _cmd);
+        if (!deallocBlocks) {
+            deallocBlocks = [[NSMutableArray alloc] init];
+            objc_setAssociatedObject(self, _cmd, deallocBlocks, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        [deallocBlocks addObject:blockExecutor];
     }
-    [deallocBlocks addObject:blockExecutor];
 }
 
 @end
