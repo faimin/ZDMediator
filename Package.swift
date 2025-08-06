@@ -29,7 +29,7 @@ let package = Package(
             publicHeadersPath: "Classes",
             cSettings: [
                 .headerSearchPath("Classes/Public"),
-                .headerSearchPath("Classes/Invoke"),
+                .headerSearchPath("Classes/Tools"),
                 .headerSearchPath("Classes/Private"),
             ]
         ),

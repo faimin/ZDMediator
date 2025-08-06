@@ -20,12 +20,16 @@
 		6003F5B1195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
 		6003F5B2195388D20070C39A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F591195388D20070C39A /* UIKit.framework */; };
 		6003F5BA195388D20070C39A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6003F5B8195388D20070C39A /* InfoPlist.strings */; };
-		6003F5BC195388D20070C39A /* Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6003F5BB195388D20070C39A /* Tests.m */; };
 		71719F9F1E33DC2100824A3D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 71719F9D1E33DC2100824A3D /* LaunchScreen.storyboard */; };
 		873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 873B8AEA1B1F5CCA007FD442 /* Main.storyboard */; };
 		C224A7692A6BAC5D004295EB /* ZDDog.m in Sources */ = {isa = PBXBuildFile; fileRef = C224A7662A6BAC5D004295EB /* ZDDog.m */; };
 		C224A76C2A6BAC84004295EB /* ZDCat.m in Sources */ = {isa = PBXBuildFile; fileRef = C224A76B2A6BAC84004295EB /* ZDCat.m */; };
 		C28B2A1C2E3C6CC400AFE1E5 /* ZDTiger.m in Sources */ = {isa = PBXBuildFile; fileRef = C28B2A1B2E3C6CC400AFE1E5 /* ZDTiger.m */; };
+		C28B54862E42062100AFE1E5 /* ZDAllTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C28B54802E42062100AFE1E5 /* ZDAllTests.m */; };
+		C28B54872E42062100AFE1E5 /* ZDBroadcastTest.m in Sources */ = {isa = PBXBuildFile; fileRef = C28B54812E42062100AFE1E5 /* ZDBroadcastTest.m */; };
+		C28B54882E42062100AFE1E5 /* ZDDispatchTest.m in Sources */ = {isa = PBXBuildFile; fileRef = C28B54822E42062100AFE1E5 /* ZDDispatchTest.m */; };
+		C28B54892E42062100AFE1E5 /* ZDUnrecognizedMethodTest.m in Sources */ = {isa = PBXBuildFile; fileRef = C28B54832E42062100AFE1E5 /* ZDUnrecognizedMethodTest.m */; };
+		C28B548A2E42062100AFE1E5 /* ZDUnregisterServiceTest.m in Sources */ = {isa = PBXBuildFile; fileRef = C28B54842E42062100AFE1E5 /* ZDUnregisterServiceTest.m */; };
 		DA26B1852D24DCA800275688 /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA26B1842D24DCA800275688 /* Test.swift */; };
 		E71BCAA0CD1D2CF53610451B /* Pods_ZDMediator_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D93062865AF6D43151EBB7C3 /* Pods_ZDMediator_Tests.framework */; };
 /* End PBXBuildFile section */
@@ -60,7 +64,6 @@
 		6003F5AF195388D20070C39A /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		6003F5B7195388D20070C39A /* Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
 		6003F5B9195388D20070C39A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		6003F5BB195388D20070C39A /* Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Tests.m; sourceTree = "<group>"; };
 		606FC2411953D9B200FFA9A0 /* Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Prefix.pch"; sourceTree = "<group>"; };
 		6676EAE441F7A3BCD2DC7173 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		681D287EFD85D348DF8898D4 /* Pods_ZDMediator_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ZDMediator_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -78,6 +81,11 @@
 		C23F65C72A70CE16003CA9F3 /* ZDClassProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZDClassProtocol.h; sourceTree = "<group>"; };
 		C28B2A1A2E3C6CC400AFE1E5 /* ZDTiger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZDTiger.h; sourceTree = "<group>"; };
 		C28B2A1B2E3C6CC400AFE1E5 /* ZDTiger.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZDTiger.m; sourceTree = "<group>"; };
+		C28B54802E42062100AFE1E5 /* ZDAllTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZDAllTests.m; sourceTree = "<group>"; };
+		C28B54812E42062100AFE1E5 /* ZDBroadcastTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZDBroadcastTest.m; sourceTree = "<group>"; };
+		C28B54822E42062100AFE1E5 /* ZDDispatchTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZDDispatchTest.m; sourceTree = "<group>"; };
+		C28B54832E42062100AFE1E5 /* ZDUnrecognizedMethodTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZDUnrecognizedMethodTest.m; sourceTree = "<group>"; };
+		C28B54842E42062100AFE1E5 /* ZDUnregisterServiceTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ZDUnregisterServiceTest.m; sourceTree = "<group>"; };
 		C2A9DE192C3087C300B90BCC /* AnimalProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AnimalProtocol.h; sourceTree = "<group>"; };
 		D93062865AF6D43151EBB7C3 /* Pods_ZDMediator_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ZDMediator_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA26B1832D24DCA700275688 /* ZDMediator_Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZDMediator_Tests-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -175,10 +183,9 @@
 		6003F5B5195388D20070C39A /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				C28B54852E42062100AFE1E5 /* Tests */,
 				C224A7642A6BAC5D004295EB /* Animals */,
-				6003F5BB195388D20070C39A /* Tests.m */,
 				6003F5B6195388D20070C39A /* Supporting Files */,
-				DA26B1842D24DCA800275688 /* Test.swift */,
 				DA26B1832D24DCA700275688 /* ZDMediator_Tests-Bridging-Header.h */,
 			);
 			path = Tests;
@@ -230,6 +237,19 @@
 				C28B2A1B2E3C6CC400AFE1E5 /* ZDTiger.m */,
 			);
 			path = Animals;
+			sourceTree = "<group>";
+		};
+		C28B54852E42062100AFE1E5 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				C28B54802E42062100AFE1E5 /* ZDAllTests.m */,
+				C28B54812E42062100AFE1E5 /* ZDBroadcastTest.m */,
+				C28B54822E42062100AFE1E5 /* ZDDispatchTest.m */,
+				C28B54832E42062100AFE1E5 /* ZDUnrecognizedMethodTest.m */,
+				C28B54842E42062100AFE1E5 /* ZDUnregisterServiceTest.m */,
+				DA26B1842D24DCA800275688 /* Test.swift */,
+			);
+			path = Tests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -412,10 +432,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				C224A76C2A6BAC84004295EB /* ZDCat.m in Sources */,
+				C28B54862E42062100AFE1E5 /* ZDAllTests.m in Sources */,
+				C28B54872E42062100AFE1E5 /* ZDBroadcastTest.m in Sources */,
+				C28B54882E42062100AFE1E5 /* ZDDispatchTest.m in Sources */,
+				C28B54892E42062100AFE1E5 /* ZDUnrecognizedMethodTest.m in Sources */,
+				C28B548A2E42062100AFE1E5 /* ZDUnregisterServiceTest.m in Sources */,
 				DA26B1852D24DCA800275688 /* Test.swift in Sources */,
 				C28B2A1C2E3C6CC400AFE1E5 /* ZDTiger.m in Sources */,
 				C224A7692A6BAC5D004295EB /* ZDDog.m in Sources */,
-				6003F5BC195388D20070C39A /* Tests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -593,6 +617,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "Tests/Tests-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Tests/ZDMediator_Tests-Bridging-Header.h";
@@ -618,6 +643,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Tests/Tests-Prefix.pch";
 				INFOPLIST_FILE = "Tests/Tests-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Tests/ZDMediator_Tests-Bridging-Header.h";

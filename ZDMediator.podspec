@@ -33,22 +33,22 @@ Pod::Spec.new do |s|
   #   :osx => "10.12",
   # }
   
-  s.subspec 'Invoke' do |ss|
-    ss.source_files = 'Sources/Classes/Invoke/*.{h,m}'
+  s.subspec 'Tools' do |ss|
+    ss.source_files = 'Sources/Classes/Tools/*.{h,m}'
   end
   
   s.subspec 'Mediator' do |ss|
     ss.source_files = 'Sources/Classes/**/*.{h,m}'
-    ss.exclude_files = 'Sources/Classes/Invoke/*.{h,m}'
+    ss.exclude_files = 'Sources/Classes/Tools/*.{h,m}'
     ss.project_header_files = 'Sources/Classes/Private/*.{h}'
     ss.resource_bundles = {
       "#{s.name}_Privacy" => ['Sources/Resource/PrivacyInfo.xcprivacy']
     }
-    ss.dependency "#{s.name}/Invoke"
+    ss.dependency "#{s.name}/Tools"
   end
     
   s.subspec 'EnableAssert' do |ss|
-    ss.dependency "#{s.name}/Invoke"
+    ss.dependency "#{s.name}/Tools"
     ss.pod_target_xcconfig = {
       'GCC_PREPROCESSOR_DEFINITIONS' => 'ENABLE_ASSERT=1',
     }

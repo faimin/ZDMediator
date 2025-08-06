@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.4.1
+
+- bug fix:
+  - 注册信息变更后未同步到`proxy`的问题
+  - `proxy`被多次初始化的问题
+  - `proxy`内部消息分发的`unrecognized selector`问题
+
 ## 0.4.0
 
 - 调整代码结构
