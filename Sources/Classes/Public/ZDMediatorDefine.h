@@ -11,12 +11,6 @@
 #import <Foundation/Foundation.h>
 #import <mach-o/loader.h>
 
-typedef NS_ENUM(NSInteger, ZDMPriority) {
-    ZDMPriorityLow = -100,
-    ZDMPriorityDefalut = 0,
-    ZDMPriorityHigh = 100,
-};
-
 // 1v1 priority
 static NSInteger const ZDMDefaultPriority = 0;
 
@@ -42,7 +36,7 @@ struct ZDMMachoOFARegisterKV {
     const char *value;
     const int autoInit;     ///< 0,1
     const int allClsMethod; ///< 0,1
-    const int priority;
+    int priority;
 };
 
 #ifndef ZDMediatorOFASectionName
