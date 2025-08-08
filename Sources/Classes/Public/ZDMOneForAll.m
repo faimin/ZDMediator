@@ -444,25 +444,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         NSString *clsName = NSStringFromClass(box.cls);
         id serviceInstance = [self _serviceInstaceWithClassName:clsName];
         if (!serviceInstance) {
-            BOOL needInitialize = NO;
-            if (box.isAllClsMethod) {
-                serviceInstance = box.cls;
-            } else if ([box.cls respondsToSelector:@selector(zdm_createInstance:)]) {
-                serviceInstance = [box.cls zdm_createInstance:mediator.context];
-            } else {
-                serviceInstance = [box.cls alloc];
-                needInitialize = YES;
-            }
-            // store instance to map
-            [self _storeServiceWithStrongObj:serviceInstance weakObj:nil];
-            
-            if (needInitialize) {
-                __unused id _ = [serviceInstance init];
-            }
-            
-            if ([(NSObject *)serviceInstance respondsToSelector:@selector(zdm_setup)]) {
-                [serviceInstance zdm_setup];
-            }
+            serviceInstance = [self _createInstance:box];
         };
         
         va_list args;
@@ -676,34 +658,8 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         serviceInstance = [self _serviceInstaceWithClassName:clsName];
     }
     
-    __auto_type createInstanceBlock = ^id(ZDMServiceBox *innerBox, ZDMContext *context){
-        Class aCls = innerBox.cls;
-        if (!aCls) {
-            NSLog(@"❌ >>>>> %d, %s => please register first", __LINE__, __FUNCTION__);
-            return nil;
-        }
-        id instanceOrCls = nil;
-        BOOL needInitialize = NO;
-        if (innerBox.isAllClsMethod) {
-            instanceOrCls = aCls;
-        } else if ([aCls respondsToSelector:@selector(zdm_createInstance:)]) {
-            instanceOrCls = [aCls zdm_createInstance:context];
-        } else {
-            // initialize after store to avoid loop call
-            instanceOrCls = [aCls alloc];
-            needInitialize = YES;
-        }
-        
-        [self _storeServiceWithStrongObj:instanceOrCls weakObj:nil];
-        
-        if (needInitialize) {
-            __unused id _ = [instanceOrCls init];
-        }
-        return instanceOrCls;
-    };
-    
     if ((!serviceInstance || object_isClass(serviceInstance)) && box.autoInit) {
-        serviceInstance = createInstanceBlock(box, mediator.context);
+        serviceInstance = [self _createInstance:box];
     }
     
     if (!serviceInstance) {
@@ -721,12 +677,45 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
             // 执行到这个闭包说明协议中不都是类方法，需要修改这个属性
             box.isAllClsMethod = NO;
             
-            id value = createInstanceBlock(box, mediator.context);
+            id value = [self _createInstance:box];
             return value;
         }];
         return proxyValue;
     }
     return serviceInstance;
+}
+
++ (id)_createInstance:(ZDMServiceBox *)innerBox {
+    Class aCls = innerBox.cls;
+    if (!aCls) {
+        NSLog(@"❌ >>>>> %d, %s => please register first", __LINE__, __FUNCTION__);
+        return nil;
+    }
+    
+    id instanceOrCls = nil;
+    BOOL needInitialize = NO;
+    if (innerBox.isAllClsMethod) {
+        instanceOrCls = aCls;
+    } else if ([aCls respondsToSelector:@selector(zdm_createInstance:)]) {
+        ZDMContext *context = ZDMOneForAll.shareInstance.context;
+        instanceOrCls = [aCls zdm_createInstance:context];
+    } else {
+        // initialize after store to avoid loop call
+        instanceOrCls = [aCls alloc];
+        needInitialize = YES;
+    }
+    
+    [self _storeServiceWithStrongObj:instanceOrCls weakObj:nil];
+    
+    if (needInitialize) {
+        instanceOrCls = [instanceOrCls init];
+    }
+    
+    if ([(NSObject *)instanceOrCls respondsToSelector:@selector(zdm_setup)]) {
+        [instanceOrCls zdm_setup];
+    }
+    
+    return instanceOrCls;
 }
 
 + (void)_storeServiceWithName:(NSString *)serviceName serviceBox:(ZDMServiceBox *)box {
