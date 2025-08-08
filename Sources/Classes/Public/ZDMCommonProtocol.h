@@ -18,6 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @optional
 
+///  `initialize` or `invocation` priority
++ (NSInteger)zdm_priority;
+
 /// initialize method of module
 ///
 /// - Parameter context: context information

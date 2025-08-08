@@ -106,6 +106,12 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
                 __auto_type serviceBox = ({
                     ZDMServiceBox *box = [[ZDMServiceBox alloc] initWithClass:value];
                     box.protocolName = serviceName;
+                    // 如果类实现了优先级协议,则优先使用协议中的优先级
+                    if ([value respondsToSelector:@selector(zdm_priority)]) {
+                        NSInteger clsPriority = [value zdm_priority];
+                        NSCAssert(clsPriority >= INT_MIN && clsPriority <= INT_MAX, @"priority out of int bounds");
+                        item.priority = (int)clsPriority;
+                    }
                     box.priority = item.priority;
                     box.autoInit = item.autoInit == 1;
                     box.isAllClsMethod = item.allClsMethod == 1;
@@ -121,6 +127,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
                 });
                 
                 NSNumber *priorityNum = @(item.priority);
+                NSString *protocolPriorityKey = zdmStoreKey(serviceName, priorityNum);
                 
                 [lock lock];
                 NSMutableOrderedSet<NSNumber *> *orderSet = priorityMap[serviceName];
@@ -140,21 +147,18 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 #endif
                 [orderSet addObject:priorityNum];
                 
-                // store to storeMap
-                NSString *protocolPriorityKey = zdmStoreKey(serviceName, priorityNum);
                 // storeMap中有可能已经存在serviceBox了,
                 // 不过不管它,用自动注册的这个serviceBox,
                 // 因为自动注册的这个信息更全
                 storeMap[protocolPriorityKey] = serviceBox;
                 
-                // store to clsMap
+                // store key to clsMap
                 NSMutableSet<NSString *> *protocolPriorityKeySet = clsMap[clsName];
                 if (!protocolPriorityKeySet) {
                     protocolPriorityKeySet = [[NSMutableSet alloc] initWithCapacity:2];
                     clsMap[clsName] = protocolPriorityKeySet;
                 }
                 [protocolPriorityKeySet addObject:protocolPriorityKey];
-                
                 [lock unlock];
             }
         }
@@ -353,21 +357,30 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     return table;
 }
 
-+ (NSSet<Class> *)allRegisterClses {
++ (NSOrderedSet<Class> *)allRegisterClses {
     [self _loadRegisterIfNeed];
     
-    NSMutableSet<Class> *clsSet = [[NSMutableSet alloc] init];
-    __auto_type mediator = ZDMOneForAll.shareInstance;
-    [mediator.lock lock];
-    [ZDMOneForAll.shareInstance.registerInfoMap enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, ZDMServiceBox * _Nonnull obj, BOOL * _Nonnull stop) {
-        Class cls = obj.cls;
-        if (cls) {
-            // `addObject`会导致cls的`+initialize`方法被调用
-            [clsSet addObject:cls];
+    NSArray<ZDMServiceBox *> *serviceBoxs = ZDMOneForAll.shareInstance.registerInfoMap.allValues;
+    NSArray<ZDMServiceBox *> *sortedBoxs = [serviceBoxs sortedArrayUsingComparator:^NSComparisonResult(ZDMServiceBox * _Nonnull obj1, ZDMServiceBox * _Nonnull obj2) {
+        NSInteger priority1 = obj1.priority;
+        NSInteger priority2 = obj2.priority;
+#if false
+        if ([obj1.cls respondsToSelector:@selector(zdm_priority)]) {
+            priority1 = [obj1.cls zdm_priority];
         }
+        if ([obj2.cls respondsToSelector:@selector(zdm_priority)]) {
+            priority2 = [obj2.cls zdm_priority];
+        }
+#endif
+        NSComparisonResult result = priority1 >= priority2 ? NSOrderedAscending : NSOrderedDescending;
+        return result;
     }];
-    [mediator.lock unlock];
-    return clsSet.copy;
+    
+    NSMutableOrderedSet<Class> *clsOrderSet = [[NSMutableOrderedSet alloc] init];
+    for (ZDMServiceBox *box in sortedBoxs) {
+        [clsOrderSet addObject:box.cls];
+    }
+    return clsOrderSet.copy;
 }
 
 #pragma mark - Register Event
