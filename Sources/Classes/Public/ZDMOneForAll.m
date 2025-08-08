@@ -453,9 +453,15 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
                 serviceInstance = [box.cls alloc];
                 needInitialize = YES;
             }
+            // store instance to map
             [self _storeServiceWithStrongObj:serviceInstance weakObj:nil];
+            
             if (needInitialize) {
                 __unused id _ = [serviceInstance init];
+            }
+            
+            if ([(NSObject *)serviceInstance respondsToSelector:@selector(zdm_setup)]) {
+                [serviceInstance zdm_setup];
             }
         };
         

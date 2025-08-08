@@ -23,6 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// - Parameter context: context information
 + (instancetype)zdm_createInstance:(ZDMContext *_Nullable)context;
 
+/// called if this method is implemented after `alloc init`
+- (void)zdm_setup;
+
 /// called when it is about to be released
 - (void)zdm_willDispose;
 
