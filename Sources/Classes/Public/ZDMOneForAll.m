@@ -683,10 +683,8 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     if (serviceInstance && needWrap) {
         ZDMProxy *proxyValue = [ZDMProxy proxyWithTarget:serviceInstance];
         __weak typeof(box) weakBox = box;
-        __weak typeof(mediator) weakMediator = mediator;
         [proxyValue fixmeWithCallback:^id{
             __strong typeof(weakBox) box = weakBox;
-            __strong typeof(weakMediator) mediator = weakMediator;
             // 执行到这个闭包说明协议中不都是类方法，需要修改这个属性
             box.isAllClsMethod = NO;
             
