@@ -107,12 +107,13 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
                     ZDMServiceBox *box = [[ZDMServiceBox alloc] initWithClass:value];
                     box.protocolName = serviceName;
                     // 如果类实现了优先级协议,则优先使用协议中的优先级
+                    NSInteger effectivePriority = item.priority;
                     if ([value respondsToSelector:@selector(zdm_priority)]) {
                         NSInteger clsPriority = [value zdm_priority];
-                        NSCAssert(clsPriority >= INT_MIN && clsPriority <= INT_MAX, @"priority out of int bounds");
-                        item.priority = (int)clsPriority;
+                        NSCAssert(clsPriority >= NSIntegerMin && clsPriority <= NSIntegerMax, @"priority out of int bounds");
+                        effectivePriority = clsPriority;
                     }
-                    box.priority = item.priority;
+                    box.priority = effectivePriority;
                     box.autoInit = item.autoInit == 1;
                     box.isAllClsMethod = item.allClsMethod == 1;
                     if (box.isAllClsMethod) {
@@ -126,7 +127,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
                     box;
                 });
                 
-                NSNumber *priorityNum = @(item.priority);
+                NSNumber *priorityNum = @(serviceBox.priority);
                 NSString *protocolPriorityKey = zdmStoreKey(serviceName, priorityNum);
                 
                 [lock lock];
@@ -360,7 +361,10 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 + (NSOrderedSet<Class> *)allRegisterClses {
     [self _loadRegisterIfNeed];
     
-    NSArray<ZDMServiceBox *> *serviceBoxs = ZDMOneForAll.shareInstance.registerInfoMap.allValues;
+    ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
+    [mediator.lock lock];
+    NSArray<ZDMServiceBox *> *serviceBoxs = mediator.registerInfoMap.allValues.copy;
+    [mediator.lock unlock];
     NSArray<ZDMServiceBox *> *sortedBoxs = [serviceBoxs sortedArrayUsingComparator:^NSComparisonResult(ZDMServiceBox * _Nonnull obj1, ZDMServiceBox * _Nonnull obj2) {
         NSInteger priority1 = obj1.priority;
         NSInteger priority2 = obj2.priority;

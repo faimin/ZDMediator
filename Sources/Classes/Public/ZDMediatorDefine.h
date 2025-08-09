@@ -36,7 +36,7 @@ struct ZDMMachoOFARegisterKV {
     const char *value;
     const int autoInit;     ///< 0,1
     const int allClsMethod; ///< 0,1
-    int priority;
+    const int priority;
 };
 
 #ifndef ZDMediatorOFASectionName
