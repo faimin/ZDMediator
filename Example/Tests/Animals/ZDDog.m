@@ -12,14 +12,19 @@
 #import <ZDMediator/ZDMediator.h>
 #import "AnimalProtocol.h"
 
-ZDMediatorOFARegister(DogProtocol, ZDDog, 0)
-ZDMediatorOFARegister(AnimalProtocol, ZDDog, 1)
+ZDMediatorOFARegister(DogProtocol, ZDDog, 10)
+ZDMediatorOFARegister(AnimalProtocol, ZDDog, 10)
 
 @implementation ZDDog
 
++ (NSInteger)zdm_priority {
+    return 12345;
+}
+
 + (void)initialize {
     if (self == [ZDDog class]) {
-        [ZDMOneForAll manualRegisterService:@protocol(ZDClassProtocol) implementer:self];
+#warning 在initialize中注册会由于递归dispatch_once发生crash
+        //[ZDMOneForAll manualRegisterService:@protocol(ZDClassProtocol) implementer:self];
     }
 }
 
@@ -37,6 +42,10 @@ ZDMediatorOFARegister(AnimalProtocol, ZDDog, 1)
         NSLog(@"创建了小狗");
     }
     return self;
+}
+
+- (void)zdm_setup {
+    NSLog(@" %s", __PRETTY_FUNCTION__);
 }
 
 + (instancetype)zdm_createInstance:(ZDMContext *)context {

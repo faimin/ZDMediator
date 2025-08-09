@@ -17,6 +17,10 @@ ZDMediator1V1Register(CatProtocol, ZDCat)
 
 @implementation ZDCat
 
++ (NSInteger)zdm_priority {
+    return ZDMDefaultPriority;
+}
+
 - (void)dealloc {
     NSLog(@"%s", __PRETTY_FUNCTION__);
 }

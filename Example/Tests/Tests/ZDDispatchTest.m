@@ -34,7 +34,7 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wundeclared-selector"
     [ZDMOneForAll registerResponder:@protocol(DogProtocol)
-                           priority:ZDMPriorityHigh
+                           priority:100
                           selectors:@selector(foo:), @selector(bar:), nil];
 #pragma clang diagnostic pop
     

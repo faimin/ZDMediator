@@ -11,12 +11,6 @@
 #import <Foundation/Foundation.h>
 #import <mach-o/loader.h>
 
-typedef NS_ENUM(NSInteger, ZDMPriority) {
-    ZDMPriorityLow = -100,
-    ZDMPriorityDefalut = 0,
-    ZDMPriorityHigh = 100,
-};
-
 // 1v1 priority
 static NSInteger const ZDMDefaultPriority = 0;
 
