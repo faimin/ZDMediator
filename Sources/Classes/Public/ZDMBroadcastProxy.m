@@ -110,7 +110,7 @@
     }
     ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
     [mediator.lock lock];
-    id serviceInstance = mediator.instanceMap[clsName].obj;
+    id serviceInstance = mediator.instanceDict[clsName].obj;
     [mediator.lock unlock];
     if (serviceInstance && [serviceInstance respondsToSelector:invocation.selector]) {
         [invocation invokeWithTarget:serviceInstance];
@@ -118,8 +118,8 @@
     }
     
     [mediator.lock lock];
-    NSString *protocolPriorityKey = mediator.registerClsMap[clsName].anyObject;
-    ZDMServiceBox *box = protocolPriorityKey ? mediator.registerInfoMap[protocolPriorityKey] : nil;
+    NSString *protocolPriorityKey = mediator.registerClsDict[clsName].anyObject;
+    ZDMServiceBox *box = protocolPriorityKey ? mediator.registerInfoDict[protocolPriorityKey] : nil;
     [mediator.lock unlock];
     if (!box) {
         return;

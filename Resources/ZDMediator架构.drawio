@@ -715,7 +715,7 @@
             <mxPoint y="1" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="a8c17RV4zfYqLQoVAdT7-17" value="通过class到InstanceMap查找" style="whiteSpace=wrap;html=1;rounded=1;" parent="1" vertex="1">
+        <mxCell id="a8c17RV4zfYqLQoVAdT7-17" value="通过class到instanceDict查找" style="whiteSpace=wrap;html=1;rounded=1;" parent="1" vertex="1">
           <mxGeometry x="910" y="1530" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="wzV2goiQ7jv2x39GUOF9-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="a8c17RV4zfYqLQoVAdT7-18" target="wzV2goiQ7jv2x39GUOF9-1" edge="1">
@@ -733,13 +733,13 @@
         <mxCell id="a8c17RV4zfYqLQoVAdT7-19" value="返回 Instance 对象" style="whiteSpace=wrap;html=1;rounded=1;" parent="1" vertex="1">
           <mxGeometry x="910" y="1650" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="wzV2goiQ7jv2x39GUOF9-1" value="缓存到InstanceMap" style="whiteSpace=wrap;html=1;rounded=1;" parent="1" vertex="1">
+        <mxCell id="wzV2goiQ7jv2x39GUOF9-1" value="缓存到instanceDict" style="whiteSpace=wrap;html=1;rounded=1;" parent="1" vertex="1">
           <mxGeometry x="570" y="1535" width="120" height="50" as="geometry" />
         </mxCell>
         <mxCell id="wzV2goiQ7jv2x39GUOF9-14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="wzV2goiQ7jv2x39GUOF9-9" target="wzV2goiQ7jv2x39GUOF9-13" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="wzV2goiQ7jv2x39GUOF9-9" value="通过service到PriorityMap查OrderSet" style="whiteSpace=wrap;html=1;rounded=1;" parent="1" vertex="1">
+        <mxCell id="wzV2goiQ7jv2x39GUOF9-9" value="通过service到priorityDict查OrderSet" style="whiteSpace=wrap;html=1;rounded=1;" parent="1" vertex="1">
           <mxGeometry x="1077.5" y="1770" width="145" height="60" as="geometry" />
         </mxCell>
         <mxCell id="wzV2goiQ7jv2x39GUOF9-16" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="wzV2goiQ7jv2x39GUOF9-13" target="wzV2goiQ7jv2x39GUOF9-15" edge="1">
