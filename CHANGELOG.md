@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.4.2
+
+- 事件分发时支持通过`zdm_priority`指定优先级
+
 ## 0.4.1
 
 - bug fix:
