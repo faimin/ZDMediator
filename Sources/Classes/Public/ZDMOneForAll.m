@@ -831,7 +831,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 }
 
 + (void)_updateProxyTargets {
-    NSSet<Class> *clsSet = [self allRegisterClasses];
+    NSOrderedSet<Class> *clsSet = [self allRegisterClasses];
     [ZDMOneForAll.shareInstance.proxy replaceTargetSet:clsSet];
 }
 
