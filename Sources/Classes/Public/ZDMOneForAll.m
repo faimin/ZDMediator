@@ -766,8 +766,9 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     }
 #endif
     [orderSet addObject:priorityNum];
-    [orderSet sortUsingComparator:^NSComparisonResult(id _Nonnull obj1, id _Nonnull obj2) {
-        return [obj2 compare:obj1];
+    [orderSet sortUsingComparator:^NSComparisonResult(NSNumber * _Nonnull obj1, NSNumber * _Nonnull obj2) {
+        NSComparisonResult result = obj1.integerValue >= obj2.integerValue ? NSOrderedAscending : NSOrderedDescending;
+        return result;
     }];
     
     mediator.registerInfoDict[key] = box;
