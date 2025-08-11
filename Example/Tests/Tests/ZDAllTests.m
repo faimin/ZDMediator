@@ -68,12 +68,12 @@ typedef NS_ENUM(NSInteger, ZDMPriority) {
     
     //----------------------------------
     
-    BOOL dogResult1 = [ZDMGetService(DogProtocol) zdm_handleEvent:123 userInfo:@{} callback:^id(NSUInteger x) {
+    BOOL dogResult1 = [ZDMGetServiceWithPriority(DogProtocol, ZDDog.zdm_priority) zdm_handleEvent:123 userInfo:@{} callback:^id(NSUInteger x) {
         return @(x);
     }];
     XCTAssertFalse(dogResult1);
     
-    BOOL dogResult2 = [ZDMGetService(DogProtocol) zdm_handleEvent:200 userInfo:@{} callback:^id(NSUInteger x, NSString *y) {
+    BOOL dogResult2 = [ZDMGetServiceWithPriority(DogProtocol, ZDDog.zdm_priority) zdm_handleEvent:200 userInfo:@{} callback:^id(NSUInteger x, NSString *y) {
         XCTAssertEqual(x, 2);
         NSString *a = [NSString stringWithFormat:@"%zd, %@", x, y];
         return a;
@@ -139,11 +139,11 @@ typedef NS_ENUM(NSInteger, ZDMPriority) {
 
 // 测试注册时说明全是类方法，但其实并不是的异常情况
 - (void)testAllClassMethodException {
-    __auto_type dog = ZDMGetService(DogProtocol);
-    NSInteger age = [dog age];
+    __auto_type dog1 = ZDMGetServiceWithPriority(DogProtocol, 12345);
+    NSInteger age = [dog1 age];
     XCTAssertEqual(age, 2);
     
-    __auto_type dog2 = ZDMGetService(DogProtocol);
+    __auto_type dog2 = ZDMGetServiceWithPriority(DogProtocol, 12345);
     XCTAssertTrue([dog2 isKindOfClass:ZDDog.class]);
 }
 
@@ -197,6 +197,7 @@ typedef NS_ENUM(NSInteger, ZDMPriority) {
     XCTAssertNotNil(cat);
     
     [ZDMOneForAll removeService:@protocol(CatProtocol) priority:ZDMDefaultPriority autoInitAgain:NO];
+    id v = ZDMGetService(CatProtocol);
     XCTAssertNil(ZDMGetService(CatProtocol));
     
     NSString *name = [ZDMGetService(CatProtocol) name];

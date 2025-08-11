@@ -20,7 +20,7 @@
 static NSString * const zdmJoinKey = @"--->";
 
 NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
-    NSCAssert(priority, @"priority is nil");
+    NSCAssert1(priority != nil, @"the service: %@'s priority is nil", serviceName);
     return [NSString stringWithFormat:@"%@%@%@", serviceName, zdmJoinKey, priority];
 }
 
@@ -659,11 +659,6 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     NSString *key = zdmStoreKey(serviceName, @(priority));
     [mediator.lock lock];
     ZDMServiceBox *box = mediator.registerInfoDict[key];
-    if (!box && priority == ZDMDefaultPriority) {
-        NSNumber *prioNum = mediator.priorityDict[serviceName].firstObject;
-        NSString *newKey = zdmStoreKey(serviceName, prioNum);
-        box = mediator.registerInfoDict[newKey];
-    }
     [mediator.lock unlock];
     if (!box) {
         NSLog(@"❌ >>>>> please register a class first");
