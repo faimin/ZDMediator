@@ -18,10 +18,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @optional
 
+///  `initialize` or `invocation` priority
++ (NSInteger)zdm_priority;
+
 /// initialize method of module
 ///
 /// - Parameter context: context information
 + (instancetype)zdm_createInstance:(ZDMContext *_Nullable)context;
+
+/// called if this method is implemented after `alloc init`
+- (void)zdm_setup;
 
 /// called when it is about to be released
 - (void)zdm_willDispose;

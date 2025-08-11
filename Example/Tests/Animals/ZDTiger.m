@@ -22,6 +22,10 @@
     return self;
 }
 
+- (void)zdm_setup {
+    NSLog(@" %s", __PRETTY_FUNCTION__);
+}
+
 #pragma mark -
 
 - (NSString *)animalName {

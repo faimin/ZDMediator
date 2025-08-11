@@ -105,7 +105,11 @@
 #pragma mark - NSObject Protocol
 
 - (BOOL)isEqual:(id)object {
-    return [_target isEqual:object];
+    id realObj = object;
+    if (object_getClass(object) == ZDMProxy.class) {
+        realObj = [(ZDMProxy *)object target];
+    }
+    return [_target isEqual:realObj];
 }
 
 - (NSUInteger)hash {

@@ -16,6 +16,12 @@
 #import "ZDDog.h"
 #import "ZDTiger.h"
 
+typedef NS_ENUM(NSInteger, ZDMPriority) {
+    ZDMPriorityLow = -100,
+    ZDMPriorityDefalut = 0,
+    ZDMPriorityHigh = 100,
+};
+
 @interface ZDAllTests : XCTestCase
 
 @end
@@ -62,22 +68,27 @@
     
     //----------------------------------
     
-    BOOL dogResult1 = [ZDMGetService(DogProtocol) zdm_handleEvent:123 userInfo:@{} callback:^id(NSUInteger x) {
+    id<DogProtocol> dog1 = ZDMGetServiceWithPriority(DogProtocol, ZDMDefaultPriority);
+    BOOL dogResult1 = [dog1 zdm_handleEvent:123 userInfo:@{} callback:^id(NSUInteger x) {
         return @(x);
     }];
     XCTAssertFalse(dogResult1);
     
-    BOOL dogResult2 = [ZDMGetService(DogProtocol) zdm_handleEvent:200 userInfo:@{} callback:^id(NSUInteger x, NSString *y) {
+    id<DogProtocol> dog2 = ZDMGetServiceWithPriority(DogProtocol, ZDDog.zdm_priority);
+    XCTAssertEqualObjects(dog1, dog2);
+    BOOL dogResult2 = [dog2 zdm_handleEvent:200 userInfo:@{} callback:^id(NSUInteger x, NSString *y) {
         XCTAssertEqual(x, 2);
         NSString *a = [NSString stringWithFormat:@"%zd, %@", x, y];
         return a;
     }];
     XCTAssertTrue(dogResult2);
     
-    NSArray *dogResult3 = [ZDMGetService(ZDClassProtocol) foo:@[ @1, @2 ] bar:@[ @3, @4, @5 ]];
+    [ZDMOneForAll manualRegisterService:@protocol(ZDClassProtocol) implementer:ZDDog.self];
+    id<ZDClassProtocol> instance = ZDMGetService(ZDClassProtocol);
+    NSArray *dogResult3 = [instance foo:@[ @1, @2 ] bar:@[ @3, @4, @5 ]];
     XCTAssertEqual(dogResult3.count, 5);
     
-    NSString *animalName = [ZDMGetServiceWithPriority(AnimalProtocol, 1) animalName];
+    NSString *animalName = [ZDMGetServiceWithPriority(AnimalProtocol, ZDDog.zdm_priority) animalName];
     XCTAssertTrue([animalName isEqualToString:@"小狗"]);
 }
 
@@ -106,10 +117,11 @@
 }
 
 - (void)testPriority {
-    NSString *clsName = NSStringFromClass([ZDMGetServiceWithPriority(AnimalProtocol, 1) class]);
+    NSInteger dogPriority = ZDDog.zdm_priority;
+    NSString *clsName = NSStringFromClass([ZDMGetServiceWithPriority(AnimalProtocol, dogPriority) class]);
     XCTAssertTrue([clsName isEqualToString:@"ZDDog"]);
     
-    BOOL res = [ZDMGetServiceWithPriority(AnimalProtocol, 1) zdm_handleEvent:200 userInfo:@{} callback:^id(NSUInteger x) {
+    BOOL res = [ZDMGetServiceWithPriority(AnimalProtocol, dogPriority) zdm_handleEvent:200 userInfo:@{} callback:^id(NSUInteger x) {
         return @(x);
     }];
     XCTAssertTrue(res);
@@ -130,11 +142,11 @@
 
 // 测试注册时说明全是类方法，但其实并不是的异常情况
 - (void)testAllClassMethodException {
-    __auto_type dog = ZDMGetService(DogProtocol);
-    NSInteger age = [dog age];
+    __auto_type dog1 = ZDMGetServiceWithPriority(DogProtocol, ZDMDefaultPriority);
+    NSInteger age = [dog1 age];
     XCTAssertEqual(age, 2);
     
-    __auto_type dog2 = ZDMGetService(DogProtocol);
+    __auto_type dog2 = ZDMGetServiceWithPriority(DogProtocol, 12345);
     XCTAssertTrue([dog2 isKindOfClass:ZDDog.class]);
 }
 
@@ -188,6 +200,7 @@
     XCTAssertNotNil(cat);
     
     [ZDMOneForAll removeService:@protocol(CatProtocol) priority:ZDMDefaultPriority autoInitAgain:NO];
+    id v = ZDMGetService(CatProtocol);
     XCTAssertNil(ZDMGetService(CatProtocol));
     
     NSString *name = [ZDMGetService(CatProtocol) name];
