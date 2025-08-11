@@ -20,7 +20,7 @@
 @property (nonatomic, strong) NSMutableDictionary<NSString *, ZDMServiceBox *> *registerInfoDict;
 
 /// { key(className): [protocol+priority] }
-@property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableSet<NSString *> *> *registerClsDict;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableSet<NSString *> *> *registerClassDict;
 
 /// { key(protocol): [priority] }, used to distribute events
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableOrderedSet<NSNumber *> *> *priorityDict;

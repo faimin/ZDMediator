@@ -118,7 +118,7 @@
     }
     
     [mediator.lock lock];
-    NSString *protocolPriorityKey = mediator.registerClsDict[clsName].anyObject;
+    NSString *protocolPriorityKey = mediator.registerClassDict[clsName].anyObject;
     ZDMServiceBox *box = protocolPriorityKey ? mediator.registerInfoDict[protocolPriorityKey] : nil;
     [mediator.lock unlock];
     if (!box) {

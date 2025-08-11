@@ -49,7 +49,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 - (void)_setup {
     _lock = [[ZDMLock alloc] init];
     _registerInfoDict = @{}.mutableCopy;
-    _registerClsDict = @{}.mutableCopy;
+    _registerClassDict = @{}.mutableCopy;
     _priorityDict = @{}.mutableCopy;
     _instanceDict = @{}.mutableCopy;
     _serviceResponderDict = @{}.mutableCopy;
@@ -71,7 +71,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 + (void)_loadRegisterFromMacho {
     ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
     NSMutableDictionary<NSString *, ZDMServiceBox *> *storeMap = mediator.registerInfoDict;
-    NSMutableDictionary<NSString *, NSMutableSet<NSString *> *> *clsMap = mediator.registerClsDict;
+    NSMutableDictionary<NSString *, NSMutableSet<NSString *> *> *clsMap = mediator.registerClassDict;
     NSMutableDictionary<NSString *, NSMutableOrderedSet<NSNumber *> *> *priorityDict = mediator.priorityDict;
     NSMutableDictionary<NSString *, ZDMServiceItem *> *instanceDict = mediator.instanceDict;
     
@@ -224,7 +224,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     // 检查是否已经存在自动注册的信息, 有的话就不创建
     ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
     [mediator.lock lock];
-    NSMutableSet<NSString *> *keySet = mediator.registerClsDict[clsName];
+    NSMutableSet<NSString *> *keySet = mediator.registerClassDict[clsName];
     [mediator.lock unlock];
     NSString *key = zdmStoreKey(serviceName, @(priority));
     if (![keySet containsObject:key]) {
@@ -318,12 +318,12 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         item = mediator.instanceDict[clsName];
         mediator.instanceDict[clsName] = nil;
         
-        NSMutableSet<NSString *> *protocolPrioprityKeys = mediator.registerClsDict[clsName];
+        NSMutableSet<NSString *> *protocolPrioprityKeys = mediator.registerClassDict[clsName];
         [protocolPrioprityKeys removeObject:key];
         // cleanup register info if it didn't auto init agin
         if (!autoInitAgain) {
             if (protocolPrioprityKeys.count == 0) {
-                mediator.registerClsDict[clsName] = nil;
+                mediator.registerClassDict[clsName] = nil;
             }
             mediator.registerInfoDict[key] = nil;
             
@@ -358,7 +358,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     return table;
 }
 
-+ (NSOrderedSet<Class> *)allRegisterClses {
++ (NSOrderedSet<Class> *)allRegisterClasses {
     [self _loadRegisterIfNeed];
     
     ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
@@ -567,12 +567,12 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     
     NSArray<NSString *> *registerClsNames = nil;
     [mediator.lock lock];
-    registerClsNames = mediator.registerClsDict.allKeys.copy;
+    registerClsNames = mediator.registerClassDict.allKeys.copy;
     [mediator.lock unlock];
     
     for (NSString *clsName in registerClsNames) {
         [mediator.lock lock];
-        NSString *key = mediator.registerClsDict[clsName].anyObject;
+        NSString *key = mediator.registerClassDict[clsName].anyObject;
         ZDMServiceBox *serviceBox = mediator.registerInfoDict[key];
         id serviceObj = mediator.instanceDict[clsName].obj;
         [mediator.lock unlock];
@@ -766,10 +766,10 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         return;
     }
     [mediator.lock lock];
-    NSMutableSet<NSString *> *servicePrioritySet = mediator.registerClsDict[clsName];
+    NSMutableSet<NSString *> *servicePrioritySet = mediator.registerClassDict[clsName];
     if (!servicePrioritySet) {
         servicePrioritySet = [[NSMutableSet alloc] init];
-        mediator.registerClsDict[clsName] = servicePrioritySet;
+        mediator.registerClassDict[clsName] = servicePrioritySet;
     }
     [servicePrioritySet addObject:key];
     [mediator.lock unlock];
@@ -813,7 +813,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 }
 
 + (void)_updateProxyTargets {
-    NSSet<Class> *clsSet = [self allRegisterClses];
+    NSSet<Class> *clsSet = [self allRegisterClasses];
     [ZDMOneForAll.shareInstance.proxy replaceTargetSet:clsSet];
 }
 
@@ -821,7 +821,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 
 - (ZDMBroadcastProxy *)proxy {
     // 首次读取时读取全部注册的类.
-    // 由于在`+allRegisterClses`方法内部,当`class`添加到`Set`时会触发类的`+initialize`方法执行,
+    // 由于在`+allRegisterClasses`方法内部,当`class`添加到`Set`时会触发类的`+initialize`方法执行,
     // 此时假如`+initialize`中有注册行为,会导致`proxy`再次被调用,出现`proxy`被多次初始化的问题,
     // 所以为了规避此类情况,`proxy`放在`ZDMediator`初始化时一起初始化.
     static BOOL _isFirst = YES;
@@ -833,7 +833,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         _isFirst = NO;
-        [_proxy replaceTargetSet:[ZDMOneForAll allRegisterClses]];
+        [_proxy replaceTargetSet:[ZDMOneForAll allRegisterClasses]];
     });
     return _proxy;
 }

@@ -166,7 +166,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSHashTable *)allInitializedObjects;
 
 /// get all register classes in mediator
-+ (NSSet<Class> *)allRegisterClses;
++ (NSSet<Class> *)allRegisterClasses;
 
 @end
 
