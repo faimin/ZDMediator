@@ -486,11 +486,11 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     
     ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
     [mediator.lock lock];
-    NSMutableOrderedSet<ZDMEventResponder *> *set = mediator.serviceResponderDict[eventId];
+    NSOrderedSet<ZDMEventResponder *> *responders = mediator.serviceResponderDict[eventId].copy;
     [mediator.lock unlock];
     
     NSMutableArray *results = @[].mutableCopy;
-    for (ZDMEventResponder *obj in set.copy) {
+    for (ZDMEventResponder *obj in responders) {
         [mediator.lock lock];
         NSOrderedSet<NSNumber *> *prioritySet = mediator.priorityDict[obj.serviceName].copy;
         [mediator.lock unlock];
@@ -574,6 +574,10 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     for (NSString *clsName in registerClsNames) {
         [mediator.lock lock];
         NSString *key = mediator.registerClassDict[clsName].anyObject;
+        if (!key) {
+            [mediator.lock unlock];
+            continue;
+        }
         ZDMServiceBox *serviceBox = mediator.registerInfoDict[key];
         id serviceObj = mediator.instanceDict[clsName].obj;
         [mediator.lock unlock];
