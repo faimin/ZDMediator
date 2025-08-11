@@ -20,6 +20,7 @@
 static NSString * const zdmJoinKey = @"--->";
 
 NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
+    NSCAssert(priority, @"priority is nil");
     return [NSString stringWithFormat:@"%@%@%@", serviceName, zdmJoinKey, priority];
 }
 
@@ -491,7 +492,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     NSMutableArray *results = @[].mutableCopy;
     for (ZDMEventResponder *obj in set.copy) {
         [mediator.lock lock];
-        NSOrderedSet *prioritySet = mediator.priorityDict[obj.serviceName];
+        NSOrderedSet<NSNumber *> *prioritySet = mediator.priorityDict[obj.serviceName].copy;
         [mediator.lock unlock];
         for (NSNumber *priorityNum in prioritySet) {
             @autoreleasepool {
@@ -531,7 +532,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     NSMutableArray *results = @[].mutableCopy;
     for (ZDMEventResponder *obj in set.copy) {
         [mediator.lock lock];
-        NSOrderedSet *prioritySet = mediator.priorityDict[obj.serviceName];
+        NSOrderedSet<NSNumber *> *prioritySet = mediator.priorityDict[obj.serviceName].copy;
         [mediator.lock unlock];
         for (NSNumber *priorityNum in prioritySet) {
             @autoreleasepool {
