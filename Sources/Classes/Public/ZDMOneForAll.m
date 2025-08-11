@@ -656,7 +656,17 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     [self _loadRegisterIfNeed];
     
     ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
+    
+    [mediator.lock lock];
+    NSOrderedSet<NSNumber *> *prioritySet = mediator.priorityDict[serviceName].copy;
+    [mediator.lock unlock];
+    
+    // Fault tolerance
+    if (![prioritySet containsObject:@(priority)]) {
+        priority = prioritySet.firstObject.integerValue;
+    }
     NSString *key = zdmStoreKey(serviceName, @(priority));
+    
     [mediator.lock lock];
     ZDMServiceBox *box = mediator.registerInfoDict[key];
     [mediator.lock unlock];

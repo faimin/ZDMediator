@@ -68,12 +68,15 @@ typedef NS_ENUM(NSInteger, ZDMPriority) {
     
     //----------------------------------
     
-    BOOL dogResult1 = [ZDMGetServiceWithPriority(DogProtocol, ZDDog.zdm_priority) zdm_handleEvent:123 userInfo:@{} callback:^id(NSUInteger x) {
+    id<DogProtocol> dog1 = ZDMGetServiceWithPriority(DogProtocol, 0);
+    BOOL dogResult1 = [dog1 zdm_handleEvent:123 userInfo:@{} callback:^id(NSUInteger x) {
         return @(x);
     }];
     XCTAssertFalse(dogResult1);
     
-    BOOL dogResult2 = [ZDMGetServiceWithPriority(DogProtocol, ZDDog.zdm_priority) zdm_handleEvent:200 userInfo:@{} callback:^id(NSUInteger x, NSString *y) {
+    id<DogProtocol> dog2 = ZDMGetServiceWithPriority(DogProtocol, ZDDog.zdm_priority);
+    XCTAssertEqualObjects(dog1, dog2);
+    BOOL dogResult2 = [dog2 zdm_handleEvent:200 userInfo:@{} callback:^id(NSUInteger x, NSString *y) {
         XCTAssertEqual(x, 2);
         NSString *a = [NSString stringWithFormat:@"%zd, %@", x, y];
         return a;
