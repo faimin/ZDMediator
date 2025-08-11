@@ -68,7 +68,7 @@ typedef NS_ENUM(NSInteger, ZDMPriority) {
     
     //----------------------------------
     
-    id<DogProtocol> dog1 = ZDMGetServiceWithPriority(DogProtocol, 0);
+    id<DogProtocol> dog1 = ZDMGetServiceWithPriority(DogProtocol, ZDMDefaultPriority);
     BOOL dogResult1 = [dog1 zdm_handleEvent:123 userInfo:@{} callback:^id(NSUInteger x) {
         return @(x);
     }];
@@ -142,7 +142,7 @@ typedef NS_ENUM(NSInteger, ZDMPriority) {
 
 // 测试注册时说明全是类方法，但其实并不是的异常情况
 - (void)testAllClassMethodException {
-    __auto_type dog1 = ZDMGetServiceWithPriority(DogProtocol, 12345);
+    __auto_type dog1 = ZDMGetServiceWithPriority(DogProtocol, ZDMDefaultPriority);
     NSInteger age = [dog1 age];
     XCTAssertEqual(age, 2);
     

@@ -662,7 +662,8 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     [mediator.lock unlock];
     
     // Fault tolerance
-    if (![prioritySet containsObject:@(priority)]) {
+    // 假如用默认优先级来取,并且集合中不存在的话,说明未注册,此时则取集合中优先级最高的那个优先级来代替
+    if (priority == ZDMDefaultPriority && ![prioritySet containsObject:@(priority)] && prioritySet.count > 0) {
         priority = prioritySet.firstObject.integerValue;
     }
     NSString *key = zdmStoreKey(serviceName, @(priority));
