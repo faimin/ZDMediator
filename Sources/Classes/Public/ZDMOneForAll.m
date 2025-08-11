@@ -723,7 +723,13 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     [self _storeServiceWithStrongObj:instanceOrCls weakObj:nil];
     
     if (needInitialize) {
+#if DEBUG
+        id temp = instanceOrCls;
+#endif
         instanceOrCls = [instanceOrCls init];
+#if DEBUG
+        NSAssert(instanceOrCls == temp, @"The instance should be equal before and after");
+#endif
     }
     
     if ([(NSObject *)instanceOrCls respondsToSelector:@selector(zdm_setup)]) {
