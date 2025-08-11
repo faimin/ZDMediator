@@ -310,6 +310,10 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     }
     
     ZDMServiceBox *serviceBox = mediator.registerInfoDict[key];
+    if (!serviceBox) {
+        [mediator.lock unlock];
+        return NO;
+    }
     serviceBox.autoInit = autoInitAgain;
     
     NSString *clsName = NSStringFromClass(serviceBox.cls);
@@ -369,14 +373,6 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     NSArray<ZDMServiceBox *> *sortedBoxs = [serviceBoxs sortedArrayUsingComparator:^NSComparisonResult(ZDMServiceBox * _Nonnull obj1, ZDMServiceBox * _Nonnull obj2) {
         NSInteger priority1 = obj1.priority;
         NSInteger priority2 = obj2.priority;
-#if false
-        if ([obj1.cls respondsToSelector:@selector(zdm_priority)]) {
-            priority1 = [obj1.cls zdm_priority];
-        }
-        if ([obj2.cls respondsToSelector:@selector(zdm_priority)]) {
-            priority2 = [obj2.cls zdm_priority];
-        }
-#endif
         NSComparisonResult result = priority1 >= priority2 ? NSOrderedAscending : NSOrderedDescending;
         return result;
     }];
