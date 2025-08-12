@@ -14,6 +14,16 @@
 // 1v1 priority
 static NSInteger const ZDMDefaultPriority = 0;
 
+#if DEBUG
+#ifndef ZDMLog
+#define ZDMLog(...) NSLog(@"❌❌❌" __VA_ARGS__);
+#endif
+#else
+#ifndef ZDMLog
+#define ZDMLog(...)
+#endif
+#endif
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wstrict-prototypes"
 // 参数不能为bool类型，因为会报错

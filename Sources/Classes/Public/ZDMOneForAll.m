@@ -279,22 +279,18 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
              priority:(NSInteger)priority
         autoInitAgain:(BOOL)autoInitAgain {
     if (!serviceProtocol) {
-#if DEBUG
-        NSLog(@"❌ >>>>> the protocol is nil");
-#if ENABLE_ASSERT
+        ZDMLog(@"❌ >>>>> the protocol is nil");
+#if DEBUG && ENABLE_ASSERT
         NSAssert(NO, @"the protocol is nil");
-#endif
 #endif
         return NO;
     }
     
     NSString *serviceName = NSStringFromProtocol(serviceProtocol);
     if (!serviceName) {
-#if DEBUG
-        NSLog(@"❌ >>>>> the protocol name is nil");
-#if ENABLE_ASSERT
+        ZDMLog(@"❌ >>>>> the protocol name is nil");
+#if DEBUG && ENABLE_ASSERT
         NSAssert(NO, @"the protocol name is nil");
-#endif
 #endif
         return NO;
     }
@@ -664,6 +660,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     // Fault tolerance
     // 假如用默认优先级来取,并且集合中不存在的话,说明未注册,此时则取集合中优先级最高的那个优先级来代替
     if (priority == ZDMDefaultPriority && ![prioritySet containsObject:@(priority)] && prioritySet.count > 0) {
+        ZDMLog(@"❌ >>>>> not found service for protocol: (%@)", serviceName);
         priority = prioritySet.firstObject.integerValue;
     }
     NSString *key = zdmStoreKey(serviceName, @(priority));
@@ -672,7 +669,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     ZDMServiceBox *box = mediator.registerInfoDict[key];
     [mediator.lock unlock];
     if (!box) {
-        NSLog(@"❌ >>>>> please register a class first");
+        ZDMLog(@"❌ >>>>> please register a class first for protocol: (%@)", serviceName);
         return nil;
     }
     
@@ -687,7 +684,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     }
     
     if (!serviceInstance) {
-        NSLog(@"❌ >>>>> Finally, the instance object of service: (%@), priority: (%zd) was not found", serviceName, priority);
+        ZDMLog(@"❌ >>>>> Finally, the instance object of service: (%@), priority: (%zd) was not found", serviceName, priority);
     }
     
     // prevent crashes
@@ -710,7 +707,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 + (id)_createInstance:(ZDMServiceBox *)innerBox {
     Class aCls = innerBox.cls;
     if (!aCls) {
-        NSLog(@"❌ >>>>> %d, %s => please register first", __LINE__, __FUNCTION__);
+        ZDMLog(@"❌ >>>>> %d, %s => please register first", __LINE__, __FUNCTION__);
         return nil;
     }
     

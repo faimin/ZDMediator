@@ -200,7 +200,6 @@ typedef NS_ENUM(NSInteger, ZDMPriority) {
     XCTAssertNotNil(cat);
     
     [ZDMOneForAll removeService:@protocol(CatProtocol) priority:ZDMDefaultPriority autoInitAgain:NO];
-    id v = ZDMGetService(CatProtocol);
     XCTAssertNil(ZDMGetService(CatProtocol));
     
     NSString *name = [ZDMGetService(CatProtocol) name];
