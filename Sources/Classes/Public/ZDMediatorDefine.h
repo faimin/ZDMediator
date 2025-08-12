@@ -31,14 +31,6 @@ static NSInteger const ZDMDefaultPriority = 0;
 typedef id (^ZDMCommonCallback)();
 #pragma clang diagnostic pop
 
-#ifndef ZDMIGNORE_SELWARNING
-#define ZDMIGNORE_SELWARNING(...)                                              \
-  _Pragma("clang diagnostic push")                                             \
-  _Pragma("clang diagnostic ignored \"-Wundeclared-selector\"")                \
-    __VA_ARGS__                                                                \
-  _Pragma("clang diagnostic pop")
-#endif
-
 //-------------------------One For All------------------------------
 
 struct ZDMMachoOFARegisterKV {
