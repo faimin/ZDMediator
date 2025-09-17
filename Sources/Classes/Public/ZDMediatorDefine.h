@@ -11,8 +11,10 @@
 #import <Foundation/Foundation.h>
 #import <mach-o/loader.h>
 
-// 1v1 priority
-static NSInteger const ZDMDefaultPriority = 0;
+/// 1v1 priority
+#ifndef ZDMDefaultPriority
+#define ZDMDefaultPriority ((NSInteger)0)
+#endif
 
 #if DEBUG
 #ifndef ZDMLog
@@ -36,8 +38,10 @@ typedef id (^ZDMCommonCallback)();
 struct ZDMMachoOFARegisterKV {
     const char *key;
     const char *value;
-    const int autoInit;     ///< 0,1
-    const int allClsMethod; ///< 0,1
+    /// 0,1
+    const int autoInit;
+    /// 0,1
+    const int allClsMethod;
     const int priority;
 };
 
