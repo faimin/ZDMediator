@@ -11,8 +11,20 @@
 #import <Foundation/Foundation.h>
 #import <mach-o/loader.h>
 
-// 1v1 priority
-static NSInteger const ZDMDefaultPriority = 0;
+/// 1v1 priority
+#ifndef ZDMDefaultPriority
+#define ZDMDefaultPriority ((NSInteger)0)
+#endif
+
+#if DEBUG
+#ifndef ZDMLog
+#define ZDMLog(...) NSLog(@"❌❌❌" __VA_ARGS__);
+#endif
+#else
+#ifndef ZDMLog
+#define ZDMLog(...)
+#endif
+#endif
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wstrict-prototypes"
@@ -21,21 +33,15 @@ static NSInteger const ZDMDefaultPriority = 0;
 typedef id (^ZDMCommonCallback)();
 #pragma clang diagnostic pop
 
-#ifndef ZDMIGNORE_SELWARNING
-#define ZDMIGNORE_SELWARNING(...)                                              \
-  _Pragma("clang diagnostic push")                                             \
-  _Pragma("clang diagnostic ignored \"-Wundeclared-selector\"")                \
-    __VA_ARGS__                                                                \
-  _Pragma("clang diagnostic pop")
-#endif
-
 //-------------------------One For All------------------------------
 
 struct ZDMMachoOFARegisterKV {
     const char *key;
     const char *value;
-    const int autoInit;     ///< 0,1
-    const int allClsMethod; ///< 0,1
+    /// 0,1
+    const int autoInit;
+    /// 0,1
+    const int allClsMethod;
     const int priority;
 };
 
