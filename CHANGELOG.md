@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.4.3
+
+- 统一`Log`前缀
+- Fix `Xcode26`编译器把`static`常量`trim`掉的问题
+
 ## 0.4.2
 
 - 事件分发时支持通过`zdm_priority`指定优先级
