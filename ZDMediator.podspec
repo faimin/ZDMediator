@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'ZDMediator'
-  s.version          = '0.4.3'
+  s.version          = '0.4.3.1'
   s.summary          = '模块通信中间件'
   s.description      = <<-DESC
     用于模块间通信的中间件，支持自动注册、手动注册、强弱引用、实例方法、类方法调用
