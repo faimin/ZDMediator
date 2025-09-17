@@ -660,8 +660,9 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     // Fault tolerance
     // 假如用默认优先级来取,并且集合中不存在的话,说明未注册,此时则取集合中优先级最高的那个优先级来代替
     if (priority == ZDMDefaultPriority && ![prioritySet containsObject:@(priority)] && prioritySet.count > 0) {
-        ZDMLog(@"❌ >>>>> not found service for protocol: (%@)", serviceName);
-        priority = prioritySet.firstObject.integerValue;
+        NSInteger newPriority = prioritySet.firstObject.integerValue;
+        //ZDMLog(@"❌ >>>>> not found service for protocol: (%@), priority: (%zd), and then will use a new priority: (%zd) to search", serviceName, priority, newPriority);
+        priority = newPriority;
     }
     NSString *key = zdmStoreKey(serviceName, @(priority));
     
