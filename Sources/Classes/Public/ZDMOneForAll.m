@@ -272,7 +272,11 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 }
 
 + (id)serviceWithName:(NSString *)serviceName priority:(NSInteger)priority {
-    return [self _serviceWithName:serviceName priority:priority needProxyWrap:YES];
+    return [self serviceWithName:serviceName priority:priority onlyFromCache:NO];
+}
+
++ (id)serviceWithName:(NSString *)serviceName priority:(NSInteger)priority onlyFromCache:(BOOL)onlyFromCache {
+    return [self _serviceWithName:serviceName priority:priority needProxyWrap:YES onlyFromCache:onlyFromCache];
 }
 
 + (BOOL)removeService:(Protocol *)serviceProtocol
@@ -645,6 +649,12 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 }
 
 + (id)_serviceWithName:(NSString *)serviceName priority:(NSInteger)priority needProxyWrap:(BOOL)needWrap {
+    return [self _serviceWithName:serviceName priority:priority needProxyWrap:needWrap onlyFromCache:NO];
+}
+
+/// - Parameters:
+///   - onlyFromCache: 是否只是获取已存在的实例不自动创建, 默认为`false`
++ (id)_serviceWithName:(NSString *)serviceName priority:(NSInteger)priority needProxyWrap:(BOOL)needWrap onlyFromCache:(BOOL)onlyFromCache {
     if (!serviceName) {
         return nil;
     }
@@ -680,7 +690,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         serviceInstance = [self _serviceInstaceWithClassName:clsName];
     }
     
-    if ((!serviceInstance || object_isClass(serviceInstance)) && box.autoInit) {
+    if ((!serviceInstance || object_isClass(serviceInstance)) && box.autoInit && !onlyFromCache) {
         serviceInstance = [self _createInstance:box];
     }
     

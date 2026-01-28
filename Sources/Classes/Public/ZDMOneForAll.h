@@ -61,19 +61,27 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Get
 
-/// get service instance with protocol
+/// get service instance with protocol, auto create if need
 ///
 /// - Parameters:
 ///   - serviceProtocol: protocol of service
 ///   - priority: priority
 + (S _Nullable)service:(Protocol *)serviceProtocol priority:(NSInteger)priority;
 
-/// get service instance with protocol name
+/// get service instance with protocol name, auto create if need
 ///
 /// - Parameters:
 ///   - serviceName: protocol of service
 ///   - priority: priority
 + (S _Nullable)serviceWithName:(NSString *)serviceName priority:(NSInteger)priority;
+
+/// get service instance with protocol name, don't auto create if `onlyFromCache` is `true`.
+///
+/// - Parameters:
+///   - serviceName: protocol of service
+///   - priority: priority
+///   - onlyFromCache:
++ (S _Nullable)serviceWithName:(NSString *)serviceName priority:(NSInteger)priority onlyFromCache:(BOOL)onlyFromCache;
 
 /// delete service from store map
 ///
@@ -181,6 +189,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 #ifndef ZDMGetServiceWithPriority
 #define ZDMGetServiceWithPriority(proto, _priority) ((id<proto>)[ZDMOneForAll service:@protocol(proto) priority:_priority])
+#endif
+
+#ifndef ZDMGetServiceFromCache
+#define ZDMGetServiceFromCache(proto) ZDMGetServiceFromCacheWithPriority(proto, ZDMDefaultPriority)
+#endif
+
+#ifndef ZDMGetServiceFromCacheWithPriority
+#define ZDMGetServiceFromCacheWithPriority(_proto, _priority)                       \
+({                                                                                  \
+    NSString *protocolName = NSStringFromProtocol(@protocol(_proto));               \
+    ((id<_proto>)[ZDMOneForAll serviceWithName:protocolName priority:_priority onlyFromCache:YES]); \
+})                                                                                  
 #endif
 
 #ifndef ZDMGetServiceWithClass
