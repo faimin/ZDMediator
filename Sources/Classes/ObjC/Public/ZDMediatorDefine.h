@@ -24,7 +24,7 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wstrict-prototypes"
 // Breaking Change (0.5.0): 简化为无参 block，与 Swift 版本保持一致
-typedef id (^ZDMCommonCallback)(void);
+typedef id _Nullable (^ZDMCommonCallback)(void);
 #pragma clang diagnostic pop
 
 //-------------------------Macho Section------------------------------

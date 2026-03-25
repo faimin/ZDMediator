@@ -169,8 +169,8 @@ extension Mediator {
             var priorities = priorityDict[serviceName] ?? []
 #if DEBUG
             if priorities.contains(priority) {
-                let existing = registerInfoDict[key]?.cls
-                if NSStringFromClass(existing!) != NSStringFromClass(registration.cls) {
+				let existing: AnyClass? = registerInfoDict[key]?.cls
+                if let existing, NSStringFromClass(existing) != NSStringFromClass(registration.cls) {
                     assertionFailure("❌ 同一 Protocol(\(serviceName)) 下有多个类注册了相同 Priority(\(priority))")
                 }
             }
@@ -292,14 +292,14 @@ extension Mediator {
             )?.takeUnretainedValue()
 
             // 设置 fixme 回调：当发现协议并非全类方法时，自动修正并创建实例
-            if let proxy = proxy as? AnyObject,
+			if let proxy = proxy,
                proxy.responds(to: NSSelectorFromString("fixmeWithCallback:")) {
                 let fixme: @convention(block) () -> AnyObject? = { [weak registration] in
                     guard let reg = registration else { return nil }
                     shared.lock.withLock { reg.isAllClassMethods = false }
                     return shared._createInstance(reg)
                 }
-                proxy.perform(
+                _ = proxy.perform(
                     NSSelectorFromString("fixmeWithCallback:"),
                     with: fixme as AnyObject
                 )
@@ -313,7 +313,7 @@ extension Mediator {
     // MARK: 实例创建
 
     func _createInstance(_ registration: ServiceRegistration) -> AnyObject? {
-        let cls = registration.cls
+		let cls: AnyClass = registration.cls
         let clsName = NSStringFromClass(cls)
 
         // 1. 已有实例直接返回
@@ -553,7 +553,7 @@ extension Mediator {
             guard let registration = box else { continue }
 
             var serviceObj = existingInst
-            let cls = registration.cls
+			let cls: AnyClass = registration.cls
 
             if serviceObj == nil
                 && (cls.instancesRespond(to: sel) || cls.responds(to: sel))

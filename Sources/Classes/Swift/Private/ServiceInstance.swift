@@ -27,7 +27,7 @@ final class ServiceInstance {
 
     private func notifyWillDispose() {
         let old = _strong ?? _weak
-        if let disposable = old as? AnyObject,
+		if let disposable = old,
            disposable.responds(to: NSSelectorFromString("zdm_willDispose")) {
             _ = disposable.perform(NSSelectorFromString("zdm_willDispose"))
         }
