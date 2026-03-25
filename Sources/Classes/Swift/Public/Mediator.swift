@@ -31,12 +31,19 @@ public final class Mediator: NSObject, @unchecked Sendable {
 
     let lock = ZDMLock()
     private var _sectionLoaded = false
-    private var _proxyInitialized = false
 
     // ZDMBroadcastProxy 实例（NSProxy 子类，用 alloc 不用 init）
     // ZDMBroadcastProxy.h 在 publicHeadersPath 内，Swift 可直接引用
     // 内部存储属性，供 _updateProxyTargets 和 proxy 使用，避免循环引用
-    lazy var _broadcastProxy: AnyObject = ZDMBroadcastProxy.alloc()
+    private var _proxy: AnyObject?
+    @objc public var proxy: AnyObject {
+        lock.withLock {
+            if _proxy == nil {
+                _proxy = ZDMBroadcastProxy.alloc()
+            }
+            return _proxy!
+        }
+    }
 
     @objc public var context: MediatorContext?
 }
@@ -187,6 +194,9 @@ extension Mediator {
             }
         }
 
+        // Note: Proxy target update is intentionally best-effort and called outside the lock.
+        // The proxy may briefly reflect a slightly stale snapshot if concurrent registrations occur,
+        // but correctness of service lookup is unaffected (that path re-acquires the lock).
         Mediator._updateProxyTargets()
     }
 
@@ -286,7 +296,7 @@ extension Mediator {
                proxy.responds(to: NSSelectorFromString("fixmeWithCallback:")) {
                 let fixme: @convention(block) () -> AnyObject? = { [weak registration] in
                     guard let reg = registration else { return nil }
-                    reg.isAllClassMethods = false
+                    shared.lock.withLock { reg.isAllClassMethods = false }
                     return shared._createInstance(reg)
                 }
                 proxy.perform(
@@ -392,6 +402,7 @@ extension Mediator {
             }
         }
 
+        // Note: best-effort proxy update after lock release — see _store for rationale.
         if shouldUpdateProxy { _updateProxyTargets() }
         item?.clear()
         return item != nil
@@ -425,24 +436,10 @@ extension Mediator {
     static func _updateProxyTargets() {
         let clsSet = allRegisterClasses()
         // 调用 ZDMBroadcastProxy.replaceTargetSet:（直接访问内部存储，避免触发 proxy 初始化循环）
-        _ = shared._broadcastProxy.perform(
+        _ = shared.proxy.perform(
             NSSelectorFromString("replaceTargetSet:"),
             with: clsSet
         )
-    }
-
-    // proxy: 公开广播代理，访问时确保 Macho section 注册已完成
-    // loadSectionIfNeeded 内部有 guard 保证只执行一次；_updateProxyTargets 在注册时已调用
-    @objc public var proxy: AnyObject {
-        loadSectionIfNeeded()
-        // 首次访问时填充 targetSet（之后由注册/注销时的 _updateProxyTargets 保持最新）
-        lock.withLock {
-            if !_proxyInitialized {
-                _proxyInitialized = true
-                Mediator._updateProxyTargets()
-            }
-        }
-        return _broadcastProxy
     }
 
     // proxyForBroadcast: 兼容旧 API，等同于 proxy

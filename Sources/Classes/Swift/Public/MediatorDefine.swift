@@ -29,7 +29,11 @@ public func zdmService<T>(_ type: T.Type, priority: Int = 0) -> T? {
 //
 // 注：StaticString.utf8Start 对所有 ASCII 字符串（协议名/类名）始终是指针形式，安全。
 
-/// 创建 section entry（供 Swift 模块内 @_section 注册使用）
+/// 创建 Mach-O section entry（供 Swift 模块内 @_section 注册使用）
+/// - Warning: `protocolName` and `className` MUST be string literals (not stored StaticString variables).
+///   The returned `SectionEntry` holds raw pointers into the string literal's __TEXT segment storage,
+///   which has program lifetime. Passing a non-literal StaticString whose backing storage has a shorter
+///   lifetime will cause a use-after-free when the section is scanned at startup.
 public func zdmMakeSectionEntry(
     _ protocolName: StaticString,
     _ className: StaticString,
