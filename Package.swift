@@ -1,37 +1,37 @@
-// swift-tools-version: 5.10
-// The swift-tools-version declares the minimum version of Swift required to build this package.
-
+// swift-tools-version: 6.0
 import PackageDescription
 
 let package = Package(
     name: "ZDMediator",
     platforms: [
-        .iOS(.v12),
-        .tvOS(.v12),
-        .watchOS(.v5),
-        .macOS(.v10_13),
+        .iOS(.v13),
+        .macOS(.v14),
+        .tvOS(.v16),
+        .watchOS(.v9),
         .visionOS(.v1),
     ],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
-        .library(
-            name: "ZDMediator",
-            targets: ["ZDMediator"]
-        ),
+        .library(name: "ZDMediator", targets: ["ZDMediator"]),
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "ZDMediator",
             path: "Sources",
             resources: [.process("Resource/PrivacyInfo.xcprivacy")],
-            publicHeadersPath: "Classes",
+            publicHeadersPath: "Classes/ObjC/Public",
             cSettings: [
-                .headerSearchPath("Classes/Public"),
-                .headerSearchPath("Classes/Tools"),
-                .headerSearchPath("Classes/Private"),
+                .headerSearchPath("Classes/ObjC/Public"),
+                .headerSearchPath("Classes/ObjC/Tools"),
+                .headerSearchPath("Classes/ObjC/Private"),
+            ],
+            swiftSettings: [
+                .enableExperimentalFeature("SymbolLinkageMarkers"),
             ]
+        ),
+        .testTarget(
+            name: "ZDMediatorTests",
+            dependencies: ["ZDMediator"],
+            path: "Tests/ZDMediatorTests"
         ),
     ]
 )
