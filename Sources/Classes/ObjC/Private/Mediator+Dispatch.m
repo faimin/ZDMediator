@@ -4,7 +4,7 @@
 //
 
 #import "Mediator+Dispatch.h"
-#import "ZDMediator-Swift.h"   // SPM 混编自动生成，包含 Swift 定义的方法
+#import "ZDMOneForAll+Forward.h"   // 前向声明 ZDMOneForAll（Swift Mediator 的 @objc 名），避免依赖 SPM 自动生成头
 #import "ZDMInvocation.h"
 
 @implementation ZDMOneForAll (Dispatch)

@@ -7,8 +7,7 @@
 
 #import "ZDMBroadcastProxy.h"
 #import <objc/runtime.h>
-#import "ZDMOneForAll+Private.h"
-#import "ZDMServiceBox.h"
+#import "ZDMOneForAll+Forward.h"
 
 @interface ZDMBroadcastProxy ()
 @property (atomic, strong) id<NSFastEnumeration> targetSet;
@@ -18,7 +17,6 @@
 
 - (void)dealloc {
     _targetSet = nil;
-    NSLog(@"%s", __PRETTY_FUNCTION__);
 }
 
 - (void)replaceTargetSet:(id<NSFastEnumeration>)targetSet {
@@ -102,33 +100,14 @@
 
 #pragma mark - Private
 
-/// execute instance method for a class, create a instance if it is not exist
+/// Execute instance method for a class — look up or create the instance via ZDMOneForAll.
 - (void)_executeInstanceMethodWithCls:(Class)cls invocation:(NSInvocation *)invocation {
     NSString *clsName = NSStringFromClass(cls);
     if (!clsName) {
         return;
     }
-    ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
-    [mediator.lock lock];
-    id serviceInstance = mediator.instanceDict[clsName].obj;
-    [mediator.lock unlock];
-    if (serviceInstance && [serviceInstance respondsToSelector:invocation.selector]) {
-        [invocation invokeWithTarget:serviceInstance];
-        return;
-    }
-    
-    [mediator.lock lock];
-    NSString *protocolPriorityKey = mediator.registerClassDict[clsName].anyObject;
-    ZDMServiceBox *box = protocolPriorityKey ? mediator.registerInfoDict[protocolPriorityKey] : nil;
-    [mediator.lock unlock];
-    if (!box) {
-        return;
-    }
-    if (!box.autoInit) {
-        return;
-    }
-    // intilize service mediatory
-    serviceInstance = [ZDMOneForAll serviceWithName:box.protocolName priority:box.priority];
+    // Use the public @objc API to resolve (and auto-init if needed) the service instance.
+    id serviceInstance = [ZDMOneForAll serviceWithName:clsName priority:0];
     if (serviceInstance && [serviceInstance respondsToSelector:invocation.selector]) {
         [invocation invokeWithTarget:serviceInstance];
     }

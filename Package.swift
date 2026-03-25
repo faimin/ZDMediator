@@ -14,19 +14,32 @@ let package = Package(
         .library(name: "ZDMediator", targets: ["ZDMediator"]),
     ],
     targets: [
+        // Pure ObjC target: all ObjC sources
+        .target(
+            name: "ZDMediatorObjC",
+            path: "Sources/Classes/ObjC",
+            publicHeadersPath: "Public",
+            cSettings: [
+                .headerSearchPath("Public"),
+                .headerSearchPath("Tools"),
+                .headerSearchPath("Private"),
+            ]
+        ),
+        // Pure Swift target: all Swift sources + resource
         .target(
             name: "ZDMediator",
+            dependencies: ["ZDMediatorObjC"],
             path: "Sources",
-            resources: [.process("Resource/PrivacyInfo.xcprivacy")],
-            publicHeadersPath: "Classes/ObjC/Public",
-            cSettings: [
-                .headerSearchPath("Classes/ObjC/Public"),
-                .headerSearchPath("Classes/ObjC/Tools"),
-                .headerSearchPath("Classes/ObjC/Private"),
+            exclude: [
+                "Classes/ObjC",
             ],
+            sources: [
+                "Classes/Swift",
+            ],
+            resources: [.process("Resource/PrivacyInfo.xcprivacy")],
             swiftSettings: [
                 .enableExperimentalFeature("SymbolLinkageMarkers"),
-                .swiftLanguageVersion(.v6),
+                .swiftLanguageMode(.v6),
             ]
         ),
         .testTarget(

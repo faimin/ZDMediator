@@ -10,10 +10,8 @@
 #import "ZDMProxy.h"
 #import "ZDMBroadcastProxy.h"
 
-// dispatch + registerResponder 变参接口
-#import "Mediator+Dispatch.h"
-
 // ObjC 调用宏（ZDMGetService 系列）定义在 ZDMediatorDefine.h 中
 // Swift 类型（ZDMOneForAll / ZDMContext 等）由编译器通过 @objc(ZDMOneForAll) 暴露
+// Mediator+Dispatch.h 在 Private 目录，通过 ObjC target cSettings headerSearchPath 可访问
 
 #endif /* ZDMediator_h */

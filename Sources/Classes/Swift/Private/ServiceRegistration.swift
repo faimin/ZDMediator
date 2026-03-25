@@ -2,7 +2,7 @@
 import Foundation
 
 final class ServiceRegistration {
-    unowned(unsafe) var cls: AnyClass
+    var cls: AnyClass
     let protocolName: String
     var autoInit: Bool
     var isAllClassMethods: Bool

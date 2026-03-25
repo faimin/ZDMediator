@@ -8,7 +8,7 @@ private final class DeallocExecutor: NSObject {
     deinit { block() }
 }
 
-private var deallocKey: UInt8 = 0
+nonisolated(unsafe) private var deallocKey: UInt8 = 0
 
 extension NSObject {
     /// 注册一个 block，在 self 被释放时执行

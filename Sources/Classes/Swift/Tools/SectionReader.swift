@@ -5,7 +5,7 @@ import Foundation
 /// Macho section 数据结构，与 C 端的 ZDMMachoKVEntry 内存布局完全一致
 /// @frozen 保证跨编译器版本 layout 稳定
 @frozen
-struct SectionEntry {
+public struct SectionEntry {
     let protocolNamePtr: UnsafePointer<CChar>
     let classNamePtr: UnsafePointer<CChar>
     let autoInit: Int32
@@ -42,8 +42,8 @@ enum SectionReader {
             ) else { continue }
             let count = Int(size) / MemoryLayout<SectionEntry>.stride
             guard count > 0 else { continue }
-            let buffer = UnsafeBufferPointer(
-                start: ptr.assumingMemoryBound(to: SectionEntry.self),
+            let buffer = UnsafeBufferPointer<SectionEntry>(
+                start: UnsafeRawPointer(ptr).assumingMemoryBound(to: SectionEntry.self),
                 count: count
             )
             for entry in buffer {

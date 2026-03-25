@@ -1,6 +1,7 @@
 // Sources/Classes/Swift/Public/Mediator.swift
 import Foundation
 import ObjectiveC
+import ZDMediatorObjC
 
 @objc(ZDMOneForAll)
 public final class Mediator: NSObject, @unchecked Sendable {
@@ -183,7 +184,7 @@ extension Mediator {
             }
         }
 
-        _updateProxyTargets()
+        Mediator._updateProxyTargets()
     }
 
     func _storeInstance(_ obj: AnyObject, weak isWeak: Bool) {
@@ -300,7 +301,7 @@ extension Mediator {
         // 3. 自定义工厂
         else if cls.responds(to: NSSelectorFromString("zdm_createInstance:")) {
             let ctx = context
-            instance = cls.perform(NSSelectorFromString("zdm_createInstance:"), with: ctx)?
+            instance = (cls as AnyObject).perform(NSSelectorFromString("zdm_createInstance:"), with: ctx)?
                 .takeUnretainedValue() as AnyObject?
         }
         // 4. 默认 alloc（先存再 init，防循环依赖）

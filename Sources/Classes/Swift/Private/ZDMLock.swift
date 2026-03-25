@@ -1,4 +1,5 @@
 // Sources/Classes/Swift/Private/ZDMLock.swift
+import Foundation
 
 final class ZDMLock: @unchecked Sendable {
     private let _lock = NSRecursiveLock()
