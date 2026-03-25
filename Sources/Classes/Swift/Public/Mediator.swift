@@ -196,29 +196,232 @@ extension Mediator {
     }
 }
 
-// MARK: - Stubs（implemented in later tasks）
+// MARK: - 服务获取（对外 API）
 
 extension Mediator {
 
-    /// Implemented in Part 2 (service lookup)
-    @objc public static func serviceWithName(_ name: String, priority: Int) -> AnyObject? {
-        // Part 2 will provide the full implementation
-        return nil
+    @objc public static func service(_ serviceProtocol: Protocol, priority: Int) -> AnyObject? {
+        let name = NSStringFromProtocol(serviceProtocol)
+        return _service(name: name, priority: priority, needProxyWrap: true, onlyFromCache: false)
     }
 
-    /// Implemented in Part 3 (remove service)
-    @discardableResult
-    @objc public static func removeService(
+    @objc public static func serviceWithName(_ name: String, priority: Int) -> AnyObject? {
+        _service(name: name, priority: priority, needProxyWrap: true, onlyFromCache: false)
+    }
+
+    @objc public static func serviceWithName(
+        _ name: String,
+        priority: Int,
+        onlyFromCache: Bool
+    ) -> AnyObject? {
+        _service(name: name, priority: priority, needProxyWrap: true, onlyFromCache: onlyFromCache)
+    }
+
+    // MARK: 内部核心获取方法
+
+    static func _service(
+        name: String,
+        priority: Int,
+        needProxyWrap: Bool,
+        onlyFromCache: Bool = false
+    ) -> AnyObject? {
+        shared.loadSectionIfNeeded()
+
+        let effectivePriority = shared.lock.withLock { () -> Int in
+            let priorities = shared.priorityDict[name] ?? []
+            // Fault tolerance: priority=0 找不到时 fallback 到最高 priority
+            if priority == 0 && !priorities.contains(0) && !priorities.isEmpty {
+                return priorities[0] // 降序第一个即最高
+            }
+            return priority
+        }
+
+        let key = zdmStoreKey(name, effectivePriority)
+        guard let registration = shared.lock.withLock({ shared.registerInfoDict[key] }) else {
+            zdmLog("请先注册 protocol: \(name)")
+            return nil
+        }
+
+        let clsName = NSStringFromClass(registration.cls)
+        var instance = shared.lock.withLock { shared.instanceDict[clsName]?.obj }
+
+        if (instance == nil || object_isClass(instance)) && registration.autoInit && !onlyFromCache {
+            instance = shared._createInstance(registration)
+        }
+
+        guard let instance else { return nil }
+
+        // ZDMProxy 包装（防止不识别方法时崩溃）
+        if needProxyWrap,
+           let proxyClass = NSClassFromString("ZDMProxy") as? NSObject.Type {
+            // 等效于 [ZDMProxy proxyWithTarget:instance]
+            let proxy = proxyClass.perform(
+                NSSelectorFromString("proxyWithTarget:"),
+                with: instance
+            )?.takeUnretainedValue()
+
+            // 设置 fixme 回调：当发现协议并非全类方法时，自动修正并创建实例
+            if let proxy = proxy as? AnyObject,
+               proxy.responds(to: NSSelectorFromString("fixmeWithCallback:")) {
+                let fixme: @convention(block) () -> AnyObject? = { [weak registration] in
+                    guard let reg = registration else { return nil }
+                    reg.isAllClassMethods = false
+                    return shared._createInstance(reg)
+                }
+                proxy.perform(
+                    NSSelectorFromString("fixmeWithCallback:"),
+                    with: fixme as AnyObject
+                )
+            }
+            return proxy as AnyObject?
+        }
+
+        return instance
+    }
+
+    // MARK: 实例创建
+
+    func _createInstance(_ registration: ServiceRegistration) -> AnyObject? {
+        let cls = registration.cls
+        let clsName = NSStringFromClass(cls)
+
+        // 1. 已有实例直接返回
+        if let existing = lock.withLock({ instanceDict[clsName]?.obj }),
+           !object_isClass(existing) {
+            return existing
+        }
+
+        var instance: AnyObject?
+
+        // 2. 全类方法：返回 class 本身
+        if registration.isAllClassMethods {
+            instance = cls
+        }
+        // 3. 自定义工厂
+        else if cls.responds(to: NSSelectorFromString("zdm_createInstance:")) {
+            let ctx = context
+            instance = cls.perform(NSSelectorFromString("zdm_createInstance:"), with: ctx)?
+                .takeUnretainedValue() as AnyObject?
+        }
+        // 4. 默认 alloc（先存再 init，防循环依赖）
+        // 注：AnyClass 在 Swift 中没有 .alloc()，必须通过 ObjC 消息转发
+        else {
+            guard let allocated = (cls as AnyObject)
+                .perform(NSSelectorFromString("alloc"))?.takeUnretainedValue() else { return nil }
+            lock.withLock { instanceDict[clsName] = ServiceInstance.withStrong(allocated) }
+            instance = (allocated as AnyObject)
+                .perform(NSSelectorFromString("init"))?.takeUnretainedValue() ?? allocated
+        }
+
+        guard let instance else { return nil }
+
+        // 存储
+        lock.withLock { instanceDict[clsName] = ServiceInstance.withStrong(instance) }
+
+        // 5. 调用 zdm_setup
+        if instance.responds(to: NSSelectorFromString("zdm_setup")) {
+            _ = instance.perform(NSSelectorFromString("zdm_setup"))
+        }
+
+        return instance
+    }
+}
+
+// MARK: - 移除服务
+
+extension Mediator {
+
+    @objc @discardableResult
+    public static func removeService(
         _ serviceProtocol: Protocol,
         priority: Int,
         autoInitAgain: Bool
     ) -> Bool {
-        // Part 3 will provide the full implementation
-        return false
+        let serviceName = NSStringFromProtocol(serviceProtocol)
+        let key = zdmStoreKey(serviceName, priority)
+        let mediator = shared
+
+        var item: ServiceInstance?
+        var shouldUpdateProxy = false
+
+        mediator.lock.withLock {
+            // 只在 !autoInitAgain 时从 priorityDict 移除；
+            // autoInitAgain=true 时只清除实例，保留注册信息（与 ObjC 行为一致）
+            if !autoInitAgain {
+                mediator.priorityDict[serviceName]?.removeAll { $0 == priority }
+                if mediator.priorityDict[serviceName]?.isEmpty == true {
+                    mediator.priorityDict[serviceName] = nil
+                }
+            }
+
+            guard let registration = mediator.registerInfoDict[key] else { return }
+            registration.autoInit = autoInitAgain
+
+            let clsName = NSStringFromClass(registration.cls)
+            item = mediator.instanceDict[clsName]
+            mediator.instanceDict[clsName] = nil
+
+            mediator.registerClassDict[clsName]?.remove(key)
+            if !autoInitAgain {
+                if mediator.registerClassDict[clsName]?.isEmpty == true {
+                    mediator.registerClassDict[clsName] = nil
+                }
+                mediator.registerInfoDict[key] = nil
+                shouldUpdateProxy = true
+            }
+        }
+
+        if shouldUpdateProxy { _updateProxyTargets() }
+        item?.clear()
+        return item != nil
+    }
+}
+
+// MARK: - 调试接口
+
+extension Mediator {
+
+    @objc public static func allInitializedObjects() -> NSHashTable<AnyObject> {
+        shared.loadSectionIfNeeded()
+        let table = NSHashTable<AnyObject>.weakObjects()
+        shared.lock.withLock {
+            for item in shared.instanceDict.values {
+                if let obj = item.obj { table.add(obj) }
+            }
+        }
+        return table
     }
 
-    /// Implemented in Part 4 (proxy targets update)
-    func _updateProxyTargets() {
-        // Part 4 will provide the full implementation
+    @objc public static func allRegisterClasses() -> NSOrderedSet {
+        shared.loadSectionIfNeeded()
+        let boxes = shared.lock.withLock { Array(shared.registerInfoDict.values) }
+        let sorted = boxes.sorted { $0.priority >= $1.priority }
+        let orderedSet = NSMutableOrderedSet()
+        for reg in sorted { orderedSet.add(reg.cls) }
+        return orderedSet.copy() as! NSOrderedSet
+    }
+
+    static func _updateProxyTargets() {
+        let clsSet = allRegisterClasses()
+        // 调用 ZDMBroadcastProxy.replaceTargetSet:
+        _ = shared.proxy.perform(
+            NSSelectorFromString("replaceTargetSet:"),
+            with: clsSet
+        )
+    }
+
+    // proxy 访问时懒初始化 targets（与原 OC 行为一致）
+    // 使用 ZDMLock 保证线程安全，避免 struct Once { static var done } 的非原子性问题
+    @objc public var proxyForBroadcast: AnyObject? {
+        lock.withLock {
+            if !_proxyInitialized {
+                _proxyInitialized = true
+                _ = proxy.perform(
+                    NSSelectorFromString("replaceTargetSet:"),
+                    with: Mediator.allRegisterClasses()
+                )
+            }
+        }
+        return proxy
     }
 }
