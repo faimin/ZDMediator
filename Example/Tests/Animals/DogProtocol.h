@@ -10,7 +10,7 @@
 #define DogProtocol_h
 
 #import <Foundation/Foundation.h>
-#import <ZDMediator/ZDMCommonProtocol.h>
+@import ZDMediator;
 
 @protocol DogProtocol <ZDMCommonProtocol>
 

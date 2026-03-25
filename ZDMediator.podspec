@@ -23,9 +23,12 @@ Pod::Spec.new do |s|
     ss.dependency "#{s.name}/Tools"
     ss.source_files = 'Sources/Classes/ObjC/**/*.{h,m}',
                       'Sources/Classes/Swift/**/*.swift'
-    ss.public_header_files = 'Sources/Classes/ObjC/Public/*.h',
-                             'Sources/Classes/ObjC/Private/Mediator+Dispatch.h'
-    ss.project_header_files = 'Sources/Classes/ObjC/Private/Mediator+Dispatch.h'
+    ss.public_header_files = 'Sources/Classes/ObjC/Public/ZDMBroadcastProxy.h',
+                             'Sources/Classes/ObjC/Public/ZDMediator.h',
+                             'Sources/Classes/ObjC/Public/ZDMediatorDefine.h',
+                             'Sources/Classes/ObjC/Public/ZDMProxy.h'
+    ss.private_header_files = 'Sources/Classes/ObjC/Private/Mediator+Dispatch.h'
+    ss.project_header_files = 'Sources/Classes/ObjC/Public/ZDMOneForAll+Forward.h'
     ss.resource_bundles = {
       "#{s.name}_Privacy" => ['Sources/Resource/PrivacyInfo.xcprivacy']
     }

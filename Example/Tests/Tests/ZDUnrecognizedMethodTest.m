@@ -40,7 +40,7 @@
     NSString *foodName = [ZDMGetServiceWithPriority(CatProtocol, ZDMDefaultPriority) eatWhatFood];
     XCTAssertNil(foodName);
     
-    NSObject *dog = ZDMGetServiceWithClass(CatProtocol, ZDMDefaultPriority, ZDDog);
+    NSObject *dog = ZDMGetServiceWithClassAndPriority(CatProtocol, ZDMDefaultPriority, ZDDog);
     XCTAssertNil(dog);
 }
 

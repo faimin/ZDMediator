@@ -106,8 +106,9 @@
     if (!clsName) {
         return;
     }
-    // Use the public @objc API to resolve (and auto-init if needed) the service instance.
-    id serviceInstance = [ZDMOneForAll serviceWithName:clsName priority:0];
+    // Use the raw (no ZDMProxy wrapping) API to avoid creating a strong reference that would
+    // prevent weakly-stored instances from being released when they go out of scope.
+    id serviceInstance = [ZDMOneForAll serviceInstanceWithName:clsName priority:0];
     if (serviceInstance && [serviceInstance respondsToSelector:invocation.selector]) {
         [invocation invokeWithTarget:serviceInstance];
     }

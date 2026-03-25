@@ -75,7 +75,7 @@ ZDMediator1V1Register(CatProtocol, ZDCat)
                callback:(ZDMCommonCallback)callback {
     if (event == 100) {
         if (callback) {
-            callback(self.name);
+            callback();
         }
         return YES;
     }

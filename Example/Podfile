@@ -1,12 +1,12 @@
 use_frameworks!
 
-platform :ios, '10.0'
+platform :ios, '13.0'
 
 target 'ZDMediator_Example' do
   pod 'ZDMediator', :path => '../'
 
   target 'ZDMediator_Tests' do
-    inherit! :search_paths
+    inherit! :complete
 
     #pod 'FBSnapshotTestCase'
   end

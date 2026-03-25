@@ -1,7 +1,9 @@
 // Sources/Classes/Swift/Public/Mediator.swift
 import Foundation
 import ObjectiveC
+#if canImport(ZDMediatorObjC)
 import ZDMediatorObjC
+#endif
 
 @objc(ZDMOneForAll)
 public final class Mediator: NSObject, @unchecked Sendable {
@@ -33,7 +35,8 @@ public final class Mediator: NSObject, @unchecked Sendable {
 
     // ZDMBroadcastProxy 实例（NSProxy 子类，用 alloc 不用 init）
     // ZDMBroadcastProxy.h 在 publicHeadersPath 内，Swift 可直接引用
-    @objc public private(set) lazy var proxy: AnyObject = ZDMBroadcastProxy.alloc()
+    // 内部存储属性，供 _updateProxyTargets 和 proxy 使用，避免循环引用
+    lazy var _broadcastProxy: AnyObject = ZDMBroadcastProxy.alloc()
 
     @objc public var context: MediatorContext?
 }
@@ -218,6 +221,11 @@ extension Mediator {
         _service(name: name, priority: priority, needProxyWrap: true, onlyFromCache: onlyFromCache)
     }
 
+    /// 不包装 ZDMProxy，直接返回原始实例（供 ZDMBroadcastProxy 内部使用，避免强引用导致弱引用对象无法释放）
+    @objc public static func serviceInstanceWithName(_ name: String, priority: Int) -> AnyObject? {
+        _service(name: name, priority: priority, needProxyWrap: false, onlyFromCache: false)
+    }
+
     // MARK: 内部核心获取方法
 
     static func _service(
@@ -238,7 +246,18 @@ extension Mediator {
         }
 
         let key = zdmStoreKey(name, effectivePriority)
-        guard let registration = shared.lock.withLock({ shared.registerInfoDict[key] }) else {
+        // 先按 protocol-name 查找；若未找到则尝试 class-name 反查（供 ZDMBroadcastProxy 使用）
+        var registration = shared.lock.withLock { shared.registerInfoDict[key] }
+        if registration == nil {
+            // name 可能是 class name，通过 registerClassDict 反查 protocol key
+            registration = shared.lock.withLock {
+                guard let keySet = shared.registerClassDict[name], !keySet.isEmpty else { return nil }
+                // 优先匹配指定 priority，否则取任意一个
+                let matchedKey = keySet.first(where: { $0.hasSuffix("--->\(effectivePriority)") }) ?? keySet.first!
+                return shared.registerInfoDict[matchedKey]
+            }
+        }
+        guard let registration else {
             zdmLog("请先注册 protocol: \(name)")
             return nil
         }
@@ -253,10 +272,11 @@ extension Mediator {
         guard let instance else { return nil }
 
         // ZDMProxy 包装（防止不识别方法时崩溃）
+        // 注：ZDMProxy 继承自 NSProxy（而非 NSObject），不能用 NSObject.Type 转换
         if needProxyWrap,
-           let proxyClass = NSClassFromString("ZDMProxy") as? NSObject.Type {
+           let proxyClass = NSClassFromString("ZDMProxy") {
             // 等效于 [ZDMProxy proxyWithTarget:instance]
-            let proxy = proxyClass.perform(
+            let proxy = (proxyClass as AnyObject).perform(
                 NSSelectorFromString("proxyWithTarget:"),
                 with: instance
             )?.takeUnretainedValue()
@@ -404,26 +424,30 @@ extension Mediator {
 
     static func _updateProxyTargets() {
         let clsSet = allRegisterClasses()
-        // 调用 ZDMBroadcastProxy.replaceTargetSet:
-        _ = shared.proxy.perform(
+        // 调用 ZDMBroadcastProxy.replaceTargetSet:（直接访问内部存储，避免触发 proxy 初始化循环）
+        _ = shared._broadcastProxy.perform(
             NSSelectorFromString("replaceTargetSet:"),
             with: clsSet
         )
     }
 
-    // proxy 访问时懒初始化 targets（与原 OC 行为一致）
-    // 使用 ZDMLock 保证线程安全，避免 struct Once { static var done } 的非原子性问题
-    @objc public var proxyForBroadcast: AnyObject? {
+    // proxy: 公开广播代理，访问时确保 Macho section 注册已完成
+    // loadSectionIfNeeded 内部有 guard 保证只执行一次；_updateProxyTargets 在注册时已调用
+    @objc public var proxy: AnyObject {
+        loadSectionIfNeeded()
+        // 首次访问时填充 targetSet（之后由注册/注销时的 _updateProxyTargets 保持最新）
         lock.withLock {
             if !_proxyInitialized {
                 _proxyInitialized = true
-                _ = proxy.perform(
-                    NSSelectorFromString("replaceTargetSet:"),
-                    with: Mediator.allRegisterClasses()
-                )
+                Mediator._updateProxyTargets()
             }
         }
-        return proxy
+        return _broadcastProxy
+    }
+
+    // proxyForBroadcast: 兼容旧 API，等同于 proxy
+    @objc public var proxyForBroadcast: AnyObject? {
+        proxy
     }
 }
 

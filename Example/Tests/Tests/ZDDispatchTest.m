@@ -8,6 +8,7 @@
 
 #import <XCTest/XCTest.h>
 @import ZDMediator;
+#import <ZDMediator/Mediator+Dispatch.h>
 #import "AnimalProtocol.h"
 #import "DogProtocol.h"
 
@@ -56,10 +57,7 @@
 - (void)testDispatchWithProtocol {
     {
         NSMutableArray *results1 = @[].mutableCopy;
-        [ZDMOneForAll dispatchWithProtocol:@protocol(ZDMCommonProtocol) selAndArgs:@selector(zdm_handleEvent:userInfo:callback:), 100, @{}, ^id(NSString *name){
-            if (name) {
-                [results1 addObject:name];
-            }
+        [ZDMOneForAll dispatchWithProtocol:@protocol(ZDMCommonProtocol) selAndArgs:@selector(zdm_handleEvent:userInfo:callback:), 100, @{}, ^id{
             return nil;
         }];
         NSLog(@"---> %@", results1);

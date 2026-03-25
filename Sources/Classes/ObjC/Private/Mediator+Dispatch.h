@@ -4,9 +4,10 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ZDMOneForAll+Forward.h"
 
-// ZDMOneForAll 由 ZDMOneForAll+Forward.h 前向声明（SPM 拆目标后无法 import ZDMediator-Swift.h）
+// ZDMOneForAll 前向声明：SPM 中由 ZDMOneForAll+Forward.h 提供完整 @interface；
+// CocoaPods 中由 Swift 生成头文件提供；这里用 @class 避免重复定义冲突。
+@class ZDMOneForAll;
 
 NS_ASSUME_NONNULL_BEGIN
 

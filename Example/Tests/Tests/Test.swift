@@ -15,21 +15,21 @@ struct Test {
         func foo(age: Int) -> String
     }
 
-    class APerson: AProtocol {
+    class APerson: NSObject, AProtocol {
         func foo(age: Int) -> String {
             let str = "age = \(age)"
             debugPrint(str)
             return str
         }
     }
-    
+
     @available(iOS 13.0.0, *)
     @Test func mediator() async throws {
         // Write your test here and use APIs like `#expect(...)` to check expected conditions.
         let a = APerson()
-        ZDMOneForAll<AProtocol>.manualRegisterService(AProtocol.self, implementer: a)
-        
-        let s = ZDMOneForAll<AProtocol>.service(AProtocol.self, priority: 0)
+        Mediator.manualRegisterService(AProtocol.self, implementer: a)
+
+        let s = Mediator.service(AProtocol.self, priority: 0) as? AProtocol
         let str = s?.foo(age: 10)
         #expect(str == "age = 10")
     }

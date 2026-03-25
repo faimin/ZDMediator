@@ -21,6 +21,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// Retrieve service instance by name and priority (maps to Mediator.serviceWithName:priority:).
 + (id _Nullable)serviceWithName:(NSString *)name priority:(NSInteger)priority;
 
+/// Retrieve raw service instance (no ZDMProxy wrapping) by name and priority.
+/// Use this when proxy wrapping would create an unintended strong reference.
++ (id _Nullable)serviceInstanceWithName:(NSString *)name priority:(NSInteger)priority;
+
 /// Register eventId-based responders (called from Mediator+Dispatch.m).
 - (void)_registerResponderForProtocol:(Protocol *)serviceProtocol
                               priority:(NSInteger)priority

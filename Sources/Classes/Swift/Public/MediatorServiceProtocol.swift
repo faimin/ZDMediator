@@ -1,6 +1,8 @@
 // Sources/Classes/Swift/Public/MediatorServiceProtocol.swift
 import Foundation
+#if canImport(ZDMediatorObjC)
 import ZDMediatorObjC
+#endif
 
 // ZDMCommonCallback 定义在 ZDMediatorDefine.h，通过 ZDMediatorObjC 模块桥接为 Swift typealias
 public typealias ZDMCommonCallback = @convention(block) () -> AnyObject?

@@ -3,8 +3,8 @@
 //  ZDMediator
 //
 
+#import "ZDMOneForAll+Forward.h"   // 完整 @interface ZDMOneForAll：SPM 中无法 import ZDMediator-Swift.h
 #import "Mediator+Dispatch.h"
-#import "ZDMOneForAll+Forward.h"   // 前向声明 ZDMOneForAll（Swift Mediator 的 @objc 名），避免依赖 SPM 自动生成头
 #import "ZDMInvocation.h"
 
 @implementation ZDMOneForAll (Dispatch)

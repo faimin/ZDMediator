@@ -8,6 +8,7 @@
 
 @import XCTest;
 @import ZDMediator;
+#import <ZDMediator/Mediator+Dispatch.h>
 #import "CatProtocol.h"
 #import "DogProtocol.h"
 #import "AnimalProtocol.h"
@@ -58,8 +59,8 @@ typedef NS_ENUM(NSInteger, ZDMPriority) {
     __auto_type cat = [ZDCat new];
     [ZDMOneForAll manualRegisterService:@protocol(CatProtocol) implementer:cat];
     
-    BOOL catResult1 = [ZDMGetService(CatProtocol) zdm_handleEvent:100 userInfo:@{} callback:^id(NSString *x) {
-        return @[ x ];
+    BOOL catResult1 = [ZDMGetService(CatProtocol) zdm_handleEvent:100 userInfo:@{} callback:^id{
+        return nil;
     }];
     XCTAssertTrue(catResult1);
     
@@ -69,17 +70,15 @@ typedef NS_ENUM(NSInteger, ZDMPriority) {
     //----------------------------------
     
     id<DogProtocol> dog1 = ZDMGetServiceWithPriority(DogProtocol, ZDMDefaultPriority);
-    BOOL dogResult1 = [dog1 zdm_handleEvent:123 userInfo:@{} callback:^id(NSUInteger x) {
-        return @(x);
+    BOOL dogResult1 = [dog1 zdm_handleEvent:123 userInfo:@{} callback:^id{
+        return nil;
     }];
     XCTAssertFalse(dogResult1);
     
     id<DogProtocol> dog2 = ZDMGetServiceWithPriority(DogProtocol, ZDDog.zdm_priority);
     XCTAssertEqualObjects(dog1, dog2);
-    BOOL dogResult2 = [dog2 zdm_handleEvent:200 userInfo:@{} callback:^id(NSUInteger x, NSString *y) {
-        XCTAssertEqual(x, 2);
-        NSString *a = [NSString stringWithFormat:@"%zd, %@", x, y];
-        return a;
+    BOOL dogResult2 = [dog2 zdm_handleEvent:200 userInfo:@{} callback:^id{
+        return nil;
     }];
     XCTAssertTrue(dogResult2);
     
@@ -128,8 +127,8 @@ typedef NS_ENUM(NSInteger, ZDMPriority) {
     NSString *clsName = NSStringFromClass([ZDMGetServiceWithPriority(AnimalProtocol, dogPriority) class]);
     XCTAssertTrue([clsName isEqualToString:@"ZDDog"]);
     
-    BOOL res = [ZDMGetServiceWithPriority(AnimalProtocol, dogPriority) zdm_handleEvent:200 userInfo:@{} callback:^id(NSUInteger x) {
-        return @(x);
+    BOOL res = [ZDMGetServiceWithPriority(AnimalProtocol, dogPriority) zdm_handleEvent:200 userInfo:@{} callback:^id{
+        return nil;
     }];
     XCTAssertTrue(res);
 }
@@ -143,7 +142,7 @@ typedef NS_ENUM(NSInteger, ZDMPriority) {
     NSString *foodName = [ZDMGetServiceWithPriority(CatProtocol, ZDMDefaultPriority) eatWhatFood];
     XCTAssertNil(foodName);
     
-    NSObject *dog = ZDMGetServiceWithClass(CatProtocol, ZDMDefaultPriority, ZDDog);
+    NSObject *dog = ZDMGetServiceWithClassAndPriority(CatProtocol, ZDMDefaultPriority, ZDDog);
     XCTAssertNil(dog);
 }
 
@@ -171,10 +170,7 @@ typedef NS_ENUM(NSInteger, ZDMPriority) {
 - (void)testDispatchWithProtocol {
     {
         NSMutableArray *results1 = @[].mutableCopy;
-        [ZDMOneForAll dispatchWithProtocol:@protocol(ZDMCommonProtocol) selAndArgs:@selector(zdm_handleEvent:userInfo:callback:), 100, @{}, ^id(NSString *name){
-            if (name) {
-                [results1 addObject:name];
-            }
+        [ZDMOneForAll dispatchWithProtocol:@protocol(ZDMCommonProtocol) selAndArgs:@selector(zdm_handleEvent:userInfo:callback:), 100, @{}, ^id{
             return nil;
         }];
         NSLog(@"---> %@", results1);

@@ -12,8 +12,8 @@
 #import <ZDMediator/ZDMediator.h>
 #import "AnimalProtocol.h"
 
-ZDMediatorOFARegister(DogProtocol, ZDDog, 10)
-ZDMediatorOFARegister(AnimalProtocol, ZDDog, 10)
+ZDMediatorOFARegister(DogProtocol, ZDDog)
+ZDMediatorOFARegister(AnimalProtocol, ZDDog)
 
 @implementation ZDDog
 
@@ -90,15 +90,15 @@ ZDMediatorOFARegister(AnimalProtocol, ZDDog, 10)
                userInfo:(id)userInfo
                callback:(ZDMCommonCallback)callback {
     if (event == 200) {
-        !callback ? NULL : callback(self.age, @"我是第二个参数");
+        !callback ? NULL : callback();
         return YES;
     } else if (event == 101) {
         return YES;
     } else if (event == 100) {
-        !callback ? NULL : callback(@"小狗");
+        !callback ? NULL : callback();
         return YES;
     } else if (event == 12345) {
-        !callback ? NULL : callback(@"12345-12345");
+        !callback ? NULL : callback();
         return YES;
     }
     return NO;
