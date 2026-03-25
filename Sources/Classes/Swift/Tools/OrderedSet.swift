@@ -28,38 +28,38 @@
 ///     set.insert("b", at: 1)
 ///     set.append("c")
 ///     set.map { Int($0)! } // [1, 2, 3], in this order.
-public struct OrderedSet<Element: Hashable> {
+struct OrderedSet<Element: Hashable> {
     private var array: [Element] = []
     private var set: Set<Element> = []
     
     /// Creates an empty ordered set.
-    public init() {
+    init() {
         self.array = []
         self.set = Set()
     }
     
     /// Creates an empty ordered set.
-    public init(_ array: [Element]) {
+    init(_ array: [Element]) {
         self.init()
         for element in array {
             append(element)
         }
     }
     
-    public var count: Int {
+    var count: Int {
         return array.count
     }
     
-    public var isEmpty: Bool {
+    var isEmpty: Bool {
         return array.isEmpty
     }
     
     /// Array value of the ordered set.
-    public var elements: [Element] {
+    var elements: [Element] {
         return array
     }
     
-    public func contains(_ member: Element) -> Bool {
+    func contains(_ member: Element) -> Bool {
         return set.contains(member)
     }
     
@@ -76,7 +76,7 @@ public struct OrderedSet<Element: Hashable> {
     ///    compare operations on the `Element` type, if it implements high-quality
     ///    hashing.
     @discardableResult
-    public mutating func append(_ newElement: Element) -> (inserted: Bool, index: Int) {
+    mutating func append(_ newElement: Element) -> (inserted: Bool, index: Int) {
         let inserted = set.insert(newElement).inserted
         if inserted {
             array.append(newElement)
@@ -99,7 +99,7 @@ public struct OrderedSet<Element: Hashable> {
     ///    type, if it implements high-quality hashing. (Insertions need to make
     ///    room in the storage array to add the inserted element.)
     @discardableResult
-    public mutating func insert(_ newElement: Element, at index: Int) -> (inserted: Bool, index: Int) {
+    mutating func insert(_ newElement: Element, at index: Int) -> (inserted: Bool, index: Int) {
         if let existingIndex = array.firstIndex(of: newElement) {
             return (false, existingIndex)
         }
@@ -112,7 +112,7 @@ public struct OrderedSet<Element: Hashable> {
     
     /// Remove and return the element at the beginning of the ordered set.
     @discardableResult
-    public mutating func removeFirst() -> Element {
+    mutating func removeFirst() -> Element {
         let firstElement = array.removeFirst()
         set.remove(firstElement)
         return firstElement
@@ -120,21 +120,21 @@ public struct OrderedSet<Element: Hashable> {
     
     /// Remove and return the element at the end of the ordered set.
     @discardableResult
-    public mutating func removeLast() -> Element {
+    mutating func removeLast() -> Element {
         let lastElement = array.removeLast()
         set.remove(lastElement)
         return lastElement
     }
     
     @discardableResult
-    public mutating func remove(_ member: Element) -> Element? {
+    mutating func remove(_ member: Element) -> Element? {
         guard let index = array.firstIndex(of: member) else { return nil }
         array.remove(at: index)
         return set.remove(member)
     }
     
     /// Remove all elements.
-     public mutating func removeAll(keepingCapacity keepCapacity: Bool = false) {
+     mutating func removeAll(keepingCapacity keepCapacity: Bool = false) {
          array.removeAll(keepingCapacity: keepCapacity)
          set.removeAll(keepingCapacity: keepCapacity)
      }
@@ -142,26 +142,26 @@ public struct OrderedSet<Element: Hashable> {
 
 
 extension OrderedSet: Collection {
-    public typealias Index = Int
+    typealias Index = Int
     
-    public var startIndex: Int { 0 }
-    public var endIndex: Int { array.count }
+    var startIndex: Int { 0 }
+    var endIndex: Int { array.count }
     
-    public func index(after i: Int) -> Int { i + 1 }
+    func index(after i: Int) -> Int { i + 1 }
     
-    public subscript(position: Int) -> Element {
+    subscript(position: Int) -> Element {
         return array[position]
     }
 }
 
 extension OrderedSet: ExpressibleByArrayLiteral {
-    public init(arrayLiteral elements: Element...) {
+    init(arrayLiteral elements: Element...) {
         self.init(elements)
     }
 }
 
 extension OrderedSet: CustomStringConvertible {
-    public var description: String {
+    var description: String {
         if array.isEmpty {
             return "[]"
         } else {
@@ -171,7 +171,7 @@ extension OrderedSet: CustomStringConvertible {
 }
 
 extension OrderedSet: Equatable where Element: Equatable {
-    public static func == (lhs: OrderedSet, rhs: OrderedSet) -> Bool {
+    static func == (lhs: OrderedSet, rhs: OrderedSet) -> Bool {
         return lhs.array == rhs.array
     }
 }
