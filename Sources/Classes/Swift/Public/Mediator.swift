@@ -425,3 +425,128 @@ extension Mediator {
         return proxy
     }
 }
+
+// MARK: - 事件注册（ObjC Category 调用的内部接口）
+
+extension Mediator {
+
+    /// 注册 eventId 响应者（由 Mediator+Dispatch.m 的变参方法调用）
+    @objc(_registerResponderForProtocol:priority:eventIds:)
+    public func _registerResponder(
+        forProtocol serviceProtocol: Protocol,
+        priority: Int,
+        eventIds: [String]
+    ) {
+        for eventId in eventIds {
+            _registerResponder(protocol: serviceProtocol, priority: priority, eventKey: eventId)
+        }
+    }
+
+    /// 注册 SEL 响应者（由 Mediator+Dispatch.m 的变参方法调用）
+    @objc(_registerResponderForProtocol:priority:selectorNames:)
+    public func _registerResponder(
+        forProtocol serviceProtocol: Protocol,
+        priority: Int,
+        selectorNames: [String]
+    ) {
+        for name in selectorNames {
+            _registerResponder(protocol: serviceProtocol, priority: priority, eventKey: name)
+        }
+    }
+
+    private func _registerResponder(protocol: Protocol, priority: Int, eventKey: String) {
+        guard !eventKey.isEmpty else { return }
+        let serviceName = NSStringFromProtocol(`protocol`)
+        let responder = EventResponder(serviceName: serviceName, priority: priority)
+
+        lock.withLock {
+            var set = eventResponderDict[eventKey] ?? OrderedSet()
+            // 去重：同 serviceName 先移后插（更新 priority）
+            set.remove(responder)
+            // 按 priority 降序插入
+            if let idx = set.firstIndex(where: { $0.priority <= priority }) {
+                set.insert(responder, at: idx)
+            } else {
+                set.append(responder)
+            }
+            eventResponderDict[eventKey] = set
+        }
+    }
+}
+
+// MARK: - Dispatch 查询接口（ObjC Category 调用，Option B 架构）
+
+extension Mediator {
+
+    /// 获取某 Protocol 的有序服务实例列表（按 priority 降序）
+    @objc(_serviceInstancesForProtocol:)
+    public func _serviceInstances(forProtocol proto: Protocol) -> [AnyObject] {
+        loadSectionIfNeeded()
+        let serviceName = NSStringFromProtocol(proto)
+        let priorities = lock.withLock { priorityDict[serviceName] ?? [] }
+        return priorities.compactMap { priority in
+            Mediator._service(name: serviceName, priority: priority,
+                              needProxyWrap: false, onlyFromCache: false)
+        }
+    }
+
+    /// 获取某 eventId 对应的有序服务实例列表
+    @objc(_serviceInstancesForEventId:)
+    public func _serviceInstances(forEventId eventId: String) -> [AnyObject] {
+        loadSectionIfNeeded()
+        let responders = lock.withLock { Array(eventResponderDict[eventId] ?? OrderedSet()) }
+        var results: [AnyObject] = []
+        for responder in responders {
+            let priorities = lock.withLock { priorityDict[responder.serviceName] ?? [] }
+            for priority in priorities {
+                if let inst = Mediator._service(name: responder.serviceName, priority: priority,
+                                                needProxyWrap: false) {
+                    results.append(inst)
+                }
+            }
+        }
+        return results
+    }
+
+    /// 获取某 SEL 名（作为 eventId）对应的有序服务实例列表
+    @objc(_serviceInstancesForSelectorName:)
+    public func _serviceInstances(forSelectorName selName: String) -> [AnyObject] {
+        _serviceInstances(forEventId: selName)
+    }
+
+    /// 获取所有已注册且响应某 SEL 的服务实例（用于 dispatchWithSELAndArgs:）
+    @objc(_allServiceInstancesRespondingToSelectorName:)
+    public func _allServiceInstances(respondingToSelectorName selName: String) -> [AnyObject] {
+        loadSectionIfNeeded()
+        let sel = NSSelectorFromString(selName)
+        let clsNames = lock.withLock { Array(registerClassDict.keys) }
+        var results: [AnyObject] = []
+
+        for clsName in clsNames {
+            let (box, existingInst) = lock.withLock { () -> (ServiceRegistration?, AnyObject?) in
+                guard let key = registerClassDict[clsName]?.first,
+                      let reg = registerInfoDict[key] else { return (nil, nil) }
+                return (reg, instanceDict[clsName]?.obj)
+            }
+            guard let registration = box else { continue }
+
+            var serviceObj = existingInst
+            let cls = registration.cls
+
+            if serviceObj == nil
+                && (cls.instancesRespond(to: sel) || cls.responds(to: sel))
+                && registration.autoInit {
+                serviceObj = Mediator._service(name: registration.protocolName,
+                                               priority: registration.priority,
+                                               needProxyWrap: false)
+            } else if let inst = serviceObj,
+                      !inst.responds(to: sel),
+                      cls.instancesRespond(to: sel) {
+                serviceObj = cls
+            }
+
+            if let obj = serviceObj { results.append(obj) }
+        }
+        return results
+    }
+}
