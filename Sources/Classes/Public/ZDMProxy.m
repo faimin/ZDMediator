@@ -158,12 +158,4 @@
     return [_target debugDescription];
 }
 
-/// 抑制默认的 NSInvalidArgumentException，保持 Proxy 不崩溃的行为。
-/// 转发链（forwardingTargetForSelector: → forwardInvocation:）已经通过返回零值来优雅处理未识别的消息。
-- (void)doesNotRecognizeSelector:(SEL)aSelector {
-#if DEBUG
-    NSLog(@"❌❌ >>>>> target: %@ don't recognized selector：%@", _target, NSStringFromSelector(aSelector));
-#endif
-}
-
 @end
