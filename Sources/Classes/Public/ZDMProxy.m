@@ -98,8 +98,14 @@
 
 /// 转发消息,一般只有在出现`doesNotRecognizeSelector:`情况时才会执行到这个方法,此时直接返回nil
 - (void)forwardInvocation:(NSInvocation *)invocation {
-    void *nullPointer = NULL;
-    [invocation setReturnValue:&nullPointer];
+    NSUInteger returnLength = invocation.methodSignature.methodReturnLength;
+    if (returnLength == 0) {
+        return;
+    }
+    
+    void *buffer = calloc(1, returnLength);
+    [invocation setReturnValue:buffer];
+    free(buffer);
 }
 
 #pragma mark - NSObject Protocol
@@ -150,6 +156,12 @@
 
 - (NSString *)debugDescription {
     return [_target debugDescription];
+}
+
+- (void)doesNotRecognizeSelector:(SEL)aSelector {
+#if DEBUG
+    NSLog(@"❌❌ >>>>> target: %@ don't recognized selector：%@", _target, NSStringFromSelector(aSelector));
+#endif
 }
 
 @end
