@@ -101,6 +101,9 @@ typedef NS_ENUM(NSInteger, ZDMPriority) {
         
         id x = (id<AnimalProtocol>)ZDMOneForAll.shareInstance.proxy;
         XCTAssertEqualObjects(proxy, x);
+        
+        id y = ZDMGetServiceFromCacheWithPriority(AnimalProtocol, 100);
+        XCTAssertNotNil(y);
     }
     
     [proxy eatFood];
@@ -109,6 +112,10 @@ typedef NS_ENUM(NSInteger, ZDMPriority) {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         NSObject *tiger = ZDMGetServiceWithPriority(AnimalProtocol, 100);
         XCTAssertNil(tiger);
+        
+        tiger = ZDMGetServiceFromCacheWithPriority(AnimalProtocol, 100);
+        XCTAssertNil(tiger);
+        
         [expect fulfill];
     });
     [self waitForExpectationsWithTimeout:5 handler:^(NSError * _Nullable error) {
