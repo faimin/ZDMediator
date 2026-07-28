@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 0.4.5
+
+- 修复 `forwardInvocation:` 中因返回值缓冲区大小不匹配导致的 EXC_BREAKPOINT 崩溃
+- 新增 `doesNotRecognizeSelector:` 的 DEBUG 日志输出
+
+## 0.4.4
+
+- 新增从缓存直接读取实例的方法，不触发自动创建
+- 新增宏 `ZDMGetServiceFromCache` / `ZDMGetServiceFromCacheWithPriority`
+
 ## 0.4.3.1
 
 - 关闭优先级容错处理日志
