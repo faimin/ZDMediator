@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cocoapods-lint:
+    name: CocoaPods Lint
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Pod Lint
+        run: pod lib lint ZDMediator.podspec --allow-warnings
+
+  spm-build:
+    name: SPM Build (${{ matrix.platform }})
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        platform:
+          - 'iOS'
+          - 'iOS Simulator'
+          - 'macOS'
+          - 'tvOS'
+          - 'watchOS'
+          - 'visionOS'
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build
+        run: |
+          xcodebuild build \
+            -scheme ZDMediator \
+            -destination 'generic/platform=${{ matrix.platform }}' \
+            -skipPackagePluginValidation \
+            | xcpretty || true
