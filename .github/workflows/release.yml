@@ -14,12 +14,15 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Set version from tag
         run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
 
       - name: Build archives
         run: |
+          set -o pipefail
           SCHEME="ZDMediator"
           ARCHIVES="archives"
           mkdir -p "$ARCHIVES"
@@ -37,7 +40,7 @@ jobs:
               -skipPackagePluginValidation \
               SKIP_INSTALL=NO \
               BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
-              | xcpretty || true
+              | xcpretty
           }
 
           build_archive "iOS"                "generic/platform=iOS"
