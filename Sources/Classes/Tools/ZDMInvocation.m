@@ -155,10 +155,14 @@ typedef UIEdgeInsets ZDMEdgeInsets;
                 } else if (strcmp(argType, @encode(NSRange)) == 0) {
                     NSRange arg = va_arg(args, NSRange);
                     [invocation setArgument:&arg atIndex:index];
-                } else if (strcmp(argType, @encode(CATransform3D)) == 0) {
+                }
+#if !TARGET_OS_WATCH
+                else if (strcmp(argType, @encode(CATransform3D)) == 0) {
                     CATransform3D arg = va_arg(args, CATransform3D);
                     [invocation setArgument:&arg atIndex:index];
-                } else if (strcmp(argType, @encode(ZDMEdgeInsets)) == 0) {
+                }
+#endif
+                else if (strcmp(argType, @encode(ZDMEdgeInsets)) == 0) {
                     ZDMEdgeInsets arg = va_arg(args, ZDMEdgeInsets);
                     [invocation setArgument:&arg atIndex:index];
                 }
