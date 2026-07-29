@@ -59,20 +59,18 @@ jobs:
 
       - name: Create XCFramework
         run: |
-          ARCHIVES="archives"
-          FRAMEWORK_NAME="ZDMediator"
-
-          # Collect all framework paths
-          ARGS=""
-          for archive in "$ARCHIVES"/*.xcarchive; do
-            FRAMEWORK_PATH="$archive/Products/Library/Frameworks/${FRAMEWORK_NAME}.framework"
-            if [ -d "$FRAMEWORK_PATH" ]; then
-              ARGS="$ARGS -framework $FRAMEWORK_PATH"
-            fi
+          # SPM archives produce .o not .framework, so convert to .a first
+          mkdir -p libs
+          ARGS=()
+          for archive in archives/*.xcarchive; do
+            PLATFORM=$(basename "$archive" .xcarchive)
+            LIB="libs/lib${PLATFORM}.a"
+            OBJ=$(find "$archive/Products" -name "ZDMediator.o" -type f | head -1)
+            libtool -static -o "$LIB" "$OBJ"
+            ARGS+=(-library "$LIB" -headers Sources/Classes/Public)
           done
 
-          echo "🔨 Creating XCFramework..."
-          xcodebuild -create-xcframework $ARGS -output "${FRAMEWORK_NAME}.xcframework"
+          xcodebuild -create-xcframework "${ARGS[@]}" -output ZDMediator.xcframework
 
       - name: Zip XCFramework
         run: zip -r -y ZDMediator.xcframework.zip ZDMediator.xcframework
