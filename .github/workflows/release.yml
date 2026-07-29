@@ -20,6 +20,10 @@ jobs:
       - name: Set version from tag
         run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
 
+      - name: Remove workspace/project interference
+        # Root-level _Pods.xcodeproj causes xcodebuild to ignore Package.swift
+        run: rm -rf *.xcodeproj *.xcworkspace
+
       - name: Build archives
         run: |
           set -o pipefail
