@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'ZDMediator'
-  s.version          = '0.4.4'
+  s.version          = '0.4.5'
   s.summary          = '模块通信中间件'
   s.description      = <<-DESC
     用于模块间通信的中间件，支持自动注册、手动注册、强弱引用、实例方法、类方法调用
@@ -32,11 +32,11 @@ Pod::Spec.new do |s|
   #   :ios => "10.0",
   #   :osx => "10.12",
   # }
-  
+
   s.subspec 'Tools' do |ss|
     ss.source_files = 'Sources/Classes/Tools/*.{h,m}'
   end
-  
+
   s.subspec 'Mediator' do |ss|
     ss.source_files = 'Sources/Classes/**/*.{h,m}'
     ss.exclude_files = 'Sources/Classes/Tools/*.{h,m}'
@@ -46,18 +46,18 @@ Pod::Spec.new do |s|
     }
     ss.dependency "#{s.name}/Tools"
   end
-    
+
   s.subspec 'EnableAssert' do |ss|
     ss.dependency "#{s.name}/Tools"
     ss.pod_target_xcconfig = {
       'GCC_PREPROCESSOR_DEFINITIONS' => 'ENABLE_ASSERT=1',
     }
   end
-  
+
   s.subspec 'All' do |ss|
     ss.dependency 'ZDMediator/Mediator'
     ss.dependency 'ZDMediator/EnableAssert'
   end
-  
+
   s.default_subspec = 'Mediator'
 end

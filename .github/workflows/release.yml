@@ -1,0 +1,99 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '[0-9]+.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-xcframework:
+    name: Build XCFramework & Release
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set version from tag
+        run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+
+      - name: Remove workspace/project interference
+        # Root-level _Pods.xcodeproj causes xcodebuild to ignore Package.swift
+        run: rm -rf *.xcodeproj *.xcworkspace
+
+      - name: Build archives
+        run: |
+          set -o pipefail
+          SCHEME="ZDMediator"
+          ARCHIVES="archives"
+          mkdir -p "$ARCHIVES"
+
+          build_archive() {
+            local platform="$1"
+            local destination="$2"
+            local archive_path="$ARCHIVES/$platform.xcarchive"
+
+            echo "📦 Archiving for $platform..."
+            xcodebuild archive \
+              -scheme "$SCHEME" \
+              -destination "$destination" \
+              -archivePath "$archive_path" \
+              -skipPackagePluginValidation \
+              SKIP_INSTALL=NO \
+              BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
+              | xcpretty
+          }
+
+          build_archive "iOS"                "generic/platform=iOS"
+          build_archive "iOS-Simulator"      "generic/platform=iOS Simulator"
+          build_archive "macOS"              "generic/platform=macOS"
+          build_archive "tvOS"               "generic/platform=tvOS"
+          build_archive "tvOS-Simulator"     "generic/platform=tvOS Simulator"
+          build_archive "watchOS"            "generic/platform=watchOS"
+          build_archive "watchOS-Simulator"  "generic/platform=watchOS Simulator"
+          build_archive "visionOS"           "generic/platform=visionOS"
+          build_archive "visionOS-Simulator" "generic/platform=visionOS Simulator"
+
+      - name: Create XCFramework
+        run: |
+          ARCHIVES="archives"
+          FRAMEWORK_NAME="ZDMediator"
+
+          # Collect all framework paths
+          ARGS=""
+          for archive in "$ARCHIVES"/*.xcarchive; do
+            FRAMEWORK_PATH="$archive/Products/Library/Frameworks/${FRAMEWORK_NAME}.framework"
+            if [ -d "$FRAMEWORK_PATH" ]; then
+              ARGS="$ARGS -framework $FRAMEWORK_PATH"
+            fi
+          done
+
+          echo "🔨 Creating XCFramework..."
+          xcodebuild -create-xcframework $ARGS -output "${FRAMEWORK_NAME}.xcframework"
+
+      - name: Zip XCFramework
+        run: zip -r -y ZDMediator.xcframework.zip ZDMediator.xcframework
+
+      - name: Extract changelog
+        run: |
+          VERSION_ESCAPED=$(echo "$VERSION" | sed 's/\./\\./g')
+          CHANGELOG=$(sed -n "/^## ${VERSION_ESCAPED}$/,/^## /{/^## ${VERSION_ESCAPED}$/d;/^## /d;p;}" CHANGELOG.md | sed '/^$/d')
+
+          if [ -z "$CHANGELOG" ]; then
+            CHANGELOG=""
+          fi
+
+          echo "CHANGELOG<<EOF" >> $GITHUB_ENV
+          echo "$CHANGELOG" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v3
+        with:
+          name: ${{ env.VERSION }}
+          body: ${{ env.CHANGELOG }}
+          generate_release_notes: true
+          files: ZDMediator.xcframework.zip

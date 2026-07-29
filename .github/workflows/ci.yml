@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cocoapods-lint:
+    name: CocoaPods Lint
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Pod Lint
+        run: pod lib lint ZDMediator.podspec --allow-warnings
+
+  spm-build:
+    name: SPM Build (${{ matrix.platform }})
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        platform:
+          - 'iOS'
+          - 'iOS Simulator'
+          - 'macOS'
+          - 'tvOS'
+          - 'watchOS'
+          - 'visionOS'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Remove workspace/project interference
+        # Root-level _Pods.xcodeproj causes xcodebuild to ignore Package.swift
+        run: rm -rf *.xcodeproj *.xcworkspace
+
+      - name: Build
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -scheme ZDMediator \
+            -destination 'generic/platform=${{ matrix.platform }}' \
+            -skipPackagePluginValidation \
+            | xcpretty

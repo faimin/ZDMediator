@@ -1,8 +1,12 @@
 # ZDMediator
 
+[![Platform](https://img.shields.io/badge/Platform-iOS_12%2B_|_macOS_10.13%2B_|_tvOS_12%2B_|_watchOS_5%2B_|_visionOS_1%2B-blue?style=flat&logo=apple&logoColor=white)](https://github.com/faimin/ZDMediator)
 [![Version](https://img.shields.io/cocoapods/v/ZDMediator.svg?style=flat)](https://cocoapods.org/pods/ZDMediator)
 [![License](https://img.shields.io/cocoapods/l/ZDMediator.svg?style=flat)](https://cocoapods.org/pods/ZDMediator)
-[![Platform](https://img.shields.io/cocoapods/p/ZDMediator.svg?style=flat)](https://cocoapods.org/pods/ZDMediator)
+[![CI](https://github.com/faimin/ZDMediator/actions/workflows/ci.yml/badge.svg)](https://github.com/faimin/ZDMediator/actions/workflows/ci.yml)
+[![SPM](https://img.shields.io/badge/SPM-compatible-brightgreen.svg)](https://swift.org/package-manager)
+
+模块通信中间件，用于模块间通信，支持自动注册、手动注册、强弱引用、实例方法、类方法调用。
 
 ## Example
 
@@ -17,12 +21,31 @@ To run the example project, clone the repo, and run `pod install` from the Examp
 
 ## Installation
 
-ZDMediator is available through [CocoaPods](https://cocoapods.org). To install
-it, simply add the following line to your Podfile:
+### CocoaPods
 
 ```ruby
 pod 'ZDMediator'
 ```
+
+### Swift Package Manager
+
+在 Xcode 中：`File` → `Add Package Dependencies...`，输入仓库地址：
+
+```
+https://github.com/faimin/ZDMediator.git
+```
+
+或者在 `Package.swift` 中添加：
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/faimin/ZDMediator.git", from: "0.4.5")
+]
+```
+
+### XCFramework
+
+从 [GitHub Releases](https://github.com/faimin/ZDMediator/releases) 下载 `ZDMediator.xcframework.zip`，解压后将 `ZDMediator.xcframework` 拖入项目的 `Frameworks, Libraries, and Embedded Content` 中。
 
 ## Feature
 
