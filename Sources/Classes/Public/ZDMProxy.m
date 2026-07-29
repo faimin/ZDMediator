@@ -158,10 +158,4 @@
     return [_target debugDescription];
 }
 
-- (void)doesNotRecognizeSelector:(SEL)aSelector {
-#if DEBUG
-    NSLog(@"❌❌ >>>>> target: %@ don't recognized selector：%@", _target, NSStringFromSelector(aSelector));
-#endif
-}
-
 @end

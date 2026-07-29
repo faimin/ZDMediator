@@ -94,12 +94,6 @@
     }
 }
 
-- (void)doesNotRecognizeSelector:(SEL)aSelector {
-#if DEBUG
-    NSLog(@"❌ - doesNotRecognizeSelector: %@", NSStringFromSelector(aSelector));
-#endif
-}
-
 #pragma mark - Private
 
 /// execute instance method for a class, create a instance if it is not exist
