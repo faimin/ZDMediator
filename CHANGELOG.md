@@ -1,9 +1,14 @@
 # CHANGELOG
 
+## 0.4.6
+
+- 修复`ZDMProxy`中`target`为`nil`时的崩溃
+
 ## 0.4.5
 
-- 修复 `forwardInvocation:` 中因返回值缓冲区大小不匹配导致的 EXC_BREAKPOINT 崩溃
+- 修复 `forwardInvocation:` 中因返回值缓冲区大小不匹配导致的 `EXC_BREAKPOINT` 崩溃
 - 新增 `doesNotRecognizeSelector:` 的 DEBUG 日志输出
+- 新增`CI`
 
 ## 0.4.4
 
