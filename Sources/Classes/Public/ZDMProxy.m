@@ -89,9 +89,9 @@
     NSMethodSignature *signature = nil;
     if (_target && sel) {
         signature = [_target methodSignatureForSelector:sel];
-        if (!signature) {
-            signature = [NSObject instanceMethodSignatureForSelector:@selector(init)];
-        }
+    }
+    if (!signature) {
+        signature = [NSObject instanceMethodSignatureForSelector:@selector(init)];
     }
     return signature;
 }

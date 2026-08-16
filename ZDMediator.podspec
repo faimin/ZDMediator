@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'ZDMediator'
-  s.version          = '0.4.5'
+  s.version          = '0.4.6'
   s.summary          = '模块通信中间件'
   s.description      = <<-DESC
     用于模块间通信的中间件，支持自动注册、手动注册、强弱引用、实例方法、类方法调用
@@ -26,11 +26,11 @@ Pod::Spec.new do |s|
   s.pod_target_xcconfig = {
      'DEFINES_MODULE' => 'YES'
   }
-  s.ios.deployment_target = '10.0'
-  s.osx.deployment_target = '10.12'
+  s.ios.deployment_target = '13.0'
+  s.osx.deployment_target = '10.15'
   # s.platforms = {
-  #   :ios => "10.0",
-  #   :osx => "10.12",
+  #   :ios => "13.0",
+  #   :osx => "10.15",
   # }
 
   s.subspec 'Tools' do |ss|

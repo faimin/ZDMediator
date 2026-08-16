@@ -11,6 +11,7 @@
 #import "CatProtocol.h"
 #import "ZDCat.h"
 #import "ZDDog.h"
+#import <ZDMediator/ZDMProxy.h>
 
 @interface ZDUnrecognizedMethodTest : XCTestCase
 
@@ -42,6 +43,9 @@
     
     NSObject *dog = ZDMGetServiceWithClass(CatProtocol, ZDMDefaultPriority, ZDDog);
     XCTAssertNil(dog);
+    
+    id<CatProtocol> catP = (id<CatProtocol>)[ZDMProxy proxyWithTarget:nil];
+    [catP eatWhatFood];
 }
 
 - (void)testPerformanceExample {
