@@ -223,52 +223,85 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         return;
     }
     
-    // 检查是否已经存在自动注册的信息, 有的话就不创建
     ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
-    [mediator.lock lock];
-    NSMutableSet<NSString *> *keySet = mediator.registerClassDict[clsName];
-    [mediator.lock unlock];
     NSString *key = zdmStoreKey(serviceName, @(priority));
-    // 每次注册都会替换该 service key 的生命周期归属，强引用注册则显式废弃旧弱引用 token。
     NSObject *registrationToken = weakStore && !object_isClass(obj) ? [NSObject new] : nil;
+    ZDMServiceItem *serviceItem = [ZDMServiceItem itemWithStrongObj:(weakStore ? nil : obj)
+                                                            weakObj:(weakStore ? obj : nil)];
+    BOOL updateProxy = NO;
+    ZDMServiceItem *replacedItem = nil;
     [mediator.lock lock];
-    if (registrationToken) {
-        mediator.registrationTokenDict[key] = registrationToken;
-    } else {
-        mediator.registrationTokenDict[key] = nil;
-    }
-    [mediator.lock unlock];
+    // 在同一临界区内提交 token、协议元数据和实例缓存，确保它们属于同一次注册。
+    NSMutableSet<NSString *> *keySet = mediator.registerClassDict[clsName];
     if (![keySet containsObject:key]) {
 #if DEBUG
         NSMutableSet *serviceNameSet = [[NSMutableSet alloc] init];
-        for (NSString *key in keySet) {
-            NSString *tempServiceName = [key componentsSeparatedByString:zdmJoinKey].firstObject;
+        for (NSString *registeredKey in keySet) {
+            NSString *tempServiceName = [registeredKey componentsSeparatedByString:zdmJoinKey].firstObject;
             if (!tempServiceName) {
                 continue;
             }
             [serviceNameSet addObject:tempServiceName];
         }
         if ([serviceNameSet containsObject:serviceName]) {
+            [mediator.lock unlock];
             NSAssert2(NO, @"❌ >>>>> you had registered the service: (%@), class: (%@) with another priority", serviceName, clsName);
-        } else {
-#endif
-            ZDMServiceBox *box = [[ZDMServiceBox alloc] init];
-            box.priority = priority;
-            box.autoInit = NO;
-            // 如果手动注册的是类对象，则认为协议都是类方法
-            box.isAllClsMethod = object_isClass(obj);
-            box.cls = [obj class];
-            
-            [self _storeServiceWithName:serviceName serviceBox:box];
-#if DEBUG
+            return;
         }
 #endif
+        ZDMServiceBox *box = [[ZDMServiceBox alloc] init];
+        box.priority = priority;
+        box.autoInit = NO;
+        // 如果手动注册的是类对象，则认为协议都是类方法。
+        box.isAllClsMethod = object_isClass(obj);
+        box.cls = cls;
+
+        NSMutableOrderedSet<NSNumber *> *orderSet = mediator.priorityDict[serviceName];
+        if (!orderSet) {
+            orderSet = [[NSMutableOrderedSet alloc] init];
+            mediator.priorityDict[serviceName] = orderSet;
+        }
+#if DEBUG
+        if ([orderSet containsObject:@(priority)]) {
+            Class registeredClass = mediator.registerInfoDict[key].cls;
+            NSString *registeredClassName = NSStringFromClass(registeredClass);
+            [mediator.lock unlock];
+            NSAssert4(NO, @"❌ >>>>> service被不同class注册了相同priority,请修改 => priority: %ld, serviceName: %@, aClassName: %@, bClassName: %@", priority, serviceName, registeredClassName, clsName);
+            return;
+        }
+#endif
+        [orderSet addObject:@(priority)];
+        [orderSet sortUsingComparator:^NSComparisonResult(NSNumber * _Nonnull obj1, NSNumber * _Nonnull obj2) {
+            return obj1.integerValue >= obj2.integerValue ? NSOrderedAscending : NSOrderedDescending;
+        }];
+        mediator.registerInfoDict[key] = box;
+
+        if (!keySet) {
+            keySet = [[NSMutableSet alloc] init];
+            mediator.registerClassDict[clsName] = keySet;
+        }
+        [keySet addObject:key];
+        updateProxy = YES;
     }
-    [self _storeServiceWithStrongObj:(weakStore ? nil : obj) weakObj:(weakStore ? obj : nil)];
+
+    // 每次注册都替换 service key 的生命周期归属，强引用注册会废弃旧弱引用 token。
+    if (registrationToken) {
+        mediator.registrationTokenDict[key] = registrationToken;
+    } else {
+        mediator.registrationTokenDict[key] = nil;
+    }
+    replacedItem = mediator.instanceDict[clsName];
+    mediator.instanceDict[clsName] = serviceItem;
+    [mediator.lock unlock];
+    // 释放被替换缓存项放在锁外，避免析构路径重入注册锁。
+    replacedItem = nil;
+    if (updateProxy) {
+        [self _updateProxyTargets];
+    }
     
     if (registrationToken) {
         // 旧控制器释放时可能晚于新控制器注册，过期 token 不得清理新注册。
-        [((NSObject *)obj) zdm_onDealloc:^(id  _Nullable realTarget) {
+        [((NSObject *)obj) zdm_onDealloc:^(id _Nullable realTarget) {
             [self _removeService:serviceProtocol
                         priority:priority
                    autoInitAgain:NO
@@ -793,6 +826,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     NSString *key = zdmStoreKey(serviceName, priorityNum);
     
     __auto_type mediator = ZDMOneForAll.shareInstance;
+    BOOL updateProxy = NO;
     [mediator.lock lock];
     NSMutableOrderedSet<NSNumber *> *orderSet = mediator.priorityDict[serviceName];
     if (!orderSet) {
@@ -814,22 +848,21 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     }];
     
     mediator.registerInfoDict[key] = box;
-    [mediator.lock unlock];
-    
     NSString *clsName = NSStringFromClass(box.cls);
-    if (!clsName) {
-        return;
+    if (clsName) {
+        NSMutableSet<NSString *> *servicePrioritySet = mediator.registerClassDict[clsName];
+        if (!servicePrioritySet) {
+            servicePrioritySet = [[NSMutableSet alloc] init];
+            mediator.registerClassDict[clsName] = servicePrioritySet;
+        }
+        [servicePrioritySet addObject:key];
+        updateProxy = YES;
     }
-    [mediator.lock lock];
-    NSMutableSet<NSString *> *servicePrioritySet = mediator.registerClassDict[clsName];
-    if (!servicePrioritySet) {
-        servicePrioritySet = [[NSMutableSet alloc] init];
-        mediator.registerClassDict[clsName] = servicePrioritySet;
-    }
-    [servicePrioritySet addObject:key];
     [mediator.lock unlock];
-    
-    [self _updateProxyTargets];
+
+    if (updateProxy) {
+        [self _updateProxyTargets];
+    }
 }
 
 + (void)_storeServiceWithStrongObj:(id)strongObj weakObj:(id)weakObj {

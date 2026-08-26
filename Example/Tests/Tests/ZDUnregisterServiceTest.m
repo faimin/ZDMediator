@@ -135,6 +135,69 @@
                                  onlyFromCache:YES]);
 }
 
+- (void)testConcurrentWeakRegistrationsKeepCurrentServiceAfterStaleRelease {
+    for (NSInteger index = 0; index < 100; index++) {
+        NSInteger priority = 990000 + index;
+        ZDTiger *seedTiger = [ZDTiger new];
+        [ZDMOneForAll manualRegisterService:@protocol(AnimalProtocol)
+                                   priority:priority
+                                implementer:seedTiger
+                                  weakStore:NO];
+
+        dispatch_group_t group = dispatch_group_create();
+        dispatch_group_t readyGroup = dispatch_group_create();
+        dispatch_semaphore_t startSemaphore = dispatch_semaphore_create(0);
+        dispatch_queue_t queue = dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0);
+        NSMutableArray *tigers = [[NSMutableArray alloc] init];
+        for (NSInteger tigerIndex = 0; tigerIndex < 8; tigerIndex++) {
+            [tigers addObject:[ZDTiger new]];
+        }
+        for (ZDTiger *tiger in tigers) {
+            dispatch_group_enter(readyGroup);
+            dispatch_group_async(group, queue, ^{
+                dispatch_group_leave(readyGroup);
+                dispatch_semaphore_wait(startSemaphore, DISPATCH_TIME_FOREVER);
+                [ZDMOneForAll manualRegisterService:@protocol(AnimalProtocol)
+                                           priority:priority
+                                        implementer:tiger
+                                          weakStore:YES];
+            });
+        }
+        dispatch_group_wait(readyGroup, DISPATCH_TIME_FOREVER);
+        for (NSInteger tigerIndex = 0; tigerIndex < tigers.count; tigerIndex++) {
+            dispatch_semaphore_signal(startSemaphore);
+        }
+        dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+        id service = [ZDMOneForAll serviceWithName:NSStringFromProtocol(@protocol(AnimalProtocol))
+                                          priority:priority
+                                     onlyFromCache:YES];
+        ZDTiger *currentTiger = nil;
+        for (ZDTiger *tiger in tigers) {
+            if ([service isEqual:tiger]) {
+                currentTiger = tiger;
+                break;
+            }
+        }
+        XCTAssertNotNil(currentTiger);
+
+        // 并发注册结束后，任一非当前实例释放都不得清理当前服务。
+        for (NSInteger tigerIndex = 0; tigerIndex < tigers.count; tigerIndex++) {
+            if (tigers[tigerIndex] != currentTiger) {
+                [tigers replaceObjectAtIndex:tigerIndex withObject:NSNull.null];
+                id remainingService = [ZDMOneForAll serviceWithName:NSStringFromProtocol(@protocol(AnimalProtocol))
+                                                           priority:priority
+                                                      onlyFromCache:YES];
+                XCTAssertTrue([remainingService isEqual:currentTiger]);
+            }
+        }
+
+        [ZDMOneForAll removeService:@protocol(AnimalProtocol)
+                           priority:priority
+                      autoInitAgain:NO];
+    }
+}
+
 - (void)testRemovingOneProtocolKeepsSharedClassInstance {
     NSInteger animalPriority = 987657;
     NSInteger catPriority = 987658;
