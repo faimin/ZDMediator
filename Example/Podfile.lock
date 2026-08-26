@@ -1,9 +1,9 @@
 PODS:
-  - ZDMediator (0.4.6):
-    - ZDMediator/Mediator (= 0.4.6)
-  - ZDMediator/Mediator (0.4.6):
+  - ZDMediator (0.5.0):
+    - ZDMediator/Mediator (= 0.5.0)
+  - ZDMediator/Mediator (0.5.0):
     - ZDMediator/Tools
-  - ZDMediator/Tools (0.4.6)
+  - ZDMediator/Tools (0.5.0)
 
 DEPENDENCIES:
   - ZDMediator (from `../`)
@@ -13,7 +13,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  ZDMediator: 7be4dccae0e8e87dc2cea9b4cc8391ed4d38ffd7
+  ZDMediator: 8b525b4464e1bea4639757567c7a85173db12051
 
 PODFILE CHECKSUM: 46bf512e1f25d6cb4e8997fe4dc161761125e9ad
 
