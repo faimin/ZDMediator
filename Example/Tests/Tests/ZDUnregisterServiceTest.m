@@ -13,6 +13,34 @@
 #import "AnimalProtocol.h"
 #import "ZDTiger.h"
 
+@protocol ZDServiceReplacementProtocol <ZDMCommonProtocol>
+
+- (NSString *)zdm_testServiceName;
+
+@end
+
+@interface ZDOldService : NSObject <ZDServiceReplacementProtocol>
+@end
+
+@implementation ZDOldService
+
+- (NSString *)zdm_testServiceName {
+    return @"old";
+}
+
+@end
+
+@interface ZDNewService : NSObject <ZDServiceReplacementProtocol>
+@end
+
+@implementation ZDNewService
+
+- (NSString *)zdm_testServiceName {
+    return @"new";
+}
+
+@end
+
 @interface ZDUnregisterServiceTest : XCTestCase
 
 @end
@@ -72,6 +100,33 @@
     XCTAssertNil([ZDMOneForAll serviceWithName:NSStringFromProtocol(@protocol(AnimalProtocol))
                                       priority:priority
                                  onlyFromCache:YES]);
+}
+
+- (void)testReplacingServiceKeyWithDifferentClassRemovesOldBroadcastTarget {
+#if DEBUG
+    XCTSkip(@"同优先级不同类覆盖仅在 Release 配置下允许");
+    return;
+#endif
+    NSInteger priority = 987660;
+    ZDOldService *oldService = [ZDOldService new];
+    [ZDMOneForAll manualRegisterService:@protocol(ZDServiceReplacementProtocol)
+                               priority:priority
+                            implementer:oldService
+                              weakStore:NO];
+
+    ZDNewService *newService = [ZDNewService new];
+    [ZDMOneForAll manualRegisterService:@protocol(ZDServiceReplacementProtocol)
+                               priority:priority
+                            implementer:newService
+                              weakStore:NO];
+
+    // 相同 service key 被新类覆盖后，全量广播不能再遍历旧类实例。
+    NSArray *results = [ZDMOneForAll dispatchWithSELAndArgs:@selector(zdm_testServiceName), nil];
+    XCTAssertEqualObjects(results, (@[ @"new" ]));
+
+    [ZDMOneForAll removeService:@protocol(ZDServiceReplacementProtocol)
+                       priority:priority
+                  autoInitAgain:NO];
 }
 
 - (void)testWeakStoreSameObjectMultipleProtocolsCleansEachService {

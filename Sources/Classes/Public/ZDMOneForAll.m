@@ -24,6 +24,29 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     return [NSString stringWithFormat:@"%@%@%@", serviceName, zdmJoinKey, priority];
 }
 
+/// 调用方必须持有 mediator.lock；仅当旧类不再注册任何服务时才移除其共享实例。
+NS_INLINE ZDMServiceItem *zdmRemoveServiceKeyFromClass(
+    ZDMOneForAll *mediator,
+    NSString *key,
+    Class cls
+) {
+    NSString *clsName = NSStringFromClass(cls);
+    if (!clsName) {
+        return nil;
+    }
+
+    NSMutableSet<NSString *> *keys = mediator.registerClassDict[clsName];
+    [keys removeObject:key];
+    if (keys.count > 0) {
+        return nil;
+    }
+
+    mediator.registerClassDict[clsName] = nil;
+    ZDMServiceItem *item = mediator.instanceDict[clsName];
+    mediator.instanceDict[clsName] = nil;
+    return item;
+}
+
 @implementation ZDMOneForAll
 
 #pragma mark - Singleton
@@ -132,6 +155,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
                 NSNumber *priorityNum = @(serviceBox.priority);
                 NSString *protocolPriorityKey = zdmStoreKey(serviceName, priorityNum);
                 
+                ZDMServiceItem *replacedItem = nil;
                 [lock lock];
                 NSMutableOrderedSet<NSNumber *> *orderSet = priorityDict[serviceName];
                 if (!orderSet) {
@@ -150,9 +174,12 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 #endif
                 [orderSet addObject:priorityNum];
                 
-                // storeMap中有可能已经存在serviceBox了,
-                // 不过不管它,用自动注册的这个serviceBox,
-                // 因为自动注册的这个信息更全
+                // 自动注册信息覆盖旧项前，先解除旧类的映射，防止广播到旧实例。
+                ZDMServiceBox *previousBox = storeMap[protocolPriorityKey];
+                if (previousBox.cls && previousBox.cls != serviceBox.cls) {
+                    replacedItem = zdmRemoveServiceKeyFromClass(mediator, protocolPriorityKey, previousBox.cls);
+                }
+                // storeMap中有可能已经存在serviceBox了，不过用自动注册信息覆盖。
                 storeMap[protocolPriorityKey] = serviceBox;
                 
                 // store key to clsMap
@@ -163,6 +190,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
                 }
                 [protocolPriorityKeySet addObject:protocolPriorityKey];
                 [lock unlock];
+                [replacedItem clear];
             }
         }
         
@@ -274,6 +302,10 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         [orderSet sortUsingComparator:^NSComparisonResult(NSNumber * _Nonnull obj1, NSNumber * _Nonnull obj2) {
             return obj1.integerValue >= obj2.integerValue ? NSOrderedAscending : NSOrderedDescending;
         }];
+        ZDMServiceBox *previousBox = mediator.registerInfoDict[key];
+        if (previousBox.cls && previousBox.cls != cls) {
+            replacedItem = zdmRemoveServiceKeyFromClass(mediator, key, previousBox.cls);
+        }
         mediator.registerInfoDict[key] = box;
 
         if (!keySet) {
@@ -290,11 +322,10 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     } else {
         mediator.registrationTokenDict[key] = nil;
     }
-    replacedItem = mediator.instanceDict[clsName];
     mediator.instanceDict[clsName] = serviceItem;
     [mediator.lock unlock];
     // 释放被替换缓存项放在锁外，避免析构路径重入注册锁。
-    replacedItem = nil;
+    [replacedItem clear];
     if (updateProxy) {
         [self _updateProxyTargets];
     }
@@ -847,6 +878,11 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         return result;
     }];
     
+    ZDMServiceItem *replacedItem = nil;
+    ZDMServiceBox *previousBox = mediator.registerInfoDict[key];
+    if (previousBox.cls && previousBox.cls != box.cls) {
+        replacedItem = zdmRemoveServiceKeyFromClass(mediator, key, previousBox.cls);
+    }
     mediator.registerInfoDict[key] = box;
     NSString *clsName = NSStringFromClass(box.cls);
     if (clsName) {
@@ -859,6 +895,8 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         updateProxy = YES;
     }
     [mediator.lock unlock];
+
+    [replacedItem clear];
 
     if (updateProxy) {
         [self _updateProxyTargets];
