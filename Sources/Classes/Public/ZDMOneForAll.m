@@ -281,6 +281,7 @@ NS_INLINE ZDMServiceItem *zdmRemoveServiceKeyFromClass(
         }
         if ([serviceNameSet containsObject:serviceName]) {
             [mediator.lock unlock];
+            ZDMLog(@"❌ >>>>> skip register service: (%@), class: (%@), it was registered with another priority", serviceName, clsName);
             NSAssert2(NO, @"❌ >>>>> you had registered the service: (%@), class: (%@) with another priority", serviceName, clsName);
             return;
         }
@@ -302,6 +303,7 @@ NS_INLINE ZDMServiceItem *zdmRemoveServiceKeyFromClass(
             Class registeredClass = mediator.registerInfoDict[key].cls;
             NSString *registeredClassName = NSStringFromClass(registeredClass);
             [mediator.lock unlock];
+            ZDMLog(@"❌ >>>>> skip register service: (%@), priority: (%ld) was taken by class: (%@)", serviceName, priority, registeredClassName);
             NSAssert4(NO, @"❌ >>>>> service被不同class注册了相同priority,请修改 => priority: %ld, serviceName: %@, aClassName: %@, bClassName: %@", priority, serviceName, registeredClassName, clsName);
             return;
         }
