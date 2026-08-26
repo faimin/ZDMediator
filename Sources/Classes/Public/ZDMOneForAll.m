@@ -53,6 +53,7 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     _registerClassDict = @{}.mutableCopy;
     _priorityDict = @{}.mutableCopy;
     _instanceDict = @{}.mutableCopy;
+    _registrationTokenDict = @{}.mutableCopy;
     _serviceResponderDict = @{}.mutableCopy;
     _proxy = [ZDMBroadcastProxy alloc];
 }
@@ -228,6 +229,15 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     NSMutableSet<NSString *> *keySet = mediator.registerClassDict[clsName];
     [mediator.lock unlock];
     NSString *key = zdmStoreKey(serviceName, @(priority));
+    // 每次注册都会替换该 service key 的生命周期归属，强引用注册则显式废弃旧弱引用 token。
+    NSObject *registrationToken = weakStore && !object_isClass(obj) ? [NSObject new] : nil;
+    [mediator.lock lock];
+    if (registrationToken) {
+        mediator.registrationTokenDict[key] = registrationToken;
+    } else {
+        mediator.registrationTokenDict[key] = nil;
+    }
+    [mediator.lock unlock];
     if (![keySet containsObject:key]) {
 #if DEBUG
         NSMutableSet *serviceNameSet = [[NSMutableSet alloc] init];
@@ -256,10 +266,13 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     }
     [self _storeServiceWithStrongObj:(weakStore ? nil : obj) weakObj:(weakStore ? obj : nil)];
     
-    if (weakStore && !object_isClass(obj)) {
-        // auto cleanup after obj dealloc
+    if (registrationToken) {
+        // 旧控制器释放时可能晚于新控制器注册，过期 token 不得清理新注册。
         [((NSObject *)obj) zdm_onDealloc:^(id  _Nullable realTarget) {
-            [self removeService:serviceProtocol priority:priority autoInitAgain:NO];
+            [self _removeService:serviceProtocol
+                        priority:priority
+                   autoInitAgain:NO
+                   expectedToken:registrationToken];
         }];
     }
 }
@@ -282,6 +295,17 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
 + (BOOL)removeService:(Protocol *)serviceProtocol
              priority:(NSInteger)priority
         autoInitAgain:(BOOL)autoInitAgain {
+    return [self _removeService:serviceProtocol
+                       priority:priority
+                  autoInitAgain:autoInitAgain
+                  expectedToken:nil];
+}
+
+/// 仅清理仍对应当前注册 token 的弱引用服务，避免旧实例回调误删新注册。
++ (BOOL)_removeService:(Protocol *)serviceProtocol
+              priority:(NSInteger)priority
+         autoInitAgain:(BOOL)autoInitAgain
+         expectedToken:(NSObject *)expectedToken {
     if (!serviceProtocol) {
         ZDMLog(@"❌ >>>>> the protocol is nil");
 #if DEBUG && ENABLE_ASSERT
@@ -303,32 +327,42 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     
     ZDMOneForAll *mediator = ZDMOneForAll.shareInstance;
     [mediator.lock lock];
+    ZDMServiceBox *serviceBox = mediator.registerInfoDict[key];
+    if (!serviceBox) {
+        [mediator.lock unlock];
+        return NO;
+    }
+
+    NSString *clsName = NSStringFromClass(serviceBox.cls);
+    NSObject *currentToken = mediator.registrationTokenDict[key];
+    // 释放回调携带旧 token 时，当前注册已被替换，不能执行任何清理。
+    if (expectedToken && currentToken != expectedToken) {
+        [mediator.lock unlock];
+        return NO;
+    }
+
     NSMutableOrderedSet<NSNumber *> *priorityOrderSet = mediator.priorityDict[serviceName];
     [priorityOrderSet removeObject:@(priority)];
     if (priorityOrderSet.count == 0) {
         mediator.priorityDict[serviceName] = nil;
     }
     
-    ZDMServiceBox *serviceBox = mediator.registerInfoDict[key];
-    if (!serviceBox) {
-        [mediator.lock unlock];
-        return NO;
-    }
     serviceBox.autoInit = autoInitAgain;
     
-    NSString *clsName = NSStringFromClass(serviceBox.cls);
     ZDMServiceItem *item = nil;
+    BOOL clearItem = NO;
     BOOL _updateProxy = NO;
     if (clsName) {
         item = mediator.instanceDict[clsName];
-        mediator.instanceDict[clsName] = nil;
-        
         NSMutableSet<NSString *> *protocolPrioprityKeys = mediator.registerClassDict[clsName];
         [protocolPrioprityKeys removeObject:key];
         // cleanup register info if it didn't auto init agin
         if (!autoInitAgain) {
+            mediator.registrationTokenDict[key] = nil;
             if (protocolPrioprityKeys.count == 0) {
                 mediator.registerClassDict[clsName] = nil;
+                mediator.instanceDict[clsName] = nil;
+                clearItem = YES;
             }
             mediator.registerInfoDict[key] = nil;
             
@@ -342,12 +376,11 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
         [self _updateProxyTargets];
     }
     
-    if (item) {
+    if (clearItem && item) {
         [item clear];
         item = nil;
-        return YES;
     }
-    return NO;
+    return YES;
 }
 
 + (NSHashTable *)allInitializedObjects {

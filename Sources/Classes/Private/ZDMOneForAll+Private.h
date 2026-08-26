@@ -28,6 +28,9 @@
 /// { key(className): ZDMServiceItem }, avoid creating multiple instances of a class that adheres to multiple protocols. (避免一个类注册多个协议然后被创建多次)
 @property (nonatomic, strong) NSMutableDictionary<NSString *, ZDMServiceItem *> *instanceDict;
 
+/// { key(protocol+priority): token }, 用于校验弱引用注册的释放回调是否已过期。
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSObject *> *registrationTokenDict;
+
 /// { key(SEL || eventId): [ZDMEventResponderModel] }, 响应事件的Map
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableOrderedSet<ZDMEventResponder *> *> *serviceResponderDict;
 
