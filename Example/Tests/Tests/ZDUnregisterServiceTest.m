@@ -13,6 +13,34 @@
 #import "AnimalProtocol.h"
 #import "ZDTiger.h"
 
+@protocol ZDServiceReplacementProtocol <ZDMCommonProtocol>
+
+- (NSString *)zdm_testServiceName;
+
+@end
+
+@interface ZDOldService : NSObject <ZDServiceReplacementProtocol>
+@end
+
+@implementation ZDOldService
+
+- (NSString *)zdm_testServiceName {
+    return @"old";
+}
+
+@end
+
+@interface ZDNewService : NSObject <ZDServiceReplacementProtocol>
+@end
+
+@implementation ZDNewService
+
+- (NSString *)zdm_testServiceName {
+    return @"new";
+}
+
+@end
+
 @interface ZDUnregisterServiceTest : XCTestCase
 
 @end
@@ -74,6 +102,33 @@
                                  onlyFromCache:YES]);
 }
 
+- (void)testReplacingServiceKeyWithDifferentClassRemovesOldBroadcastTarget {
+#if DEBUG
+    XCTSkip(@"同优先级不同类覆盖仅在 Release 配置下允许");
+#else
+    NSInteger priority = 987660;
+    ZDOldService *oldService = [ZDOldService new];
+    [ZDMOneForAll manualRegisterService:@protocol(ZDServiceReplacementProtocol)
+                               priority:priority
+                            implementer:oldService
+                              weakStore:NO];
+
+    ZDNewService *newService = [ZDNewService new];
+    [ZDMOneForAll manualRegisterService:@protocol(ZDServiceReplacementProtocol)
+                               priority:priority
+                            implementer:newService
+                              weakStore:NO];
+
+    // 相同 service key 被新类覆盖后，全量广播不能再遍历旧类实例。
+    NSArray *results = [ZDMOneForAll dispatchWithSELAndArgs:@selector(zdm_testServiceName), nil];
+    XCTAssertEqualObjects(results, (@[ @"new" ]));
+
+    [ZDMOneForAll removeService:@protocol(ZDServiceReplacementProtocol)
+                       priority:priority
+                  autoInitAgain:NO];
+#endif
+}
+
 - (void)testWeakStoreSameObjectMultipleProtocolsCleansEachService {
     NSInteger animalPriority = 987655;
     NSInteger catPriority = 987656;
@@ -133,6 +188,94 @@
     XCTAssertNil([ZDMOneForAll serviceWithName:NSStringFromProtocol(@protocol(AnimalProtocol))
                                       priority:priority
                                  onlyFromCache:YES]);
+}
+
+- (void)testWeakStoreOldInstanceDoesNotRemoveClassReplacement {
+#if DEBUG
+    XCTSkip(@"同优先级不同类覆盖仅在 Release 配置下允许");
+#else
+    NSInteger priority = 987661;
+    ZDOldService *oldService = [ZDOldService new];
+    [ZDMOneForAll manualRegisterService:@protocol(ZDServiceReplacementProtocol)
+                               priority:priority
+                            implementer:oldService
+                              weakStore:YES];
+
+    [ZDMOneForAll registerService:@protocol(ZDServiceReplacementProtocol)
+                         priority:priority
+                   implementClass:ZDNewService.class];
+
+    // 旧弱实例释放后，新类注册仍必须保留，不能被过期 token 注销。
+    oldService = nil;
+    XCTAssertTrue([[ZDMOneForAll allRegisterClasses] containsObject:ZDNewService.class]);
+
+    [ZDMOneForAll removeService:@protocol(ZDServiceReplacementProtocol)
+                       priority:priority
+                  autoInitAgain:NO];
+#endif
+}
+
+- (void)testConcurrentWeakRegistrationsKeepCurrentServiceAfterStaleRelease {
+    for (NSInteger index = 0; index < 100; index++) {
+        NSInteger priority = 990000 + index;
+        ZDTiger *seedTiger = [ZDTiger new];
+        [ZDMOneForAll manualRegisterService:@protocol(AnimalProtocol)
+                                   priority:priority
+                                implementer:seedTiger
+                                  weakStore:NO];
+
+        dispatch_group_t group = dispatch_group_create();
+        dispatch_group_t readyGroup = dispatch_group_create();
+        dispatch_semaphore_t startSemaphore = dispatch_semaphore_create(0);
+        dispatch_queue_t queue = dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0);
+        NSMutableArray *tigers = [[NSMutableArray alloc] init];
+        for (NSInteger tigerIndex = 0; tigerIndex < 8; tigerIndex++) {
+            [tigers addObject:[ZDTiger new]];
+        }
+        for (ZDTiger *tiger in tigers) {
+            dispatch_group_enter(readyGroup);
+            dispatch_group_async(group, queue, ^{
+                dispatch_group_leave(readyGroup);
+                dispatch_semaphore_wait(startSemaphore, DISPATCH_TIME_FOREVER);
+                [ZDMOneForAll manualRegisterService:@protocol(AnimalProtocol)
+                                           priority:priority
+                                        implementer:tiger
+                                          weakStore:YES];
+            });
+        }
+        dispatch_group_wait(readyGroup, DISPATCH_TIME_FOREVER);
+        for (NSInteger tigerIndex = 0; tigerIndex < tigers.count; tigerIndex++) {
+            dispatch_semaphore_signal(startSemaphore);
+        }
+        dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+        id service = [ZDMOneForAll serviceWithName:NSStringFromProtocol(@protocol(AnimalProtocol))
+                                          priority:priority
+                                     onlyFromCache:YES];
+        ZDTiger *currentTiger = nil;
+        for (ZDTiger *tiger in tigers) {
+            if ([service isEqual:tiger]) {
+                currentTiger = tiger;
+                break;
+            }
+        }
+        XCTAssertNotNil(currentTiger);
+
+        // 并发注册结束后，任一非当前实例释放都不得清理当前服务。
+        for (NSInteger tigerIndex = 0; tigerIndex < tigers.count; tigerIndex++) {
+            if (tigers[tigerIndex] != currentTiger) {
+                [tigers replaceObjectAtIndex:tigerIndex withObject:NSNull.null];
+                id remainingService = [ZDMOneForAll serviceWithName:NSStringFromProtocol(@protocol(AnimalProtocol))
+                                                           priority:priority
+                                                      onlyFromCache:YES];
+                XCTAssertTrue([remainingService isEqual:currentTiger]);
+            }
+        }
+
+        [ZDMOneForAll removeService:@protocol(AnimalProtocol)
+                           priority:priority
+                      autoInitAgain:NO];
+    }
 }
 
 - (void)testRemovingOneProtocolKeepsSharedClassInstance {
