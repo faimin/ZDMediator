@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2024-07-26T03:57:15.622Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.6.4 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" version="24.6.4" etag="94gu13iydFJ213h7kA2z" type="device" pages="3">
+<mxfile host="Electron" modified="2026-08-26T00:00:00.000Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.6.4 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" version="24.6.4" etag="94gu13iydFJ213h7kA2z" type="device" pages="4">
   <diagram name="第 1 页" id="EzM8UU-Q2m9B1OBtjnuV">
     <mxGraphModel dx="877" dy="-329" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -869,6 +869,119 @@
             <mxPoint x="1150" y="1240" as="sourcePoint" />
             <mxPoint x="1140" y="1220" as="targetPoint" />
           </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="注册、替换与释放" id="registration-lifecycle-20260826">
+    <mxGraphModel dx="1600" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1080" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="lifecycle-title" value="ZDMOneForAll：注册、覆盖与弱引用释放" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=24;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="60" y="30" width="780" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-subtitle" value="service key = protocol + priority；状态变更由 ZDMLock 保护，实例清理由锁外执行" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=15;fontColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="60" y="75" width="980" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-lock" value="ZDMLock 临界区：原子提交服务元数据、类反向索引、实例缓存与生命周期 token" style="swimlane;html=1;rounded=1;startSize=30;fontStyle=1;fontSize=17;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="50" y="130" width="1130" height="480" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-register-info" value="registerInfoDict&lt;br&gt;&lt;font style=&quot;font-size:13px&quot;&gt;key(protocol + priority) → ZDMServiceBox&lt;br&gt;cls / priority / autoInit / isAllClsMethod&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="90" y="190" width="245" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-class-map" value="registerClassDict&lt;br&gt;&lt;font style=&quot;font-size:13px&quot;&gt;key(className) → Set&lt;service key&gt;&lt;br&gt;类到服务键的反向索引&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="375" y="190" width="245" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-instance-map" value="instanceDict&lt;br&gt;&lt;font style=&quot;font-size:13px&quot;&gt;key(className) → ZDMServiceItem&lt;br&gt;strongObj 或 weakObj&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="660" y="190" width="245" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-token-map" value="registrationTokenDict&lt;br&gt;&lt;font style=&quot;font-size:13px&quot;&gt;key(protocol + priority) → token&lt;br&gt;仅当前弱手动注册拥有&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="945" y="190" width="205" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-priority-map" value="priorityDict&lt;br&gt;&lt;font style=&quot;font-size:13px&quot;&gt;protocol → 有序 priority 集合&lt;br&gt;用于服务选择与广播排序&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#f5f5f5;strokeColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="90" y="330" width="245" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-register-source" value="弱手动注册&lt;br&gt;&lt;font style=&quot;font-size:13px&quot;&gt;manualRegisterService(..., weakStore:YES)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="1230" y="155" width="250" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-class-source" value="类注册 / Mach-O 自动注册&lt;br&gt;&lt;font style=&quot;font-size:13px&quot;&gt;registerService 或 _loadRegisterFromMacho&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="1230" y="270" width="250" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-replace" value="覆盖同一 service key 的事务&lt;br&gt;&lt;font style=&quot;font-size:13px&quot;&gt;1. 读取旧 ServiceBox&lt;br&gt;2. 从旧类的 Set 移除 key&lt;br&gt;3. 若旧类无其它 key，取出其缓存项&lt;br&gt;4. 失效旧 token 或写入新弱 token&lt;br&gt;5. 写入新 Box、类映射、实例与 priority&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="375" y="450" width="500" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-lock-outside" value="解锁后&lt;br&gt;clear 被替换的 ZDMServiceItem&lt;br&gt;&lt;font style=&quot;font-size:13px&quot;&gt;避免 zdm_willDispose 回调重入 mediator.lock&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="940" y="455" width="260" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-update-proxy" value="更新广播目标&lt;br&gt;allRegisterClasses → ZDMBroadcastProxy" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="1230" y="420" width="250" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-dealloc" value="旧弱实例 dealloc&lt;br&gt;zdm_onDealloc 回调携带注册时 token" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;fontStyle=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="90" y="700" width="280" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-token-check" value="currentToken == expectedToken？" style="rhombus;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="470" y="690" width="170" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-ignore" value="不处理&lt;br&gt;&lt;font style=&quot;font-size:13px&quot;&gt;旧回调已过期，替换注册保留&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="740" y="690" width="235" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-remove" value="移除当前服务&lt;br&gt;&lt;font style=&quot;font-size:13px&quot;&gt;删除 priority、token、Box 与类反向索引&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="460" y="860" width="270" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-last-key" value="该类仍有其它 service key？" style="rhombus;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="825" y="845" width="180" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-keep-instance" value="保留共享实例&lt;br&gt;&lt;font style=&quot;font-size:13px&quot;&gt;该类仍服务于其它协议 / 优先级&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="1090" y="810" width="260" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-clear-instance" value="移除 instanceDict 项&lt;br&gt;解锁后 clear ZDMServiceItem" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="1090" y="930" width="260" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-edge-register" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;" parent="1" source="lifecycle-register-source" target="lifecycle-replace" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-edge-class" value="token = nil" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;fontSize=13;" parent="1" source="lifecycle-class-source" target="lifecycle-replace" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-edge-registerinfo" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;" parent="1" source="lifecycle-replace" target="lifecycle-register-info" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-edge-classmap" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;" parent="1" source="lifecycle-replace" target="lifecycle-class-map" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-edge-instance" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;" parent="1" source="lifecycle-replace" target="lifecycle-instance-map" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-edge-token" value="当前弱注册写入新 token" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;fontSize=12;" parent="1" source="lifecycle-replace" target="lifecycle-token-map" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-edge-priority" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;" parent="1" source="lifecycle-replace" target="lifecycle-priority-map" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-edge-clear" value="仅旧类最后一个 key 被移除" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;fontSize=12;" parent="1" source="lifecycle-replace" target="lifecycle-lock-outside" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-edge-proxy" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;" parent="1" source="lifecycle-replace" target="lifecycle-update-proxy" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-edge-dealloc" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;" parent="1" source="lifecycle-dealloc" target="lifecycle-token-check" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-edge-no" value="否" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;fontSize=14;" parent="1" source="lifecycle-token-check" target="lifecycle-ignore" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-edge-yes" value="是" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;fontSize=14;" parent="1" source="lifecycle-token-check" target="lifecycle-remove" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-edge-last" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;" parent="1" source="lifecycle-remove" target="lifecycle-last-key" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-edge-more" value="是" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;fontSize=14;" parent="1" source="lifecycle-last-key" target="lifecycle-keep-instance" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lifecycle-edge-final" value="否" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;fontSize=14;" parent="1" source="lifecycle-last-key" target="lifecycle-clear-instance" edge="1">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
