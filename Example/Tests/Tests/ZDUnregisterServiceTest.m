@@ -105,8 +105,7 @@
 - (void)testReplacingServiceKeyWithDifferentClassRemovesOldBroadcastTarget {
 #if DEBUG
     XCTSkip(@"同优先级不同类覆盖仅在 Release 配置下允许");
-    return;
-#endif
+#else
     NSInteger priority = 987660;
     ZDOldService *oldService = [ZDOldService new];
     [ZDMOneForAll manualRegisterService:@protocol(ZDServiceReplacementProtocol)
@@ -127,6 +126,7 @@
     [ZDMOneForAll removeService:@protocol(ZDServiceReplacementProtocol)
                        priority:priority
                   autoInitAgain:NO];
+#endif
 }
 
 - (void)testWeakStoreSameObjectMultipleProtocolsCleansEachService {
@@ -188,6 +188,31 @@
     XCTAssertNil([ZDMOneForAll serviceWithName:NSStringFromProtocol(@protocol(AnimalProtocol))
                                       priority:priority
                                  onlyFromCache:YES]);
+}
+
+- (void)testWeakStoreOldInstanceDoesNotRemoveClassReplacement {
+#if DEBUG
+    XCTSkip(@"同优先级不同类覆盖仅在 Release 配置下允许");
+#else
+    NSInteger priority = 987661;
+    ZDOldService *oldService = [ZDOldService new];
+    [ZDMOneForAll manualRegisterService:@protocol(ZDServiceReplacementProtocol)
+                               priority:priority
+                            implementer:oldService
+                              weakStore:YES];
+
+    [ZDMOneForAll registerService:@protocol(ZDServiceReplacementProtocol)
+                         priority:priority
+                   implementClass:ZDNewService.class];
+
+    // 旧弱实例释放后，新类注册仍必须保留，不能被过期 token 注销。
+    oldService = nil;
+    XCTAssertTrue([[ZDMOneForAll allRegisterClasses] containsObject:ZDNewService.class]);
+
+    [ZDMOneForAll removeService:@protocol(ZDServiceReplacementProtocol)
+                       priority:priority
+                  autoInitAgain:NO];
+#endif
 }
 
 - (void)testConcurrentWeakRegistrationsKeepCurrentServiceAfterStaleRelease {

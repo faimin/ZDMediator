@@ -24,7 +24,12 @@ NS_INLINE NSString *zdmStoreKey(NSString *serviceName, NSNumber *priority) {
     return [NSString stringWithFormat:@"%@%@%@", serviceName, zdmJoinKey, priority];
 }
 
-/// 调用方必须持有 mediator.lock；仅当旧类不再注册任何服务时才移除其共享实例。
+/// 移除被覆盖 service key 在旧类中的反向索引。
+///
+/// registerClassDict 按类聚合全部 service key；旧类仍有其它 key 时必须保留共享实例。
+/// 仅当最后一个 key 被移除，才从 instanceDict 取出缓存项并交由调用方在锁外 clear，
+/// 避免 zdm_willDispose 回调重入 mediator.lock。
+/// 调用方必须持有 mediator.lock。
 NS_INLINE ZDMServiceItem *zdmRemoveServiceKeyFromClass(
     ZDMOneForAll *mediator,
     NSString *key,
@@ -174,11 +179,14 @@ NS_INLINE ZDMServiceItem *zdmRemoveServiceKeyFromClass(
 #endif
                 [orderSet addObject:priorityNum];
                 
-                // 自动注册信息覆盖旧项前，先解除旧类的映射，防止广播到旧实例。
+                // 在同一临界区原子完成覆盖：先解除旧类映射，再失效旧弱注册 token，最后发布新 box。
+                // token 仅代表产生它的弱手动注册；若保留，旧对象析构时会误以为自己仍是当前服务并注销新类。
                 ZDMServiceBox *previousBox = storeMap[protocolPriorityKey];
                 if (previousBox.cls && previousBox.cls != serviceBox.cls) {
                     replacedItem = zdmRemoveServiceKeyFromClass(mediator, protocolPriorityKey, previousBox.cls);
                 }
+                // Mach-O 类注册不拥有弱注册 token，因此接管 key 时需要无条件使历史 token 失效。
+                mediator.registrationTokenDict[protocolPriorityKey] = nil;
                 // storeMap中有可能已经存在serviceBox了，不过用自动注册信息覆盖。
                 storeMap[protocolPriorityKey] = serviceBox;
                 
@@ -883,6 +891,8 @@ NS_INLINE ZDMServiceItem *zdmRemoveServiceKeyFromClass(
     if (previousBox.cls && previousBox.cls != box.cls) {
         replacedItem = zdmRemoveServiceKeyFromClass(mediator, key, previousBox.cls);
     }
+    // 普通类注册同样不拥有弱注册 token，清空后旧析构回调会因 token 不匹配提前返回。
+    mediator.registrationTokenDict[key] = nil;
     mediator.registerInfoDict[key] = box;
     NSString *clsName = NSStringFromClass(box.cls);
     if (clsName) {
